@@ -1,0 +1,117 @@
+[gd_scene load_steps=2 format=3 uid="uid://quick_bar_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/quick_bar.gd" id="1_script"]
+
+[node name="QuickBarLayer" type="CanvasLayer"]
+layer = 3
+
+[node name="QuickBar" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="BarAnchor" type="Control" parent="QuickBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -60.0
+offset_top = -18.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="BarBg" type="ColorRect" parent="QuickBar/BarAnchor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.11, 0.9)
+
+[node name="ToggleButton" type="Button" parent="QuickBar/BarAnchor"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 1.0
+offset_right = -2.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "≡"
+
+[node name="ExpandedRow" type="HBoxContainer" parent="QuickBar/BarAnchor"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 2
+theme_override_constants/separation = 2
+
+[node name="BackpackButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "背包"
+
+[node name="SquadButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "编队"
+
+[node name="SkillButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "技能"
+
+[node name="CultivationButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "养成"
+
+[node name="WonderlandButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "奇境"
+
+[node name="StageButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "关卡"
+
+[node name="CollapseButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(24, 22)
+theme_override_font_sizes/font_size = 9
+text = "‹"

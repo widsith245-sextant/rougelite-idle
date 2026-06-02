@@ -1,0 +1,19 @@
+{
+  "charge_strike": { "name": "冲锋斩", "flavor": "冲向敌阵！" },
+  "charge2_strike": { "name": "冲锋二段", "flavor": "深入敌阵！" },
+  "shield_bash": { "name": "盾击", "flavor": "震退目标" },
+  "hold_the_line": { "name": "坚守", "flavor": "前排不动如山" },
+  "basic_shot": { "name": "精准射击", "flavor": "锁定弱点" },
+  "piercing_round": { "name": "穿甲弹", "flavor": "贯穿护甲" },
+  "crossfire": { "name": "交叉火力", "flavor": "火力覆盖" },
+  "point_blank": { "name": "贴脸射击", "flavor": "近距爆发" },
+  "backslide": { "name": "后滑步", "flavor": "拉开距离" },
+  "entry_burst": { "name": "入场爆发", "flavor": "突进后爆发" },
+  "healing_pulse": { "name": "治疗脉冲", "flavor": "恢复友军" },
+  "sanctuary": { "name": "庇护", "flavor": "后撤并护佑" },
+  "regen_aura": { "name": "再生光环", "flavor": "持续恢复" },
+  "frenzy_slash": { "name": "狂乱斩", "flavor": "冲锋连斩" },
+  "blood_rush": { "name": "血涌", "flavor": "以血换力" },
+  "rage_stack": { "name": "怒意叠加", "flavor": "越战越勇" },
+  "enemy_strike": { "name": "木桩打击", "flavor": "" }
+}

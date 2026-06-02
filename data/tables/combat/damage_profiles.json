@@ -1,0 +1,16 @@
+{
+  "profiles": [
+    {
+      "id": "physical",
+      "defenseStat": "Defense",
+      "critAllowed": true,
+      "damageScale": 1.0
+    },
+    {
+      "id": "magical",
+      "defenseStat": "Defense",
+      "critAllowed": true,
+      "damageScale": 0.9
+    }
+  ]
+}

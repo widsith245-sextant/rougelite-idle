@@ -1,0 +1,71 @@
+[gd_scene load_steps=2 format=3 uid="uid://skill_cast_overlay_scene"]
+
+[ext_resource type="Script" path="res://gdscript/combat/skill_cast_overlay.gd" id="1_script"]
+
+[node name="SkillCastOverlay" type="CanvasLayer"]
+layer = 4
+script = ExtResource("1_script")
+
+[node name="OverlayRoot" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PortraitFrame" type="PanelContainer" parent="OverlayRoot"]
+offset_left = 4.0
+offset_top = 8.0
+offset_right = 60.0
+offset_bottom = 72.0
+mouse_filter = 2
+
+[node name="PortraitVBox" type="VBoxContainer" parent="OverlayRoot/PortraitFrame"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="UnitLabel" type="Label" parent="OverlayRoot/PortraitFrame/PortraitVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "单位"
+horizontal_alignment = 1
+
+[node name="PortraitHost" type="Control" parent="OverlayRoot/PortraitFrame/PortraitVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(52, 56)
+layout_mode = 2
+
+[node name="ToastPanel" type="PanelContainer" parent="OverlayRoot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 2.0
+offset_right = 80.0
+offset_bottom = 34.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="ToastVBox" type="VBoxContainer" parent="OverlayRoot/ToastPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="SkillLabel" type="Label" parent="OverlayRoot/ToastPanel/ToastVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "技能名"
+horizontal_alignment = 1
+
+[node name="FlavorLabel" type="Label" parent="OverlayRoot/ToastPanel/ToastVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = ""
+horizontal_alignment = 1

@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "id": "db_squad_2",
+      "displayName": "编组+1",
+      "costGold": 80,
+      "prerequisites": [],
+      "effects": [{ "type": "SquadSlot", "value": 2 }]
+    },
+    {
+      "id": "db_squad_3",
+      "displayName": "编组+1",
+      "costGold": 200,
+      "prerequisites": ["db_squad_2"],
+      "effects": [{ "type": "SquadSlot", "value": 3 }]
+    },
+    {
+      "id": "db_active_slot_2",
+      "displayName": "主动技能槽+1",
+      "costGold": 120,
+      "prerequisites": [],
+      "effects": [{ "type": "ActiveSkillSlot", "value": 2 }]
+    },
+    {
+      "id": "db_passive_unlock",
+      "displayName": "被动槽解锁",
+      "costGold": 150,
+      "prerequisites": ["db_active_slot_2"],
+      "effects": [{ "type": "PassiveSlot", "value": 1 }]
+    },
+    {
+      "id": "db_stat_hp",
+      "displayName": "生命+5%",
+      "costGold": 60,
+      "prerequisites": [],
+      "effects": [{ "type": "GlobalStat", "stat": "MaxHp", "percent": 5 }]
+    },
+    {
+      "id": "db_roster_sniper",
+      "displayName": "解锁狙击手",
+      "costGold": 100,
+      "prerequisites": ["db_squad_2"],
+      "effects": [{ "type": "RosterUnlock", "rosterId": "sniper_b" }]
+    },
+    {
+      "id": "db_roster_mage",
+      "displayName": "解锁大法师",
+      "costGold": 100,
+      "prerequisites": ["db_squad_2"],
+      "effects": [{ "type": "RosterUnlock", "rosterId": "mage_c" }]
+    },
+    {
+      "id": "db_roster_support",
+      "displayName": "解锁支援医师",
+      "costGold": 120,
+      "prerequisites": ["db_squad_2"],
+      "effects": [{ "type": "RosterUnlock", "rosterId": "support_d" }]
+    },
+    {
+      "id": "db_roster_berserker",
+      "displayName": "解锁狂战士",
+      "costGold": 120,
+      "prerequisites": ["db_squad_2"],
+      "effects": [{ "type": "RosterUnlock", "rosterId": "berserker_e" }]
+    }
+  ]
+}

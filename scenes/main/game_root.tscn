@@ -1,0 +1,49 @@
+[gd_scene load_steps=12 format=3 uid="uid://game_root_scene"]
+
+[ext_resource type="PackedScene" uid="uid://background_layer_scene" path="res://scenes/layers/background_layer.tscn" id="1_bg"]
+[ext_resource type="PackedScene" uid="uid://combat_stage_layer_scene" path="res://scenes/layers/combat_stage.tscn" id="2_combat"]
+[ext_resource type="PackedScene" uid="uid://hud_layer_scene" path="res://scenes/layers/hud_layer.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://skill_cast_overlay_scene" path="res://scenes/layers/skill_cast_overlay.tscn" id="3c_skillcast"]
+[ext_resource type="PackedScene" uid="uid://chest_bubble_hud_scene" path="res://scenes/layers/chest_bubble_hud.tscn" id="3d_chest"]
+[ext_resource type="PackedScene" uid="uid://stage_progress_bar_scene" path="res://scenes/layers/stage_progress_bar.tscn" id="3e_progress"]
+[ext_resource type="PackedScene" uid="uid://chest_reveal_overlay_scene" path="res://scenes/layers/chest_reveal_overlay.tscn" id="3f_reveal"]
+[ext_resource type="PackedScene" uid="uid://portrait_overlay_scene" path="res://scenes/layers/portrait_overlay.tscn" id="3g_portrait"]
+[ext_resource type="PackedScene" uid="uid://quick_bar_scene" path="res://scenes/layers/quick_bar.tscn" id="4_quickbar"]
+[ext_resource type="Script" path="res://gdscript/ui/popup_manager.gd" id="5_popup_mgr"]
+[ext_resource type="Script" path="res://gdscript/main/window_chrome.gd" id="6_window_chrome"]
+
+[node name="GameRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+custom_minimum_size = Vector2(400, 150)
+
+[node name="WindowChrome" type="Node" parent="."]
+script = ExtResource("6_window_chrome")
+
+[node name="BackgroundLayer" parent="." instance=ExtResource("1_bg")]
+
+[node name="CombatStageLayer" parent="." instance=ExtResource("2_combat")]
+
+[node name="HudLayer" parent="." instance=ExtResource("3_hud")]
+
+[node name="ChestBubbleHud" parent="." instance=ExtResource("3d_chest")]
+
+[node name="SkillCastOverlay" parent="." instance=ExtResource("3c_skillcast")]
+
+[node name="ChestRevealOverlay" parent="." instance=ExtResource("3f_reveal")]
+
+[node name="PortraitOverlay" parent="." instance=ExtResource("3g_portrait")]
+
+[node name="StageProgressLayer" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="StageProgressBar" parent="StageProgressLayer" instance=ExtResource("3e_progress")]
+
+[node name="QuickBarLayer" parent="." instance=ExtResource("4_quickbar")]
+
+[node name="PopupManager" type="Node" parent="."]
+script = ExtResource("5_popup_mgr")

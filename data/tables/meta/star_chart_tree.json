@@ -1,0 +1,25 @@
+{
+  "nodes": [
+    {
+      "id": "sc_hp_1",
+      "displayName": "星图·生命",
+      "costStarPoints": 5,
+      "prerequisites": [],
+      "statBonusPercent": 2
+    },
+    {
+      "id": "sc_dmg_1",
+      "displayName": "星图·攻击",
+      "costStarPoints": 5,
+      "prerequisites": [],
+      "statBonusPercent": 2
+    },
+    {
+      "id": "sc_hp_2",
+      "displayName": "星图·生命II",
+      "costStarPoints": 10,
+      "prerequisites": ["sc_hp_1"],
+      "statBonusPercent": 3
+    }
+  ]
+}

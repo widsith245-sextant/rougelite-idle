@@ -1,0 +1,28 @@
+[gd_scene load_steps=7 format=3 uid="uid://range_test_battle"]
+
+[ext_resource type="PackedScene" uid="uid://background_layer_scene" path="res://scenes/layers/background_layer.tscn" id="1_bg"]
+[ext_resource type="PackedScene" uid="uid://combat_stage_layer_scene" path="res://scenes/layers/combat_stage.tscn" id="2_combat"]
+[ext_resource type="PackedScene" uid="uid://hud_layer_scene" path="res://scenes/layers/hud_layer.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://quick_stats_panel_scene" path="res://scenes/layers/quick_stats_panel.tscn" id="4_qstats"]
+[ext_resource type="Script" path="res://gdscript/test/range_test_battle.gd" id="5_test"]
+
+[node name="RangeTestBattle" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+custom_minimum_size = Vector2(400, 150)
+script = ExtResource("5_test")
+
+[node name="BackgroundLayer" parent="." instance=ExtResource("1_bg")]
+
+[node name="CombatStageLayer" parent="." instance=ExtResource("2_combat")]
+
+[node name="HudLayer" parent="." instance=ExtResource("3_hud")]
+
+[node name="QuickStatsLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="QuickStatsPanel" parent="QuickStatsLayer" instance=ExtResource("4_qstats")]

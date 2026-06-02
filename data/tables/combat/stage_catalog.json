@@ -1,0 +1,19 @@
+{
+  "chapters": [
+    {
+      "chapterId": "chapter_01",
+      "levels": [
+        { "stageId": "chapter_01_level_01", "recommendedLevel": 1, "unlockFrom": "", "path": "res://data/tables/combat/stages/chapter_01/level_01.json" },
+        { "stageId": "chapter_01_level_02", "recommendedLevel": 2, "unlockFrom": "chapter_01_level_01", "path": "res://data/tables/combat/stages/chapter_01/level_02.json" },
+        { "stageId": "chapter_01_level_03", "recommendedLevel": 3, "unlockFrom": "chapter_01_level_02", "path": "res://data/tables/combat/stages/chapter_01/level_03.json" },
+        { "stageId": "chapter_01_level_04", "recommendedLevel": 4, "unlockFrom": "chapter_01_level_03", "path": "res://data/tables/combat/stages/chapter_01/level_04.json" },
+        { "stageId": "chapter_01_level_05", "recommendedLevel": 5, "unlockFrom": "chapter_01_level_04", "path": "res://data/tables/combat/stages/chapter_01/level_05.json" },
+        { "stageId": "chapter_01_level_06", "recommendedLevel": 6, "unlockFrom": "chapter_01_level_05", "path": "res://data/tables/combat/stages/chapter_01/level_06.json" },
+        { "stageId": "chapter_01_level_07", "recommendedLevel": 7, "unlockFrom": "chapter_01_level_06", "path": "res://data/tables/combat/stages/chapter_01/level_07.json" },
+        { "stageId": "chapter_01_level_08", "recommendedLevel": 8, "unlockFrom": "chapter_01_level_07", "path": "res://data/tables/combat/stages/chapter_01/level_08.json" },
+        { "stageId": "chapter_01_level_09", "recommendedLevel": 9, "unlockFrom": "chapter_01_level_08", "path": "res://data/tables/combat/stages/chapter_01/level_09.json" },
+        { "stageId": "chapter_01_level_10", "recommendedLevel": 10, "unlockFrom": "chapter_01_level_09", "path": "res://data/tables/combat/stages/chapter_01/level_10.json" }
+      ]
+    }
+  ]
+}

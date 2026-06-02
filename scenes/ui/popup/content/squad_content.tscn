@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3 uid="uid://squad_content_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/squad_content.gd" id="1_script"]
+
+[node name="SquadContent" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="Header" type="Label" parent="MainVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "出战位（点击槽位后选候选角色指派）"
+
+[node name="SlotRow" type="HBoxContainer" parent="MainVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="BodyHBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="LeftColumn" type="VBoxContainer" parent="MainVBox/BodyHBox"]
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+
+[node name="DollHost" type="Control" parent="MainVBox/BodyHBox/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+
+[node name="RightColumn" type="VBoxContainer" parent="MainVBox/BodyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="StatsLabel" type="Label" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "属性摘要"
+
+[node name="RosterTabBar" type="TabBar" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+tab_count = 2
+tab_0/title = "可入队"
+tab_1/title = "未解锁"
+
+[node name="BenchGrid" type="GridContainer" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 8
+
+[node name="FooterHBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FooterLabel" type="Label" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "编组 1/1"
+
+[node name="ApplyButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "应用到战斗"

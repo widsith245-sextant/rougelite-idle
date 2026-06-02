@@ -1,0 +1,173 @@
+{
+  "trees": [
+    {
+      "rosterId": "vanguard_a",
+      "nodes": [
+        {
+          "id": "va_charge",
+          "displayName": "冲锋斩",
+          "nodeType": "active",
+          "skillId": "charge_strike",
+          "prerequisites": [],
+          "requiredLevel": 1,
+          "cost": 0
+        },
+        {
+          "id": "va_shield",
+          "displayName": "盾击",
+          "nodeType": "active",
+          "skillId": "shield_bash",
+          "prerequisites": ["va_charge"],
+          "requiredLevel": 5,
+          "cost": 0
+        },
+        {
+          "id": "va_hold",
+          "displayName": "坚守",
+          "nodeType": "passive",
+          "skillId": "hold_the_line",
+          "prerequisites": ["va_charge"],
+          "requiredLevel": 10,
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "rosterId": "sniper_b",
+      "nodes": [
+        {
+          "id": "sb_shot",
+          "displayName": "普通射击",
+          "nodeType": "active",
+          "skillId": "basic_shot",
+          "prerequisites": [],
+          "requiredLevel": 1,
+          "cost": 0
+        },
+        {
+          "id": "sb_pierce",
+          "displayName": "穿甲弹",
+          "nodeType": "active",
+          "skillId": "piercing_round",
+          "prerequisites": ["sb_shot"],
+          "requiredLevel": 5,
+          "cost": 0
+        },
+        {
+          "id": "sb_cross",
+          "displayName": "交叉火力",
+          "nodeType": "passive",
+          "skillId": "crossfire",
+          "prerequisites": ["sb_shot"],
+          "requiredLevel": 10,
+          "cost": 0
+        },
+        {
+          "id": "sb_blank",
+          "displayName": "贴脸射击",
+          "nodeType": "passive",
+          "skillId": "point_blank",
+          "prerequisites": ["sb_pierce"],
+          "requiredLevel": 15,
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "rosterId": "mage_c",
+      "nodes": [
+        {
+          "id": "mc_charge",
+          "displayName": "魔导冲锋",
+          "nodeType": "active",
+          "skillId": "charge2_strike",
+          "prerequisites": [],
+          "requiredLevel": 1,
+          "cost": 0
+        },
+        {
+          "id": "mc_back",
+          "displayName": "后撤步",
+          "nodeType": "active",
+          "skillId": "backslide",
+          "prerequisites": ["mc_charge"],
+          "requiredLevel": 5,
+          "cost": 0
+        },
+        {
+          "id": "mc_burst",
+          "displayName": "入场爆发",
+          "nodeType": "passive",
+          "skillId": "entry_burst",
+          "prerequisites": ["mc_charge"],
+          "requiredLevel": 10,
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "rosterId": "support_d",
+      "nodes": [
+        {
+          "id": "sd_pulse",
+          "displayName": "治疗脉冲",
+          "nodeType": "active",
+          "skillId": "healing_pulse",
+          "prerequisites": [],
+          "requiredLevel": 1,
+          "cost": 0
+        },
+        {
+          "id": "sd_sanctuary",
+          "displayName": "庇护",
+          "nodeType": "active",
+          "skillId": "sanctuary",
+          "prerequisites": ["sd_pulse"],
+          "requiredLevel": 5,
+          "cost": 0
+        },
+        {
+          "id": "sd_regen",
+          "displayName": "再生光环",
+          "nodeType": "passive",
+          "skillId": "regen_aura",
+          "prerequisites": ["sd_pulse"],
+          "requiredLevel": 10,
+          "cost": 0
+        }
+      ]
+    },
+    {
+      "rosterId": "berserker_e",
+      "nodes": [
+        {
+          "id": "be_frenzy",
+          "displayName": "狂乱斩",
+          "nodeType": "active",
+          "skillId": "frenzy_slash",
+          "prerequisites": [],
+          "requiredLevel": 1,
+          "cost": 0
+        },
+        {
+          "id": "be_rush",
+          "displayName": "血涌",
+          "nodeType": "active",
+          "skillId": "blood_rush",
+          "prerequisites": ["be_frenzy"],
+          "requiredLevel": 5,
+          "cost": 0
+        },
+        {
+          "id": "be_rage",
+          "displayName": "怒意叠加",
+          "nodeType": "passive",
+          "skillId": "rage_stack",
+          "prerequisites": ["be_frenzy"],
+          "requiredLevel": 10,
+          "cost": 0
+        }
+      ]
+    }
+  ]
+}

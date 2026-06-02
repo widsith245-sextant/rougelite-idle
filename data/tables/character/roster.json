@@ -1,0 +1,38 @@
+{
+  "roster": [
+    {
+      "rosterId": "vanguard_a",
+      "classId": "Vanguard_01",
+      "displayName": "先锋剑士",
+      "defaultSlot": 0
+    },
+    {
+      "rosterId": "sniper_b",
+      "classId": "Sniper_01",
+      "displayName": "狙击手",
+      "defaultSlot": -1,
+      "unlockDbNodeId": "db_roster_sniper"
+    },
+    {
+      "rosterId": "mage_c",
+      "classId": "Mage_01",
+      "displayName": "大法师",
+      "defaultSlot": -1,
+      "unlockDbNodeId": "db_roster_mage"
+    },
+    {
+      "rosterId": "support_d",
+      "classId": "Support_01",
+      "displayName": "支援医师",
+      "defaultSlot": -1,
+      "unlockDbNodeId": "db_roster_support"
+    },
+    {
+      "rosterId": "berserker_e",
+      "classId": "Berserker_01",
+      "displayName": "狂战士",
+      "defaultSlot": -1,
+      "unlockDbNodeId": "db_roster_berserker"
+    }
+  ]
+}

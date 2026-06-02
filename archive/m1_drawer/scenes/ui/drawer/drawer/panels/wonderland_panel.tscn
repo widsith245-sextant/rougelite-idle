@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://wonderland_panel_scene"]
+
+[ext_resource type="PackedScene" uid="uid://drawer_panel_base_scene" path="res://scenes/ui/drawer/drawer_panel_base.tscn" id="1_base"]
+
+[node name="WonderlandPanel" instance=ExtResource("1_base")]
+panel_title = "奇境"
+
+[node name="Hint" type="Label" parent="PanelRoot/Content" index="0"]
+layout_mode = 2
+text = "奇境肉鸽入口（Milestone 1 占位）"

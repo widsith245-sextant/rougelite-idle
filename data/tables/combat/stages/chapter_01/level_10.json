@@ -1,0 +1,17 @@
+{
+  "stageId": "chapter_01_level_10",
+  "stageLevel": 10,
+  "stageLength": 1380,
+  "marchSpeed": 52,
+  "waves": [
+    { "progress": 0.10, "enemyId": "training_boss", "count": 1, "spawnOffsetX": -22, "rewardWeight": 1.9 },
+    { "progress": 0.22, "enemyId": "training_elite", "count": 3, "spawnOffsetX": -14, "rewardWeight": 1.6 },
+    { "progress": 0.34, "enemyId": "training_boss", "count": 1, "spawnOffsetX": -26, "rewardWeight": 2.0 },
+    { "progress": 0.46, "enemyId": "training_dummy", "count": 4, "spawnOffsetX": 0, "rewardWeight": 1.6 },
+    { "progress": 0.58, "enemyId": "training_elite", "count": 3, "spawnOffsetX": -20, "rewardWeight": 1.7 },
+    { "progress": 0.70, "enemyId": "training_boss", "count": 1, "spawnOffsetX": -30, "rewardWeight": 2.1 },
+    { "progress": 0.82, "enemyId": "training_elite", "count": 4, "spawnOffsetX": -28, "rewardWeight": 1.8 },
+    { "progress": 0.94, "enemyId": "training_boss", "count": 2, "spawnOffsetX": -40, "rewardWeight": 2.5 }
+  ],
+  "onStageComplete": { "exp": 128, "gold": 64 }
+}

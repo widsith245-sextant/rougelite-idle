@@ -1,0 +1,13 @@
+{
+  "affixes": [
+    { "affixId": "prefix_atk_01", "poolType": "Weapon_Only", "attributeTarget": "Base_Damage_Percent", "minValue": 0.10, "maxValue": 0.20, "weight": 1000, "slotCondition": null },
+    { "affixId": "suffix_spd_01", "poolType": "Boots_Only", "attributeTarget": "Move_Speed", "minValue": 10, "maxValue": 25, "weight": 500, "slotCondition": "Boots" },
+    { "affixId": "unique_rng_01", "poolType": "Ring_Only", "attributeTarget": "Normal_Attack_Range", "minValue": 15, "maxValue": 40, "weight": 100, "slotCondition": "Trinket" },
+    { "affixId": "primary_atk", "poolType": "General", "attributeTarget": "Damage", "minValue": 8, "maxValue": 14, "weight": 800, "slotCondition": null },
+    { "affixId": "sub_crit", "poolType": "General", "attributeTarget": "Crit_Rate", "minValue": 0.03, "maxValue": 0.08, "weight": 600, "slotCondition": null },
+    { "affixId": "primary_armor", "poolType": "Armor_Only", "attributeTarget": "Defense", "minValue": 0.05, "maxValue": 0.12, "weight": 700, "slotCondition": "Armor" },
+    { "affixId": "sub_hp", "poolType": "General", "attributeTarget": "MaxHp", "minValue": 30, "maxValue": 60, "weight": 650, "slotCondition": null },
+    { "affixId": "primary_speed", "poolType": "Back_Only", "attributeTarget": "Move_Speed", "minValue": 8, "maxValue": 20, "weight": 400, "slotCondition": "BackAccessory" },
+    { "affixId": "suffix_aspd", "poolType": "General", "attributeTarget": "Atk_Speed", "minValue": 0.05, "maxValue": 0.15, "weight": 450, "slotCondition": null }
+  ]
+}

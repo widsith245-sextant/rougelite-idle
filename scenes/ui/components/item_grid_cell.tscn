@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://item_grid_cell_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/item_grid_cell.gd" id="1_script"]
+
+[node name="ItemGridCell" type="PanelContainer"]
+custom_minimum_size = Vector2(64, 64)
+script = ExtResource("1_script")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Icon" type="ColorRect" parent="VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(56, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+color = Color(0.18, 0.2, 0.24, 1)
+
+[node name="NameLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = ""
+horizontal_alignment = 1
+
+[node name="CountLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 8
+text = ""

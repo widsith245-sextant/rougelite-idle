@@ -1,0 +1,55 @@
+{
+  "classes": [
+    {
+      "classId": "Vanguard_01",
+      "actives": [
+        { "id": "charge_strike", "skillMultiplier": 1.0, "moveTags": [{ "kind": "Charge", "distance": 20 }] },
+        { "id": "shield_bash", "skillMultiplier": 0.8, "moveTags": [{ "kind": "Retreat", "distance": 20 }] }
+      ],
+      "passives": [
+        { "id": "hold_the_line", "triggerType": "OnFrontLine", "targetSlot": -1, "skillMultiplier": 0.0 }
+      ]
+    },
+    {
+      "classId": "Sniper_01",
+      "actives": [
+        { "id": "basic_shot", "skillMultiplier": 1.0, "moveTags": [] },
+        { "id": "piercing_round", "skillMultiplier": 1.2, "moveTags": [] }
+      ],
+      "passives": [
+        { "id": "crossfire", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.5 },
+        { "id": "point_blank", "triggerType": "OnPointBlank", "targetSlot": 50, "skillMultiplier": 3.0 }
+      ]
+    },
+    {
+      "classId": "Mage_01",
+      "actives": [
+        { "id": "charge2_strike", "skillMultiplier": 1.0, "moveTags": [{ "kind": "Charge", "distance": 80 }] },
+        { "id": "backslide", "skillMultiplier": 0.6, "moveTags": [{ "kind": "Retreat", "distance": 60 }] }
+      ],
+      "passives": [
+        { "id": "entry_burst", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 2.0 }
+      ]
+    },
+    {
+      "classId": "Support_01",
+      "actives": [
+        { "id": "healing_pulse", "skillMultiplier": 0.5, "moveTags": [] },
+        { "id": "sanctuary", "skillMultiplier": 0.3, "moveTags": [{ "kind": "Retreat", "distance": 30 }] }
+      ],
+      "passives": [
+        { "id": "regen_aura", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.2 }
+      ]
+    },
+    {
+      "classId": "Berserker_01",
+      "actives": [
+        { "id": "frenzy_slash", "skillMultiplier": 1.5, "moveTags": [{ "kind": "Charge", "distance": 30 }] },
+        { "id": "blood_rush", "skillMultiplier": 2.0, "moveTags": [] }
+      ],
+      "passives": [
+        { "id": "rage_stack", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 1.2 }
+      ]
+    }
+  ]
+}

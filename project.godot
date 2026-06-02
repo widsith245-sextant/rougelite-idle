@@ -1,0 +1,58 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Rougelite_Idle"
+run/main_scene="res://scenes/main/game_root.tscn"
+config/features=PackedStringArray("4.6", "C#", "Mobile")
+config/icon="res://icon.svg"
+
+[autoload]
+
+EventBus="*res://Scripts/Core/EventBus.cs"
+GameLogger="*res://Scripts/Core/GameLogger.cs"
+StatsService="*res://Scripts/Stats/StatsService.cs"
+CombatManager="*res://Scripts/Combat/CombatManager.cs"
+LootManager="*res://Scripts/Loot/LootManager.cs"
+MetaManager="*res://Scripts/Meta/MetaManager.cs"
+SaveManager="*res://Scripts/Save/SaveManager.cs"
+OfflineIdleManager="*res://Scripts/Meta/OfflineIdleManager.cs"
+ProgressionManager="*res://Scripts/Meta/ProgressionManager.cs"
+DbManager="*res://Scripts/Meta/DbManager.cs"
+PartyManager="*res://Scripts/Meta/PartyManager.cs"
+RosterProgressionManager="*res://Scripts/Meta/RosterProgressionManager.cs"
+CharacterSkillManager="*res://Scripts/Meta/CharacterSkillManager.cs"
+UiFxGate="*res://gdscript/ui/ui_fx_gate.gd"
+RunSessionManager="*res://Scripts/Run/RunSessionManager.cs"
+SaveBootstrap="*res://Scripts/Save/SaveBootstrap.cs"
+
+[display]
+
+window/size/viewport_width=400
+window/size/viewport_height=150
+window/size/resizable=false
+window/size/borderless=true
+window/size/extend_to_title=true
+window/subwindows/embed_subwindows=false
+window/stretch/mode="canvas_items"
+
+[dotnet]
+
+project/assembly_name="Rougelite_Idle"
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+rendering_device/driver.windows="d3d12"
+renderer/rendering_method="mobile"

@@ -1,0 +1,13 @@
+{
+  "defaultMaxActiveSlots": 1,
+  "defaultMaxActiveSkillSlots": 1,
+  "passiveSlotsUnlocked": false,
+  "playerStatMultipliers": {
+    "MaxHp": 0.72,
+    "BaseAttack": 0.68,
+    "Defense": 0.75,
+    "Speed": 0.9
+  },
+  "playerInitialLevelCap": 10,
+  "bagSlotsVisible": 48
+}

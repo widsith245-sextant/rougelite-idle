@@ -1,0 +1,74 @@
+{
+  "classes": [
+    {
+      "classId": "Vanguard_01",
+      "nameCn": "先锋剑士",
+      "allyUnitId": "ally_a",
+      "baseHp": 300,
+      "hpPerLv": 15,
+      "baseAtk": 40,
+      "atkPerLv": 7.0,
+      "baseRange": 20,
+      "moveSpeed": 240,
+      "baseCrit": 0.05,
+      "hitBoxRadius": 15,
+      "baseAtkSpeed": 2.4
+    },
+    {
+      "classId": "Sniper_01",
+      "nameCn": "狙击手",
+      "allyUnitId": "ally_b",
+      "baseHp": 180,
+      "hpPerLv": 8,
+      "baseAtk": 70,
+      "atkPerLv": 10.0,
+      "baseRange": 250,
+      "moveSpeed": 200,
+      "baseCrit": 0.10,
+      "hitBoxRadius": 10,
+      "baseAtkSpeed": 1.8
+    },
+    {
+      "classId": "Mage_01",
+      "nameCn": "大法师",
+      "allyUnitId": "ally_c",
+      "baseHp": 150,
+      "hpPerLv": 6,
+      "baseAtk": 90,
+      "atkPerLv": 13.0,
+      "baseRange": 180,
+      "moveSpeed": 180,
+      "baseCrit": 0.05,
+      "hitBoxRadius": 12,
+      "baseAtkSpeed": 1.6
+    },
+    {
+      "classId": "Support_01",
+      "nameCn": "支援医师",
+      "allyUnitId": "",
+      "baseHp": 200,
+      "hpPerLv": 10,
+      "baseAtk": 30,
+      "atkPerLv": 4.0,
+      "baseRange": 200,
+      "moveSpeed": 190,
+      "baseCrit": 0.03,
+      "hitBoxRadius": 11,
+      "baseAtkSpeed": 1.4
+    },
+    {
+      "classId": "Berserker_01",
+      "nameCn": "狂战士",
+      "allyUnitId": "",
+      "baseHp": 220,
+      "hpPerLv": 12,
+      "baseAtk": 56,
+      "atkPerLv": 8.0,
+      "baseRange": 40,
+      "moveSpeed": 260,
+      "baseCrit": 0.08,
+      "hitBoxRadius": 14,
+      "baseAtkSpeed": 3.6
+    }
+  ]
+}

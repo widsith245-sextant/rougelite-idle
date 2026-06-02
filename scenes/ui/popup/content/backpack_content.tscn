@@ -1,0 +1,231 @@
+[gd_scene load_steps=3 format=3 uid="uid://backpack_content_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/backpack_content.gd" id="1_script"]
+[ext_resource type="Script" path="res://gdscript/ui/backpack_stats_compare.gd" id="2_stats"]
+
+[node name="BackpackContent" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 4.0
+offset_right = -8.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="UnitRow" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="UnitLabel" type="Label" parent="MainVBox/UnitRow"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "当前查看："
+
+[node name="UnitSelector" type="OptionButton" parent="MainVBox/UnitRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LevelVBox" type="VBoxContainer" parent="MainVBox/UnitRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="LevelLabel" type="Label" parent="MainVBox/UnitRow/LevelVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Lv1"
+
+[node name="ExpBar" type="ProgressBar" parent="MainVBox/UnitRow/LevelVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 10)
+layout_mode = 2
+max_value = 100.0
+show_percentage = false
+
+[node name="ExpLabel" type="Label" parent="MainVBox/UnitRow/LevelVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "0 / 100 EXP"
+
+[node name="BodyHBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="LeftColumn" type="VBoxContainer" parent="MainVBox/BodyHBox"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DollLabel" type="Label" parent="MainVBox/BodyHBox/LeftColumn"]
+layout_mode = 2
+text = "纸娃娃"
+horizontal_alignment = 1
+
+[node name="DollHost" type="Control" parent="MainVBox/BodyHBox/LeftColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+mouse_filter = 0
+
+[node name="SlotGrid" type="GridContainer" parent="MainVBox/BodyHBox/LeftColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 4
+
+[node name="RightColumn" type="VBoxContainer" parent="MainVBox/BodyHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="StatsCompare" type="Control" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+script = ExtResource("2_stats")
+
+[node name="StatsVBox" type="VBoxContainer" parent="MainVBox/BodyHBox/RightColumn/StatsCompare"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="StatGrid" type="GridContainer" parent="MainVBox/BodyHBox/RightColumn/StatsCompare/StatsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 2
+columns = 8
+
+[node name="RangeHint" type="Label" parent="MainVBox/BodyHBox/RightColumn/StatsCompare/StatsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "交战距离"
+autowrap_mode = 3
+
+[node name="ContentTabBar" type="TabBar" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+tab_count = 3
+tab_0/title = "装备"
+tab_1/title = "宝箱"
+tab_2/title = "技能"
+
+[node name="EquipPanel" type="VBoxContainer" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="BagScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/RightColumn/EquipPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 180)
+
+[node name="BagGrid" type="GridContainer" parent="MainVBox/BodyHBox/RightColumn/EquipPanel/BagScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 8
+
+[node name="ChestPanel" type="VBoxContainer" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ChestScroll" type="ScrollContainer" parent="MainVBox/BodyHBox/RightColumn/ChestPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 220)
+
+[node name="ChestGrid" type="GridContainer" parent="MainVBox/BodyHBox/RightColumn/ChestPanel/ChestScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 8
+
+[node name="SkillPanel" type="ScrollContainer" parent="MainVBox/BodyHBox/RightColumn"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 220)
+
+[node name="SkillLines" type="VBoxContainer" parent="MainVBox/BodyHBox/RightColumn/SkillPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="DetailLabel" type="Label" parent="MainVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "选择物品查看详情"
+autowrap_mode = 3
+
+[node name="FooterHBox" type="HBoxContainer" parent="MainVBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="EquipButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "穿上"
+
+[node name="UnequipButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "卸下"
+
+[node name="IdentifyButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "鉴定"
+
+[node name="SalvageButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "分解"
+
+[node name="UnlockButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "解锁"
+
+[node name="InspectButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "检视"
+
+[node name="ProgressLabel" type="Label" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Lv1 | EXP 0/100 | 金0"
+horizontal_alignment = 2

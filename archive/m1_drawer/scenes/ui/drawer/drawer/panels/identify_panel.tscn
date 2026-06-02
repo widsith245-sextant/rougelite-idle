@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://identify_panel_scene"]
+
+[ext_resource type="PackedScene" uid="uid://drawer_panel_base_scene" path="res://scenes/ui/drawer/drawer_panel_base.tscn" id="1_base"]
+[ext_resource type="Script" path="res://gdscript/ui/identify_panel.gd" id="2_script"]
+
+[node name="IdentifyPanel" instance=ExtResource("1_base")]
+script = ExtResource("2_script")
+
+[node name="VBox" type="VBoxContainer" parent="PanelRoot/Content" index="0"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="IdentifyButton" type="Button" parent="PanelRoot/Content/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "一键鉴定"
+
+[node name="ResultLabel" type="Label" parent="PanelRoot/Content/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "点击鉴定测试 mock 装备生成"
+autowrap_mode = 3

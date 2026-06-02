@@ -1,0 +1,20 @@
+{
+  "Level": "等级",
+  "Exp": "经验",
+  "MaxHp": "生命上限",
+  "Dps": "预估秒伤",
+  "Damage": "攻击伤害",
+  "AtkSpeed": "攻击速度",
+  "AtkRange": "普攻范围",
+  "MoveSpeed": "移动速度",
+  "CritRate": "暴击率",
+  "CritDamage": "暴击伤害",
+  "Defense": "护甲",
+  "Cdr": "冷却缩减",
+  "CastSpeed": "施法速度",
+  "SkillArea": "技能范围",
+  "HpRegen": "生命恢复",
+  "LifeOnHit": "击中恢复",
+  "LifeOnKill": "击杀恢复",
+  "LifeLeech": "生命偷取"
+}

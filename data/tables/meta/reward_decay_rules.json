@@ -1,0 +1,8 @@
+{
+  "startPenaltyDiff": 3,
+  "perLevelPenalty": 0.1,
+  "minMultiplier": 0.2,
+  "bonusUnderLevel": 0.05,
+  "maxBonusMultiplier": 1.5,
+  "healOnStageClearPercent": 100
+}

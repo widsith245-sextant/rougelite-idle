@@ -1,0 +1,31 @@
+{
+  "qualities": [
+    {
+      "id": "common",
+      "displayName": "普通宝箱",
+      "color": [0.55, 0.55, 0.6, 1.0],
+      "maxAccumulate": 5,
+      "itemLevelBonus": 0,
+      "bonusAffixCount": 0,
+      "minQualityTier": "common"
+    },
+    {
+      "id": "rare",
+      "displayName": "稀有宝箱",
+      "color": [0.3, 0.55, 0.95, 1.0],
+      "maxAccumulate": 5,
+      "itemLevelBonus": 2,
+      "bonusAffixCount": 1,
+      "minQualityTier": "rare"
+    },
+    {
+      "id": "epic",
+      "displayName": "史诗宝箱",
+      "color": [0.7, 0.35, 0.9, 1.0],
+      "maxAccumulate": 5,
+      "itemLevelBonus": 4,
+      "bonusAffixCount": 2,
+      "minQualityTier": "epic"
+    }
+  ]
+}

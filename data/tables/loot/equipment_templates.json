@@ -1,0 +1,77 @@
+{
+  "items": [
+    {
+      "id": "blade_t1_01",
+      "displayName": "试作军刀",
+      "slot": "Weapon",
+      "itemLevel": 5,
+      "baseStatMin": 12.0,
+      "baseStatMax": 18.0,
+      "effectId": null,
+      "affixes": [
+        {
+          "id": "primary_atk",
+          "displayName": "攻击力",
+          "min": 8.0,
+          "max": 14.0,
+          "defaultValue": 10.0,
+          "isPrimary": true
+        },
+        {
+          "id": "sub_crit",
+          "displayName": "暴击率",
+          "min": 0.03,
+          "max": 0.08,
+          "defaultValue": 0.05,
+          "isPrimary": false
+        }
+      ]
+    },
+    {
+      "id": "wing_t1_01",
+      "displayName": "夜翼披风",
+      "slot": "BackAccessory",
+      "itemLevel": 8,
+      "baseStatMin": 4.0,
+      "baseStatMax": 8.0,
+      "effectId": "001",
+      "affixes": [
+        {
+          "id": "primary_speed",
+          "displayName": "速度",
+          "min": 2.0,
+          "max": 6.0,
+          "defaultValue": 4.0,
+          "isPrimary": true
+        }
+      ]
+    },
+    {
+      "id": "armor_t1_01",
+      "displayName": "巡逻胸甲",
+      "slot": "Armor",
+      "itemLevel": 6,
+      "baseStatMin": 20.0,
+      "baseStatMax": 30.0,
+      "effectId": null,
+      "affixes": [
+        {
+          "id": "primary_armor",
+          "displayName": "护甲",
+          "min": 15.0,
+          "max": 25.0,
+          "defaultValue": 18.0,
+          "isPrimary": true
+        },
+        {
+          "id": "sub_hp",
+          "displayName": "生命",
+          "min": 30.0,
+          "max": 60.0,
+          "defaultValue": 40.0,
+          "isPrimary": false
+        }
+      ]
+    }
+  ]
+}

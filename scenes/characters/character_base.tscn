@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://character_base_scene"]
+
+[ext_resource type="Script" path="res://gdscript/characters/character_base.gd" id="1_script"]
+[ext_resource type="Script" path="res://gdscript/characters/ecchi_damaged_state.gd" id="2_ecchi"]
+[ext_resource type="Script" path="res://gdscript/characters/hit_flash_controller.gd" id="3_hit"]
+[ext_resource type="Script" path="res://gdscript/stats/stats_component.gd" id="4_stats"]
+
+[node name="CharacterBase" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Shadow" type="Sprite2D" parent="."]
+modulate = Color(0, 0, 0, 0.35)
+position = Vector2(0, 4)
+
+[node name="Back_Accessory" type="Sprite2D" parent="."]
+
+[node name="Body_Base" type="Sprite2D" parent="."]
+
+[node name="Outfit" type="Sprite2D" parent="."]
+
+[node name="Head_Accessory" type="Sprite2D" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+
+[node name="EcchiDamagedState" type="Node" parent="."]
+script = ExtResource("2_ecchi")
+
+[node name="HitFlashController" type="Node" parent="."]
+script = ExtResource("3_hit")
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("4_stats")

@@ -1,0 +1,116 @@
+[gd_scene load_steps=2 format=3 uid="uid://combat_debug_panel_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/combat_debug_panel.gd" id="1_script"]
+
+[node name="DebugLayer" type="CanvasLayer"]
+layer = 4
+
+[node name="DebugPanel" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 2.0
+offset_top = 6.0
+offset_right = 202.0
+offset_bottom = 118.0
+script = ExtResource("1_script")
+
+[node name="PanelBg" type="ColorRect" parent="DebugPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.55)
+
+[node name="VBox" type="VBoxContainer" parent="DebugPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 2
+
+[node name="Header" type="HBoxContainer" parent="DebugPanel/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="DebugPanel/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 8
+text = "战斗调试"
+
+[node name="BtnToggle" type="Button" parent="DebugPanel/VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(20, 14)
+theme_override_font_sizes/font_size = 8
+text = "▼"
+
+[node name="Body" type="VBoxContainer" parent="DebugPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BtnRow1" type="HBoxContainer" parent="DebugPanel/VBox/Body"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BtnRefresh" type="Button" parent="DebugPanel/VBox/Body/BtnRow1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "刷新"
+
+[node name="BtnRestart" type="Button" parent="DebugPanel/VBox/Body/BtnRow1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "重启"
+
+[node name="BtnFillGauge" type="Button" parent="DebugPanel/VBox/Body/BtnRow1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "满条"
+
+[node name="BtnFast" type="Button" parent="DebugPanel/VBox/Body/BtnRow1"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "快速:关"
+
+[node name="BtnRow2" type="HBoxContainer" parent="DebugPanel/VBox/Body"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="BtnForceA" type="Button" parent="DebugPanel/VBox/Body/BtnRow2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "强A"
+
+[node name="BtnForceB" type="Button" parent="DebugPanel/VBox/Body/BtnRow2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "强B"
+
+[node name="BtnForceC" type="Button" parent="DebugPanel/VBox/Body/BtnRow2"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 7
+text = "强C"
+
+[node name="LogLabel" type="Label" parent="DebugPanel/VBox/Body"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 7
+text = "..."
+autowrap_mode = 3

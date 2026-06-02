@@ -1,0 +1,7 @@
+{
+  "startingChests": [
+    { "id": "chest_01", "displayName": "盲盒宝箱" },
+    { "id": "chest_02", "displayName": "盲盒宝箱" },
+    { "id": "chest_03", "displayName": "盲盒宝箱" }
+  ]
+}

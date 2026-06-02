@@ -1,0 +1,7 @@
+{
+  "maxTeamLevel": 99,
+  "expBase": 100,
+  "expExponent": 1.35,
+  "perLevelMaxHpPercent": 0.02,
+  "perLevelDamagePercent": 0.015
+}

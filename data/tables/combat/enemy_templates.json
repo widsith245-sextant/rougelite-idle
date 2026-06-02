@@ -1,0 +1,119 @@
+{
+  "enemies": [
+    {
+      "id": "training_dummy",
+      "displayName": "训练木桩",
+      "archetype": "trash",
+      "tags": ["training", "melee"],
+      "level": 1,
+      "maxHp": 200,
+      "speed": 12,
+      "baseAttack": 12,
+      "atkSpeed": 2.4,
+      "atkRange": 20,
+      "moveSpeed": 240,
+      "hitBoxRadius": 12,
+      "rewardTier": 1,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 1.0,
+        "moveTags": []
+      }
+    },
+    {
+      "id": "training_elite",
+      "displayName": "精英木桩",
+      "archetype": "elite",
+      "tags": ["training", "melee"],
+      "level": 4,
+      "maxHp": 450,
+      "speed": 16,
+      "baseAttack": 24,
+      "atkSpeed": 2.0,
+      "atkRange": 24,
+      "moveSpeed": 200,
+      "hitBoxRadius": 14,
+      "rewardTier": 3,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [{ "id": "armor_break", "chance": 0.15 }],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 1.2,
+        "moveTags": []
+      }
+    },
+    {
+      "id": "training_boss",
+      "displayName": "教官幻像",
+      "archetype": "boss",
+      "tags": ["training", "boss"],
+      "level": 8,
+      "maxHp": 900,
+      "speed": 20,
+      "baseAttack": 40,
+      "atkSpeed": 1.8,
+      "atkRange": 28,
+      "moveSpeed": 220,
+      "hitBoxRadius": 16,
+      "rewardTier": 5,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [{ "id": "bleed_light", "chance": 0.25 }],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 1.5,
+        "moveTags": [{ "kind": "Charge", "distance": 16 }]
+      }
+    },
+    {
+      "id": "goblin_scout",
+      "displayName": "哥布林斥候",
+      "archetype": "trash",
+      "tags": ["goblin", "melee"],
+      "level": 2,
+      "maxHp": 280,
+      "speed": 14,
+      "baseAttack": 14,
+      "atkSpeed": 2.6,
+      "atkRange": 18,
+      "moveSpeed": 260,
+      "hitBoxRadius": 10,
+      "rewardTier": 2,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [{ "id": "bleed_light", "chance": 0.2 }],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 0.9,
+        "moveTags": []
+      }
+    },
+    {
+      "id": "orc_brute",
+      "displayName": "兽人蛮兵",
+      "archetype": "elite",
+      "tags": ["orc", "melee"],
+      "level": 5,
+      "maxHp": 620,
+      "speed": 10,
+      "baseAttack": 28,
+      "atkSpeed": 1.6,
+      "atkRange": 22,
+      "moveSpeed": 180,
+      "hitBoxRadius": 16,
+      "rewardTier": 3,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [{ "id": "slow_heavy", "chance": 0.18 }],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 1.3,
+        "moveTags": [{ "kind": "Charge", "distance": 12 }]
+      }
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+[gd_scene load_steps=3 format=3 uid="uid://combat_stage_layer_scene"]
+
+[ext_resource type="Script" path="res://gdscript/combat/combat_stage.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://vfx_manager_scene" path="res://scenes/combat/vfx_manager.tscn" id="2_vfx"]
+
+[node name="CombatStageLayer" type="CanvasLayer"]
+layer = 1
+
+[node name="UnitOverheadLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 2
+
+[node name="CombatStage" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 120.0
+grow_horizontal = 2
+custom_minimum_size = Vector2(400, 120)
+script = ExtResource("1_script")
+
+[node name="StageBg" type="ColorRect" parent="CombatStage"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.14, 0.18, 0.6)
+
+[node name="CombatWorld" type="Node2D" parent="."]
+
+[node name="AllySlots" type="Node2D" parent="CombatWorld"]
+unique_name_in_owner = true
+position = Vector2(40, 90)
+
+[node name="Slot0" type="Node2D" parent="CombatWorld/AllySlots"]
+position = Vector2(12, -20)
+
+[node name="Slot1" type="Node2D" parent="CombatWorld/AllySlots"]
+position = Vector2(44, -20)
+
+[node name="Slot2" type="Node2D" parent="CombatWorld/AllySlots"]
+position = Vector2(76, -20)
+
+[node name="EnemySpawn" type="Node2D" parent="CombatWorld"]
+unique_name_in_owner = true
+position = Vector2(340, 90)
+
+[node name="EnemyBlock" type="Node2D" parent="CombatWorld/EnemySpawn"]
+
+[node name="BattleCamera" type="Camera2D" parent="CombatWorld"]
+unique_name_in_owner = true
+position = Vector2(0, 60)
+enabled = true
+
+[node name="VfxManager" parent="CombatWorld" instance=ExtResource("2_vfx")]
+unique_name_in_owner = true

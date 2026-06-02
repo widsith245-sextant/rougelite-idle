@@ -1,0 +1,11 @@
+{
+  "templates": [
+    { "id": "combat_normal", "type": "combat", "stageId": "chapter_01_level_02", "weight": 5 },
+    { "id": "combat_normal_b", "type": "combat", "stageId": "chapter_01_level_03", "weight": 5 },
+    { "id": "combat_elite", "type": "combat", "stageId": "chapter_01_level_05", "weight": 2 },
+    { "id": "rest", "type": "rest", "healPercent": 30 },
+    { "id": "reward", "type": "reward", "choices": 3, "goldBonus": 25 }
+  ],
+  "bossRoom": { "id": "combat_boss", "type": "combat", "stageId": "chapter_01_level_10" },
+  "runLength": { "min": 5, "max": 8 }
+}

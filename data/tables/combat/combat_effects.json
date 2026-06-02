@@ -1,0 +1,31 @@
+{
+  "effects": [
+    {
+      "id": "bleed_light",
+      "displayName": "流血",
+      "tickInterval": 1.0,
+      "duration": 3.0,
+      "maxStacks": 3,
+      "damagePercentOfSource": 0.1,
+      "statModifier": null
+    },
+    {
+      "id": "slow_heavy",
+      "displayName": "减速",
+      "tickInterval": 0.0,
+      "duration": 4.0,
+      "maxStacks": 1,
+      "damagePercentOfSource": 0.0,
+      "statModifier": { "stat": "MoveSpeed", "flat": 0.0, "percent": -0.2 }
+    },
+    {
+      "id": "armor_break",
+      "displayName": "破甲",
+      "tickInterval": 0.0,
+      "duration": 6.0,
+      "maxStacks": 1,
+      "damagePercentOfSource": 0.0,
+      "statModifier": { "stat": "Defense", "flat": -15.0, "percent": 0.0 }
+    }
+  ]
+}

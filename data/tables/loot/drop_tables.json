@@ -1,0 +1,37 @@
+{
+  "training": {
+    "enemyKillDrop": true,
+    "bonusChestChanceAfterIdentify": 0.1,
+    "maxBonusChests": 5
+  },
+  "killRewards": {
+    "training_dummy": {
+      "exp": 8,
+      "gold": 3,
+      "chest": { "chance": 0.12, "quality": "common" }
+    },
+    "training_elite": {
+      "exp": 25,
+      "gold": 12,
+      "chest": { "chance": 0.35, "quality": "rare" }
+    },
+    "training_boss": {
+      "exp": 80,
+      "gold": 35,
+      "chest": { "chance": 0.8, "quality": "epic" }
+    }
+  },
+  "stageComplete": {
+    "training_01": { "exp": 50, "gold": 30 },
+    "chapter_01_level_01": { "exp": 40, "gold": 20 },
+    "chapter_01_level_02": { "exp": 48, "gold": 24 },
+    "chapter_01_level_03": { "exp": 56, "gold": 28 },
+    "chapter_01_level_04": { "exp": 64, "gold": 32 },
+    "chapter_01_level_05": { "exp": 72, "gold": 36 },
+    "chapter_01_level_06": { "exp": 80, "gold": 40 },
+    "chapter_01_level_07": { "exp": 88, "gold": 44 },
+    "chapter_01_level_08": { "exp": 100, "gold": 50 },
+    "chapter_01_level_09": { "exp": 112, "gold": 56 },
+    "chapter_01_level_10": { "exp": 128, "gold": 64 }
+  }
+}
