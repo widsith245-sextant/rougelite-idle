@@ -7,5 +7,6 @@
     { "id": "reward", "type": "reward", "choices": 3, "goldBonus": 25 }
   ],
   "bossRoom": { "id": "combat_boss", "type": "combat", "stageId": "chapter_01_level_10" },
-  "runLength": { "min": 5, "max": 8 }
+  "runLength": { "min": 5, "max": 8 },
+  "enemyStatMultiplier": 12
 }

@@ -29,6 +29,7 @@ public partial class RunSessionManager : Node
 	private CombatManager _combat = null!;
 	private ProgressionManager _progression = null!;
 	private RosterProgressionManager _rosterProgression = null!;
+	private RunCardManager _runCards = null!;
 	private RandomNumberGenerator _rng = new();
 
 	private int _currentRoomIndex;
@@ -43,12 +44,16 @@ public partial class RunSessionManager : Node
 		&& _state != RunSessionState.RunComplete
 		&& _state != RunSessionState.RunFailed;
 
+	public float GetEnemyStatMultiplier() =>
+		_pool.EnemyStatMultiplier > 0f ? _pool.EnemyStatMultiplier : 12f;
+
 	public override void _Ready()
 	{
 		_eventBus = GetNode<EventBus>("/root/EventBus");
 		_combat = GetNode<CombatManager>("/root/CombatManager");
 		_progression = GetNode<ProgressionManager>("/root/ProgressionManager");
 		_rosterProgression = GetNode<RosterProgressionManager>("/root/RosterProgressionManager");
+		_runCards = GetNode<RunCardManager>("/root/RunCardManager");
 		_rng.Randomize();
 		LoadPool();
 		_eventBus.StageRunCompleted += OnStageRunCompleted;
@@ -77,11 +82,46 @@ public partial class RunSessionManager : Node
 		};
 	}
 
+	public Godot.Collections.Array GetRoomQueueSnapshot()
+	{
+		var arr = new Godot.Collections.Array();
+		for (var i = 0; i < _roomQueue.Count; i++)
+		{
+			var room = _roomQueue[i];
+			arr.Add(new Godot.Collections.Dictionary
+			{
+				{ "index", i },
+				{ "type", room.Type },
+				{ "id", room.Id },
+				{ "current", i == _currentRoomIndex },
+			});
+		}
+
+		return arr;
+	}
+
+	public Godot.Collections.Array GetActiveCardsSnapshot() => _runCards.GetActiveCardsSnapshot();
+
 	public bool StartRun(int? seed = null)
 	{
-		if (_state != RunSessionState.Idle && _state != RunSessionState.RunComplete && _state != RunSessionState.RunFailed)
+		if (_state != RunSessionState.Idle
+			&& _state != RunSessionState.RunComplete
+			&& _state != RunSessionState.RunFailed
+			&& _state != RunSessionState.RoomCleared)
 		{
 			return false;
+		}
+
+		var debug = DebugSettingsLoader.Get();
+		if (!debug.SkipWonderlandTicket && _progression.WonderlandTickets < 1)
+		{
+			_eventBus.EmitCombatBroadcast("奇境门票不足", "run");
+			return false;
+		}
+
+		if (!debug.SkipWonderlandTicket)
+		{
+			_progression.TrySpendWonderlandTicket();
 		}
 
 		if (seed.HasValue)
@@ -91,13 +131,23 @@ public partial class RunSessionManager : Node
 
 		_roomQueue.Clear();
 		BuildRoomQueue();
+		if (_roomQueue.Count == 0)
+		{
+			_eventBus.EmitCombatBroadcast("房间队列生成失败", "run");
+			return false;
+		}
+
 		_currentRoomIndex = 0;
 		_roomsCleared = 0;
 		_awaitingRoomAction = false;
 		_state = RunSessionState.InRoom;
 		_combat.RunRogueliteActive = true;
+		_combat.SetRunPaused(false);
+		_runCards.ResetForRun();
+		_eventBus.EmitRunVisualModeChanged("wonderland");
 		EmitState();
 		EnterCurrentRoom();
+		_eventBus.EmitCombatBroadcast($"奇境 Run 开始 · {_roomQueue.Count} 房间", "run");
 		GetNodeOrNull<GameLogger>("/root/GameLogger")?.Log("Run", GameLogger.LogLevel.Info,
 			$"StartRun rooms={_roomQueue.Count}");
 		return true;
@@ -129,7 +179,7 @@ public partial class RunSessionManager : Node
 				_awaitingRoomAction = true;
 				break;
 			case "reward":
-				_awaitingRoomAction = true;
+				_runCards.BeginRoomRewardPick();
 				break;
 		}
 	}
@@ -144,33 +194,24 @@ public partial class RunSessionManager : Node
 
 		var percent = room.HealPercent > 0f ? room.HealPercent : 30f;
 		HealActiveParty(percent / 100f);
+		_eventBus.EmitCombatBroadcast($"休息恢复 {percent:F0}% HP", "run");
 		_awaitingRoomAction = false;
 		CompleteRoom();
 	}
 
-	public void ApplyRewardChoice(int choiceIndex)
+	public void CompleteRoomAfterCardReward()
 	{
-		var room = GetCurrentRoom();
-		if (_state != RunSessionState.InRoom || room == null || room.Type != "reward" || !_awaitingRoomAction)
+		if (_state != RunSessionState.InRoom)
 		{
 			return;
 		}
 
-		var gold = room.GoldBonus > 0 ? room.GoldBonus : 25;
-		if (choiceIndex == 0)
+		var room = GetCurrentRoom();
+		if (room == null || room.Type != "reward")
 		{
-			_progression.AddGold(gold);
-		}
-		else if (choiceIndex == 1)
-		{
-			HealActiveParty(0.15f);
-		}
-		else
-		{
-			_rosterProgression.GrantExpToActiveSquad(20f);
+			return;
 		}
 
-		_awaitingRoomAction = false;
 		CompleteRoom();
 	}
 
@@ -235,8 +276,11 @@ public partial class RunSessionManager : Node
 	private void SettleRun(bool success)
 	{
 		_combat.RunRogueliteActive = false;
+		_combat.SetRunPaused(false);
+		_runCards.Clear();
 		_awaitingRoomAction = false;
 		_state = success ? RunSessionState.RunComplete : RunSessionState.RunFailed;
+		_eventBus.EmitRunVisualModeChanged("training");
 
 		var goldBase = _roomsCleared * 15 + (success ? 40 : 0);
 		var goldGrant = success ? goldBase : goldBase / 2;
@@ -246,6 +290,11 @@ public partial class RunSessionManager : Node
 		{
 			var exp = _roomsCleared * 12f;
 			_rosterProgression.GrantExpToActiveSquad(exp);
+			_eventBus.EmitCombatBroadcast($"Run 通关 · 结算 +{goldGrant} 金币 · +{exp:F0} 经验", "run");
+		}
+		else
+		{
+			_eventBus.EmitCombatBroadcast($"Run 失败 · 结算 +{goldGrant} 金币", "run");
 		}
 
 		GetNodeOrNull<SaveBootstrap>("/root/SaveBootstrap")?.RequestSave();
@@ -353,6 +402,7 @@ public partial class RunSessionManager : Node
 		public List<RunRoomDefinition> Templates { get; set; } = new();
 		public RunRoomDefinition? BossRoom { get; set; }
 		public RunLengthRange RunLength { get; set; } = new();
+		public float EnemyStatMultiplier { get; set; } = 12f;
 	}
 
 	private sealed class RunLengthRange

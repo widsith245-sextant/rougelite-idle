@@ -9,7 +9,10 @@ enum PopupId {
 	STAR_CHART = CULTIVATION,
 	CHARACTER_STATS = 5,
 	STAGE_SELECT = 6,
+	RUN_CARD_PICK = 7,
 }
+
+const RUN_CARD_PICK_SIZE := Vector2i(640, 320)
 
 const POPUP_TITLES := {
 	PopupId.BACKPACK: "背包",
@@ -19,6 +22,7 @@ const POPUP_TITLES := {
 	PopupId.WONDERLAND: "奇境",
 	PopupId.CHARACTER_STATS: "详细属性",
 	PopupId.STAGE_SELECT: "关卡",
+	PopupId.RUN_CARD_PICK: "选择增益卡牌",
 }
 
 const CONTENT_SCENES := {
@@ -29,6 +33,7 @@ const CONTENT_SCENES := {
 	PopupId.WONDERLAND: preload("res://scenes/ui/popup/content/wonderland_content.tscn"),
 	PopupId.CHARACTER_STATS: preload("res://scenes/ui/popup/content/detailed_stats_content.tscn"),
 	PopupId.STAGE_SELECT: preload("res://scenes/ui/popup/content/stage_select_content.tscn"),
+	PopupId.RUN_CARD_PICK: preload("res://scenes/ui/popup/content/run_card_pick_content.tscn"),
 }
 
 const WindowBaseScene := preload("res://scenes/ui/popup/popup_window_base.tscn")
@@ -55,6 +60,29 @@ func open_character_stats(unit_id: String = "") -> void:
 	if not unit_id.is_empty():
 		_pending_stats_unit_id = unit_id
 	open_popup(PopupId.CHARACTER_STATS)
+
+
+func open_run_card_pick() -> void:
+	var window: Window = _get_or_create_window(PopupId.RUN_CARD_PICK)
+	window.size = RUN_CARD_PICK_SIZE
+	window.min_size = RUN_CARD_PICK_SIZE
+	window.max_size = RUN_CARD_PICK_SIZE
+	window.popup_title = POPUP_TITLES.get(PopupId.RUN_CARD_PICK, "选择增益卡牌")
+	if window.has_method("set_close_enabled"):
+		window.call("set_close_enabled", false)
+	window.show_popup()
+	var content_root: Control = window.get_content_root()
+	if content_root.get_child_count() > 0:
+		var content: Node = content_root.get_child(0)
+		if content.has_method("refresh"):
+			content.refresh()
+
+
+func close_run_card_pick() -> void:
+	close_popup(PopupId.RUN_CARD_PICK)
+	var window: Window = _windows.get(PopupId.RUN_CARD_PICK, null)
+	if window and window.has_method("set_close_enabled"):
+		window.call("set_close_enabled", true)
 
 
 func close_popup(popup_id: int) -> void:

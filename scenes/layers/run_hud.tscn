@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=3 uid="uid://run_hud_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/run_hud.gd" id="1_script"]
+
+[node name="RunHud" type="CanvasLayer"]
+layer = 4
+
+[node name="HudRoot" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 400.0
+offset_bottom = 150.0
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Panel" type="PanelContainer" parent="HudRoot"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 196.0
+offset_bottom = 72.0
+
+[node name="VBox" type="VBoxContainer" parent="HudRoot/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="TitleLabel" type="Label" parent="HudRoot/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "奇境"
+
+[node name="ProgressLabel" type="Label" parent="HudRoot/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "1/7 · 战斗"
+
+[node name="QueueLabel" type="Label" parent="HudRoot/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "战 休 奖"
+
+[node name="CardsLabel" type="Label" parent="HudRoot/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "卡牌: —"
+
+[node name="Buttons" type="HBoxContainer" parent="HudRoot/Panel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DetailButton" type="Button" parent="HudRoot/Panel/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "详情"
+
+[node name="AbandonButton" type="Button" parent="HudRoot/Panel/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "放弃"
+
+[node name="RestButton" type="Button" parent="HudRoot/Panel/VBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "休息恢复"

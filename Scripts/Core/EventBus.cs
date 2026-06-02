@@ -67,6 +67,15 @@ public partial class EventBus : Node
 	[Signal]
 	public delegate void StageRunCompletedEventHandler(string stageId);
 
+	[Signal]
+	public delegate void CombatBroadcastEventHandler(string message, string category);
+
+	[Signal]
+	public delegate void RunVisualModeChangedEventHandler(string mode);
+
+	[Signal]
+	public delegate void RunCardPickOfferedEventHandler();
+
 	public void EmitPositionChanged(string entityId, float oldX, float newX)
 	{
 		EmitSignal(SignalName.PositionChanged, entityId, oldX, newX);
@@ -170,5 +179,20 @@ public partial class EventBus : Node
 	public void EmitStageRunCompleted(string stageId)
 	{
 		EmitSignal(SignalName.StageRunCompleted, stageId);
+	}
+
+	public void EmitCombatBroadcast(string message, string category = "reward")
+	{
+		EmitSignal(SignalName.CombatBroadcast, message, category);
+	}
+
+	public void EmitRunVisualModeChanged(string mode)
+	{
+		EmitSignal(SignalName.RunVisualModeChanged, mode);
+	}
+
+	public void EmitRunCardPickOffered()
+	{
+		EmitSignal(SignalName.RunCardPickOffered);
 	}
 }

@@ -20,6 +20,7 @@ custom_minimum_size = Vector2(400, 120)
 script = ExtResource("1_script")
 
 [node name="StageBg" type="ColorRect" parent="CombatStage"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

@@ -11,6 +11,8 @@ const POPUP_SIZE := Vector2i(640, 480)
 @onready var _content_root: Control = %ContentRoot
 @onready var _root: Control = $Root
 
+var _close_allowed := true
+
 
 func _ready() -> void:
 	title = popup_title
@@ -55,9 +57,18 @@ func hide_popup() -> void:
 	hide()
 
 
+func set_close_enabled(enabled: bool) -> void:
+	_close_allowed = enabled
+	if _close_button:
+		_close_button.visible = enabled
+		_close_button.disabled = not enabled
+
+
 func get_content_root() -> Control:
 	return _content_root
 
 
 func _on_close_requested() -> void:
+	if not _close_allowed:
+		return
 	hide_popup()

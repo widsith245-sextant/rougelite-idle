@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Godot;
+using RougeliteIdle.Combat;
+using RougeliteIdle.Core;
 using RougeliteIdle.Loot;
+using RougeliteIdle.Run;
 
 namespace RougeliteIdle.Meta;
 
@@ -17,6 +20,7 @@ public partial class ProgressionManager : Node
 	private CurrenciesTable _currencies = new();
 	private DropTablesRoot _drops = new();
 	private RewardDecayRules _rewardDecay = new();
+	private EventBus? _eventBus;
 
 	public int TeamLevel { get; private set; } = 1;
 	public float TeamExp { get; private set; }
@@ -27,6 +31,7 @@ public partial class ProgressionManager : Node
 
 	public override void _Ready()
 	{
+		_eventBus = GetNodeOrNull<EventBus>("/root/EventBus");
 		LoadTables();
 		ApplyCurrencyDefaults();
 		_rng.Randomize();
@@ -81,6 +86,17 @@ public partial class ProgressionManager : Node
 		}
 
 		Gold -= amount;
+		return true;
+	}
+
+	public bool TrySpendWonderlandTicket()
+	{
+		if (WonderlandTickets < 1)
+		{
+			return false;
+		}
+
+		WonderlandTickets--;
 		return true;
 	}
 
@@ -149,8 +165,26 @@ public partial class ProgressionManager : Node
 		var rosterProg = GetNodeOrNull<RosterProgressionManager>("/root/RosterProgressionManager");
 		var avgLevel = rosterProg?.GetAverageActiveRosterLevel(party) ?? 1;
 		var mul = ComputeRewardMultiplier(avgLevel, enemyLevel);
-		rosterProg?.GrantExpToActiveSquad(reward.Exp * mul);
-		AddGold(Mathf.RoundToInt(reward.Gold * mul));
+		var expGrant = reward.Exp * mul;
+		var goldGrant = Mathf.RoundToInt(reward.Gold * mul);
+		var combat = GetNodeOrNull<CombatManager>("/root/CombatManager");
+		if (combat != null && combat.RunRogueliteActive)
+		{
+			var runCard = GetNodeOrNull<RunCardManager>("/root/RunCardManager");
+			var bonus = runCard?.GetRunGoldBonusPercent() ?? 0f;
+			if (bonus > 0f)
+			{
+				goldGrant = Mathf.RoundToInt(goldGrant * (1f + bonus / 100f));
+			}
+		}
+
+		rosterProg?.GrantExpToActiveSquad(expGrant);
+		AddGold(goldGrant);
+
+		if (goldGrant > 0 || expGrant > 0.01f)
+		{
+			_eventBus?.EmitCombatBroadcast($"+{goldGrant} 金币 · +{expGrant:F0} 经验", "reward");
+		}
 
 		if (loot == null || reward.Chest == null)
 		{
@@ -161,6 +195,7 @@ public partial class ProgressionManager : Node
 		if (_rng.Randf() <= reward.Chest.Chance)
 		{
 			loot.AddPendingChest(reward.Chest.Quality);
+			_eventBus?.EmitCombatBroadcast($"获得 {reward.Chest.Quality} 宝箱", "reward");
 		}
 	}
 

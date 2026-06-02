@@ -1,6 +1,7 @@
 extends Control
 
 const POPUP_TEXTS_PATH := "res://data/tables/ui/popup_texts.json"
+const DEBUG_SETTINGS_PATH := "res://data/tables/meta/debug_settings.json"
 
 @onready var _title: Label = %Title
 @onready var _progress: Label = %ProgressLabel
@@ -52,6 +53,18 @@ func _apply_texts() -> void:
 		_info.text = str(data.get("info", "线性 5–8 房间 · 通关结算 Meta 奖励"))
 	if _enter_button and not _is_run_active():
 		_enter_button.text = str(data.get("enterLabel", "开始 Run"))
+		_enter_button.disabled = false
+	if _ticket_label:
+		if _skip_wonderland_ticket():
+			_ticket_label.text = str(data.get("ticketLabel", "测试模式：免门票"))
+		else:
+			var prog := get_node_or_null("/root/ProgressionManager")
+			var tickets := 0
+			if prog:
+				var snap: Variant = prog.call("GetHudSnapshot")
+				if snap is Dictionary:
+					tickets = int(snap.get("wonderland_tickets", 0))
+			_ticket_label.text = "持有门票: %d" % tickets
 
 
 func _sync_from_run() -> void:
@@ -88,7 +101,7 @@ func _sync_from_run() -> void:
 	if _rest_panel:
 		_rest_panel.visible = active and awaiting and room_type == "rest"
 	if _reward_panel:
-		_reward_panel.visible = active and awaiting and room_type == "reward"
+		_reward_panel.visible = false
 
 
 func _set_idle_ui() -> void:
@@ -121,7 +134,11 @@ func _is_run_active() -> bool:
 func _on_enter_pressed() -> void:
 	var run := get_node_or_null("/root/RunSessionManager")
 	if run and run.has_method("StartRun"):
-		run.call("StartRun")
+		var ok: bool = bool(run.call("StartRun"))
+		if ok:
+			var popup_mgr := get_tree().root.get_node_or_null("GameRoot/PopupManager")
+			if popup_mgr and popup_mgr.has_method("close_popup"):
+				popup_mgr.call("close_popup", 4)
 	refresh()
 
 
@@ -177,3 +194,15 @@ func _load_section(section: String) -> Dictionary:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return {}
 	return parsed.get(section, {})
+
+
+func _skip_wonderland_ticket() -> bool:
+	if not FileAccess.file_exists(DEBUG_SETTINGS_PATH):
+		return true
+	var file := FileAccess.open(DEBUG_SETTINGS_PATH, FileAccess.READ)
+	if file == null:
+		return true
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return true
+	return bool(parsed.get("skipWonderlandTicket", true))

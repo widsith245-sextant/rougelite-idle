@@ -32,6 +32,9 @@ RosterProgressionManager="*res://Scripts/Meta/RosterProgressionManager.cs"
 CharacterSkillManager="*res://Scripts/Meta/CharacterSkillManager.cs"
 UiFxGate="*res://gdscript/ui/ui_fx_gate.gd"
 RunSessionManager="*res://Scripts/Run/RunSessionManager.cs"
+RunCardManager="*res://Scripts/Run/RunCardManager.cs"
+PortraitWindowManager="*res://Scripts/Run/PortraitWindowManager.cs"
+BroadcastWindowManager="*res://Scripts/Run/BroadcastWindowManager.cs"
 SaveBootstrap="*res://Scripts/Save/SaveBootstrap.cs"
 
 [display]

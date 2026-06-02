@@ -4,6 +4,7 @@ using Godot;
 using RougeliteIdle.Core;
 using RougeliteIdle.Loot;
 using RougeliteIdle.Meta;
+using RougeliteIdle.Run;
 using RougeliteIdle.Stats;
 
 namespace RougeliteIdle.Combat;
@@ -131,10 +132,11 @@ public sealed class StageRunController
 	{
 		_activeWave = wave;
 		_clusterWaveActive = wave.IsCluster;
+		var statMul = ResolveEnemyStatMultiplier(combat);
 		var enemies = new List<CombatUnitData>();
 		foreach (var (enemyId, offset, instanceIndex) in wave.EnumerateSpawns())
 		{
-			var enemy = EnemyTemplateLoader.CreateEnemy(enemyId, offset, instanceIndex);
+			var enemy = EnemyTemplateLoader.CreateEnemy(enemyId, offset, instanceIndex, _stage.StageLevel, statMul);
 			if (enemy != null)
 			{
 				enemies.Add(enemy);
@@ -161,6 +163,7 @@ public sealed class StageRunController
 		State = StageRunState.Engaging;
 		EmitMarchState(false);
 		_eventBus.EmitWaveStarted(_currentWaveIndex);
+		_eventBus.EmitCombatBroadcast($"第 {_currentWaveIndex + 1} 波来袭", "wave");
 		LogSpawn(wave, enemies.Count);
 	}
 
@@ -176,6 +179,7 @@ public sealed class StageRunController
 			: enemy.TemplateId;
 		var prog = combat.GetProgressionManager();
 		var loot = combat.GetLootManager();
+		_eventBus.EmitCombatBroadcast($"击败 {enemy.DisplayName}", "kill");
 		prog?.GrantKillReward(templateId, EnemyTemplateLoader.GetEnemyLevel(templateId), loot);
 
 		combat.RemoveEnemy(enemy);
@@ -200,7 +204,7 @@ public sealed class StageRunController
 			if (nextIndex >= 0 && nextIndex < spawns.Count)
 			{
 				var (enemyId, offset, instanceIndex) = spawns[nextIndex];
-				var next = EnemyTemplateLoader.CreateEnemy(enemyId, offset, instanceIndex);
+				var next = EnemyTemplateLoader.CreateEnemy(enemyId, offset, instanceIndex, _stage.StageLevel, ResolveEnemyStatMultiplier(combat));
 				if (next != null)
 				{
 					combat.SpawnEnemy(next, clearExisting: true);
@@ -214,6 +218,7 @@ public sealed class StageRunController
 		_waveClearTimer = WaveClearDelay;
 		combat.ClearAllEnemies();
 		_eventBus.EmitWaveCleared(_currentWaveIndex);
+		_eventBus.EmitCombatBroadcast("波次清空", "wave");
 		_currentWaveIndex++;
 		_activeWave = null;
 	}
@@ -274,6 +279,18 @@ public sealed class StageRunController
 		State = StageRunState.Marching;
 		EmitMarchState(true);
 		EmitProgress();
+	}
+
+	private static float ResolveEnemyStatMultiplier(CombatManager combat)
+	{
+		if (!combat.RunRogueliteActive)
+		{
+			return 1f;
+		}
+
+		var tree = combat.GetTree();
+		var run = tree?.Root.GetNodeOrNull<RunSessionManager>("/root/RunSessionManager");
+		return run?.GetEnemyStatMultiplier() ?? 12f;
 	}
 
 	private void EmitProgress()

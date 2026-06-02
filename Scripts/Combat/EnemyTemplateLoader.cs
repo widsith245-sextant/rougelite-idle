@@ -11,7 +11,7 @@ public static class EnemyTemplateLoader
 	private const string Path = "res://data/tables/combat/enemy_templates.json";
 	private static Dictionary<string, TemplateEntry>? _cache;
 
-	public static CombatUnitData? CreateEnemy(string templateId, float spawnOffsetX = 0f, int instanceIndex = 0)
+	public static CombatUnitData? CreateEnemy(string templateId, float spawnOffsetX = 0f, int instanceIndex = 0, int stageLevel = 1, float statMultiplier = 1f)
 	{
 		EnsureLoaded();
 		if (_cache == null || !_cache.TryGetValue(templateId, out var entry))
@@ -22,6 +22,10 @@ public static class EnemyTemplateLoader
 		}
 
 		var instanceId = instanceIndex <= 0 ? templateId : $"{templateId}_{instanceIndex}";
+		var levelMul = Mathf.Clamp(stageLevel, 1, 10);
+		var totalMul = levelMul * Mathf.Max(1f, statMultiplier);
+		var scaledHp = entry.MaxHp * totalMul;
+		var scaledAtk = entry.BaseAttack * totalMul;
 		var unit = new CombatUnitData
 		{
 			Id = instanceId,
@@ -32,10 +36,10 @@ public static class EnemyTemplateLoader
 			RewardTier = entry.RewardTier > 0 ? entry.RewardTier : 1,
 			IsAlly = false,
 			Level = entry.Level,
-			MaxHp = entry.MaxHp,
-			CurrentHp = entry.MaxHp,
+			MaxHp = scaledHp,
+			CurrentHp = scaledHp,
 			Speed = entry.Speed,
-			BaseAttack = entry.BaseAttack,
+			BaseAttack = scaledAtk,
 			HitBoxRadius = entry.HitBoxRadius > 0f ? entry.HitBoxRadius : 12f,
 			EnemyTemplateAtkSpeed = entry.AtkSpeed > 0f ? entry.AtkSpeed : 1.2f,
 			EnemyTemplateAtkRange = entry.AtkRange > 0f ? entry.AtkRange : 20f,

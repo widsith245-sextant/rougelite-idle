@@ -17,6 +17,10 @@ public partial class CombatManager : Node
 	/// <summary>When true, stage clear / party wipe are handled by RunSessionManager.</summary>
 	public bool RunRogueliteActive { get; set; }
 
+	public bool RunPaused { get; private set; }
+
+	public void SetRunPaused(bool paused) => RunPaused = paused;
+
 	private const float ActionResolveDelay = 0.35f;
 	private const float RepositionSettleTime = 0.15f;
 	private const float PositionEmitEpsilon = 0.01f;
@@ -236,6 +240,11 @@ public partial class CombatManager : Node
 
 	public override void _Process(double delta)
 	{
+		if (RunPaused)
+		{
+			return;
+		}
+
 		var dt = (float)delta;
 		CheckPartyWipe();
 

@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://portrait_window_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/portrait_window.gd" id="1_script"]
+
+[node name="PortraitWindow" type="Window"]
+initial_position = 1
+size = Vector2i(220, 280)
+visible = false
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Root/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="NameLabel" type="Label" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "角色名"
+horizontal_alignment = 1
+
+[node name="ClassLabel" type="Label" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "职业"
+horizontal_alignment = 1
+
+[node name="PortraitRect" type="TextureRect" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ToggleDamaged" type="Button" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "正常"
+
+[node name="HintLabel" type="Label" parent="Root/Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "点击关闭"
+horizontal_alignment = 1

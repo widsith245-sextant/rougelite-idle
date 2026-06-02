@@ -16,6 +16,7 @@ public partial class CharacterSkillManager : Node
 	private readonly Dictionary<string, List<SkillTreeNode>> _trees = new();
 	private readonly Dictionary<string, HashSet<string>> _unlockedNodes = new();
 	private readonly Dictionary<string, Dictionary<string, string>> _equippedByRoster = new();
+	private string _lastEquipError = string.Empty;
 
 	private DbManager? _db;
 	private EventBus _eventBus = null!;
@@ -51,32 +52,48 @@ public partial class CharacterSkillManager : Node
 
 	public bool TryEquipSkill(string rosterId, string nodeId, string slotKey)
 	{
+		_lastEquipError = string.Empty;
 		if (!_trees.TryGetValue(rosterId, out var nodes))
 		{
+			_lastEquipError = "未找到技能树";
 			return false;
 		}
 
 		var node = nodes.FirstOrDefault(n => n.Id == nodeId);
 		if (node == null || !IsNodeUnlocked(rosterId, nodeId))
 		{
+			_lastEquipError = "节点未解锁";
 			return false;
 		}
 
-		if (node.NodeType == "passive" && !(_db?.PassiveSlotsUnlocked ?? false))
+		if (node.NodeType == "passive")
 		{
-			return false;
-		}
-
-		if (node.NodeType == "active")
-		{
-			var maxSlots = _db?.MaxActiveSkillSlots ?? 1;
-			if (slotKey.StartsWith("active_", StringComparison.Ordinal))
+			if (slotKey != "passive_0")
 			{
-				var idx = int.Parse(slotKey["active_".Length..]);
-				if (idx >= maxSlots)
-				{
-					return false;
-				}
+				_lastEquipError = "被动技能只能装入被动槽";
+				return false;
+			}
+
+			if (!(_db?.PassiveSlotsUnlocked ?? false))
+			{
+				_lastEquipError = "被动槽未解锁";
+				return false;
+			}
+		}
+		else if (node.NodeType == "active")
+		{
+			if (!slotKey.StartsWith("active_", StringComparison.Ordinal))
+			{
+				_lastEquipError = "主动技能只能装入主动槽";
+				return false;
+			}
+
+			var maxSlots = _db?.MaxActiveSkillSlots ?? 1;
+			var idx = int.Parse(slotKey["active_".Length..]);
+			if (idx >= maxSlots)
+			{
+				_lastEquipError = "主动槽未解锁";
+				return false;
 			}
 		}
 
@@ -84,6 +101,60 @@ public partial class CharacterSkillManager : Node
 		_equippedByRoster[rosterId][slotKey] = node.SkillId;
 		_eventBus.EmitSkillsChanged();
 		return true;
+	}
+
+	public string GetLastEquipError() => _lastEquipError;
+
+	public bool TrySwapEquipped(string rosterId, string slotKeyA, string slotKeyB)
+	{
+		EnsureRosterState(rosterId);
+		var equipped = _equippedByRoster[rosterId];
+		equipped.TryGetValue(slotKeyA, out var skillA);
+		equipped.TryGetValue(slotKeyB, out var skillB);
+		if (string.IsNullOrEmpty(skillA) && string.IsNullOrEmpty(skillB))
+		{
+			_lastEquipError = "空槽无法交换";
+			return false;
+		}
+
+		if (string.IsNullOrEmpty(skillB))
+		{
+			equipped.Remove(slotKeyA);
+		}
+		else
+		{
+			equipped[slotKeyA] = skillB;
+		}
+
+		if (string.IsNullOrEmpty(skillA))
+		{
+			equipped.Remove(slotKeyB);
+		}
+		else
+		{
+			equipped[slotKeyB] = skillA;
+		}
+
+		_eventBus.EmitSkillsChanged();
+		return true;
+	}
+
+	public string? FindNodeIdForSkill(string rosterId, string skillId)
+	{
+		if (!_trees.TryGetValue(rosterId, out var nodes) || string.IsNullOrEmpty(skillId))
+		{
+			return null;
+		}
+
+		foreach (var node in nodes)
+		{
+			if (node.SkillId == skillId)
+			{
+				return node.Id;
+			}
+		}
+
+		return null;
 	}
 
 	public bool IsNodeUnlocked(string rosterId, string nodeId) =>

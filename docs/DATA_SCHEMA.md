@@ -126,6 +126,21 @@
 | onHitEffects[] | `{ id, chance }` 命中效果 |
 | rewardTier | 1–5，击杀奖励倍率 |
 
+**关卡 HP 缩放**：刷怪时 `maxHp = template.maxHp × clamp(stageLevel, 1, 10)`（L1=1x … L10=10x）。
+
+## meta/debug_settings.json
+
+| 字段 | 说明 |
+|------|------|
+| combatTraceEnabled | GameLogger 战斗 trace |
+| skipWonderlandTicket | 测试期跳过奇境门票校验 |
+| unlockPassiveSkillSlots | 解锁被动技能槽 |
+| maxActiveSkillSlotsOverride | 覆盖主动技能槽数量（0=不覆盖） |
+
+## EventBus.CombatBroadcast
+
+玩家可见顶栏弹幕：`message` + `category`（kill/reward/wave/run），由 `combat_broadcast_overlay` 渲染。
+
 ## combat/damage_profiles.json
 
 伤害类型：`id`, `defenseStat`, `critAllowed`, 可选 `damageScale`。
@@ -136,7 +151,19 @@
 
 ## run/run_room_pool.json
 
-奇境 Run 房间池：`templates[]`（combat/rest/reward）、`bossRoom`、`runLength.min/max`。
+奇境 Run 房间池：`templates[]`（combat/rest/reward）、`bossRoom`、`runLength.min/max`、`enemyStatMultiplier`（相对同 stage 训练关 HP/攻击倍率，默认 12）。
+
+## run/run_card_pool.json
+
+Run 内肉鸽卡牌池：
+
+| 字段 | 说明 |
+|------|------|
+| pickIntervalWaves | 每清 N 个 wave 触发三选一（默认 3） |
+| choicesPerPick | 每次提供卡牌数（默认 3） |
+| cards[] | `id`, `name`, `desc`, `effect.type`, `effect.value` |
+
+`effect.type`：`TeamDamagePercent`, `TeamMaxHpPercent`, `InstantHealPercent`, `TeamMoveSpeedPercent`, `TeamCritPercent`, `RunGoldBonusPercent`。Run 结束清除，不写主档。
 
 ## character/roster.json
 

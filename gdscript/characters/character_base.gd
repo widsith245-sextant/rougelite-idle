@@ -154,7 +154,7 @@ func _on_unit_hp_changed(entity_id: String, current_hp: float, max_hp: float) ->
 	set_hp(current_hp, max_hp)
 
 
-func _on_damage_dealt(_source_id: String, target_id: String, _amount: float) -> void:
+func _on_damage_dealt(_source_id: String, target_id: String, _amount: float, _is_crit: bool = false) -> void:
 	if target_id != _entity_id:
 		return
 	play_hit()

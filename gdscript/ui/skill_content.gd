@@ -3,6 +3,7 @@ extends Control
 ## Per-character skill tree + slot equip.
 
 const ItemCellScene := preload("res://scenes/ui/components/item_grid_cell.tscn")
+const SkillTreeCellScript := preload("res://gdscript/ui/skill_tree_cell.gd")
 
 @onready var _roster_tab: TabBar = %RosterTabBar
 @onready var _tree_grid: GridContainer = %TreeGrid
@@ -21,6 +22,9 @@ func _ready() -> void:
 		_roster_tab.tab_changed.connect(_on_roster_tab_changed)
 	if _equip_btn:
 		_equip_btn.pressed.connect(_on_equip_pressed)
+	var event_bus := get_node_or_null("/root/EventBus")
+	if event_bus and event_bus.has_signal("SkillsChanged"):
+		event_bus.connect("SkillsChanged", refresh)
 	call_deferred("refresh")
 
 
@@ -98,11 +102,14 @@ func _refresh_tree() -> void:
 	for entry in snap:
 		var data: Dictionary = entry
 		var node_id: String = str(data.get("id", ""))
-		var btn := Button.new()
+		var btn: Button = SkillTreeCellScript.new()
 		btn.custom_minimum_size = Vector2(72, 36)
 		var prefix := "主" if str(data.get("node_type", "")) == "active" else "被"
 		var req_lv: int = int(data.get("required_level", 1))
 		btn.text = "%s Lv%d %s" % [prefix, req_lv, str(data.get("display_name", "?"))]
+		btn.roster_id = _current_roster_id
+		btn.node_id = node_id
+		btn.node_type = str(data.get("node_type", "active"))
 		if bool(data.get("unlocked", false)):
 			btn.modulate = Color(0.85, 1.0, 0.85)
 			btn.pressed.connect(_on_select_node.bind(node_id))
@@ -141,17 +148,7 @@ func _refresh_slots() -> void:
 
 	for i in max_active:
 		var slot_key := "active_%d" % i
-		var cell: PanelContainer = ItemCellScene.instantiate()
-		cell.cell_size = Vector2(56, 40)
-		cell.drag_kind = "skill_slot"
-		cell.cell_index = i
-		cell.cell_pressed.connect(_on_skill_slot_pressed.bind(slot_key))
-		slot_row.add_child(cell)
-		var sid: String = str(equipped.get(slot_key, ""))
-		if sid.is_empty() or sid == "—":
-			cell.setup_slot("主%d" % (i + 1))
-		else:
-			cell.setup_item(sid.substr(0, mini(4, sid.length())), 0, 1, "rare")
+		_add_skill_slot(slot_row, slot_key, equipped, mgr, "主%d" % (i + 1))
 
 	for i in range(max_active, 2):
 		var lock_l := Label.new()
@@ -161,27 +158,40 @@ func _refresh_slots() -> void:
 
 	var pass_row := HBoxContainer.new()
 	_slot_box.add_child(pass_row)
-	var pass_cell: PanelContainer = ItemCellScene.instantiate()
-	pass_cell.cell_size = Vector2(56, 40)
-	pass_cell.cell_index = 0
-	pass_cell.drag_kind = "skill_slot"
-	pass_cell.cell_pressed.connect(_on_skill_slot_pressed.bind("passive_0"))
-	pass_row.add_child(pass_cell)
 	if passive_ok:
-		var pid: String = str(equipped.get("passive_0", ""))
-		if pid.is_empty() or pid == "—":
-			pass_cell.setup_slot("被")
-		else:
-			pass_cell.setup_item(pid.substr(0, mini(4, pid.length())), 0, 1, "epic")
+		_add_skill_slot(pass_row, "passive_0", equipped, mgr, "被")
 	else:
+		var pass_cell: PanelContainer = ItemCellScene.instantiate()
+		pass_cell.cell_size = Vector2(56, 40)
 		pass_cell.setup_slot("🔒")
+		pass_row.add_child(pass_cell)
+
+
+func _add_skill_slot(parent: Node, slot_key: String, equipped: Dictionary, mgr: Node, empty_label: String) -> void:
+	var cell: PanelContainer = ItemCellScene.instantiate()
+	cell.cell_size = Vector2(56, 40)
+	cell.drag_kind = "skill_slot"
+	cell.set_meta("slot_key", slot_key)
+	cell.set_meta("roster_id", _current_roster_id)
+	cell.cell_pressed.connect(_on_skill_slot_pressed.bind(slot_key))
+	cell.cell_dropped.connect(_on_skill_slot_dropped.bind(slot_key))
+	parent.add_child(cell)
+	var sid: String = str(equipped.get(slot_key, ""))
+	if sid.is_empty() or sid == "—":
+		cell.setup_slot(empty_label)
+		return
+	cell.setup_item(sid.substr(0, mini(4, sid.length())), 0, 1, "rare")
+	if mgr and mgr.has_method("FindNodeIdForSkill"):
+		var node_id: Variant = mgr.call("FindNodeIdForSkill", _current_roster_id, sid)
+		if node_id != null and str(node_id) != "":
+			cell.set_meta("node_id", str(node_id))
 
 
 func _update_detail() -> void:
 	if _detail == null:
 		return
 	if _selected_node_id.is_empty():
-		_detail.text = "选择技能节点以查看详情 | 点击插槽选择装配位"
+		_detail.text = "选择技能节点以查看详情 | 拖拽或点击插槽装配"
 		return
 	var mgr := get_node_or_null("/root/CharacterSkillManager")
 	if mgr == null:
@@ -219,9 +229,39 @@ func _on_skill_slot_pressed(slot_key: String) -> void:
 		_update_detail()
 
 
+func _on_skill_slot_dropped(slot_key: String, _target_index: int, payload: Dictionary) -> void:
+	var mgr := get_node_or_null("/root/CharacterSkillManager")
+	if mgr == null:
+		return
+	var kind: String = str(payload.get("drag_kind", ""))
+	if kind == "skill_node":
+		var node_id: String = str(payload.get("node_id", ""))
+		if node_id.is_empty():
+			return
+		_selected_node_id = node_id
+		_equip_to_slot(slot_key)
+	elif kind == "skill_slot":
+		var src_slot: String = str(payload.get("slot_key", ""))
+		if src_slot.is_empty() or src_slot == slot_key:
+			return
+		var ok: bool = mgr.call("TrySwapEquipped", _current_roster_id, src_slot, slot_key)
+		if not ok and _detail:
+			var err := str(mgr.call("GetLastEquipError")) if mgr.has_method("GetLastEquipError") else ""
+			_detail.text = "交换失败：%s" % err
+		else:
+			var party := get_node_or_null("/root/PartyManager")
+			if party:
+				party.call("ApplySquadToCombat")
+			refresh()
+
+
 func _on_equip_pressed() -> void:
 	if _selected_node_id.is_empty():
 		return
+	_equip_to_slot(_selected_slot_key)
+
+
+func _equip_to_slot(slot_key: String) -> void:
 	var mgr := get_node_or_null("/root/CharacterSkillManager")
 	if mgr == null:
 		return
@@ -232,12 +272,18 @@ func _on_equip_pressed() -> void:
 		if str(data.get("id", "")) == _selected_node_id:
 			node_type = str(data.get("node_type", "active"))
 			break
-	var slot_key := _selected_slot_key
 	if node_type == "passive":
 		slot_key = "passive_0"
 	elif not slot_key.begins_with("active_"):
 		slot_key = "active_0"
-	mgr.call("TryEquipSkill", _current_roster_id, _selected_node_id, slot_key)
+	var ok: bool = mgr.call("TryEquipSkill", _current_roster_id, _selected_node_id, slot_key)
+	if not ok:
+		var err := ""
+		if mgr.has_method("GetLastEquipError"):
+			err = str(mgr.call("GetLastEquipError"))
+		if _detail:
+			_detail.text = "装配失败：%s" % (err if not err.is_empty() else "未知原因")
+		return
 	var party := get_node_or_null("/root/PartyManager")
 	if party:
 		party.call("ApplySquadToCombat")

@@ -44,6 +44,12 @@ layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
+[node name="ToggleDamaged" type="Button" parent="Center/Panel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+text = "正常"
+
 [node name="HintLabel" type="Label" parent="Center/Panel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

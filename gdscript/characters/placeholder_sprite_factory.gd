@@ -17,6 +17,58 @@ static func build_visual_for_roster(roster_id: String) -> CharacterVisualResourc
 	return res
 
 
+static func build_portrait_for_roster(roster_id: String, damaged: bool = false) -> Texture2D:
+	var cache_key := "portrait_damaged" if damaged else "portrait"
+	var path := "%sroster_%s_%s.png" % [GENERATED_DIR, roster_id, cache_key]
+	if ResourceLoader.exists(path):
+		var cached: Texture2D = load(path)
+		if cached:
+			return cached
+
+	var visual := build_visual_for_roster(roster_id)
+	var img := Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.12, 0.14, 0.18, 1.0))
+	_compose_portrait_layer(img, visual.body_texture, 32, 36)
+	var outfit_tex: Texture2D = visual.outfit_damaged if damaged else visual.outfit_normal
+	_compose_portrait_layer(img, outfit_tex, 32, 36)
+	_compose_portrait_layer(img, visual.head_accessory, 36, 16)
+	if damaged:
+		for y in range(128):
+			for x in range(128):
+				var c := img.get_pixel(x, y)
+				if c.a > 0.01:
+					img.set_pixel(x, y, Color(c.r * 1.08, c.g * 0.82, c.b * 0.82, c.a))
+	return ImageTexture.create_from_image(img)
+
+
+static func build_portrait_for_unit(unit_id: String, damaged: bool = false) -> Texture2D:
+	var visual := build_visual_for_unit(unit_id)
+	var img := Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.12, 0.14, 0.18, 1.0))
+	_compose_portrait_layer(img, visual.body_texture, 32, 36)
+	var outfit_tex: Texture2D = visual.outfit_damaged if damaged else visual.outfit_normal
+	_compose_portrait_layer(img, outfit_tex, 32, 36)
+	_compose_portrait_layer(img, visual.head_accessory, 36, 16)
+	if damaged:
+		for y in range(128):
+			for x in range(128):
+				var c := img.get_pixel(x, y)
+				if c.a > 0.01:
+					img.set_pixel(x, y, Color(c.r * 1.08, c.g * 0.82, c.b * 0.82, c.a))
+	return ImageTexture.create_from_image(img)
+
+
+static func _compose_portrait_layer(target: Image, tex: Texture2D, offset_x: int, offset_y: int) -> void:
+	if tex == null:
+		return
+	var src := tex.get_image()
+	if src == null:
+		return
+	src = src.duplicate()
+	src.resize(64, 64, Image.INTERPOLATE_NEAREST)
+	target.blit_rect(src, Rect2i(0, 0, 64, 64), Vector2i(offset_x, offset_y))
+
+
 static func build_visual_for_unit(unit_id: String) -> CharacterVisualResource:
 	var res := CharacterVisualResource.new()
 	res.body_texture = _load_or_generate(unit_id, "body", _body_color(unit_id))

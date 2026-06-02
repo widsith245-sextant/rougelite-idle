@@ -127,6 +127,17 @@ public partial class DbManager : Node
 		MaxActiveSlots = caps.DefaultMaxActiveSlots;
 		MaxActiveSkillSlots = caps.DefaultMaxActiveSkillSlots;
 		PassiveSlotsUnlocked = caps.PassiveSlotsUnlocked;
+
+		var debug = DebugSettingsLoader.Get();
+		if (debug.UnlockPassiveSkillSlots)
+		{
+			PassiveSlotsUnlocked = true;
+		}
+
+		if (debug.MaxActiveSkillSlotsOverride > 0)
+		{
+			MaxActiveSkillSlots = Math.Max(MaxActiveSkillSlots, debug.MaxActiveSkillSlotsOverride);
+		}
 	}
 
 	private void RecalculateEffects()

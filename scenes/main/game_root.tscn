@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://chest_bubble_hud_scene" path="res://scenes/layers/chest_bubble_hud.tscn" id="3d_chest"]
 [ext_resource type="PackedScene" uid="uid://stage_progress_bar_scene" path="res://scenes/layers/stage_progress_bar.tscn" id="3e_progress"]
 [ext_resource type="PackedScene" uid="uid://chest_reveal_overlay_scene" path="res://scenes/layers/chest_reveal_overlay.tscn" id="3f_reveal"]
-[ext_resource type="PackedScene" uid="uid://portrait_overlay_scene" path="res://scenes/layers/portrait_overlay.tscn" id="3g_portrait"]
+[ext_resource type="PackedScene" uid="uid://run_hud_scene" path="res://scenes/layers/run_hud.tscn" id="3i_runhud"]
 [ext_resource type="PackedScene" uid="uid://quick_bar_scene" path="res://scenes/layers/quick_bar.tscn" id="4_quickbar"]
 [ext_resource type="Script" path="res://gdscript/ui/popup_manager.gd" id="5_popup_mgr"]
 [ext_resource type="Script" path="res://gdscript/main/window_chrome.gd" id="6_window_chrome"]
@@ -36,7 +36,7 @@ script = ExtResource("6_window_chrome")
 
 [node name="ChestRevealOverlay" parent="." instance=ExtResource("3f_reveal")]
 
-[node name="PortraitOverlay" parent="." instance=ExtResource("3g_portrait")]
+[node name="RunHud" parent="." instance=ExtResource("3i_runhud")]
 
 [node name="StageProgressLayer" type="CanvasLayer" parent="."]
 layer = 3

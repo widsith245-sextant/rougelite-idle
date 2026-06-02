@@ -227,6 +227,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		return null
 	if drag_kind == "squad_slot" and roster_id.is_empty():
 		return null
+	if drag_kind == "skill_slot":
+		var skill_node_id: String = str(get_meta("node_id", ""))
+		if skill_node_id.is_empty():
+			return null
 
 	var payload := {
 		"drag_kind": drag_kind,
@@ -240,6 +244,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	elif drag_kind == "bench":
 		payload["drag_kind"] = "roster"
 		payload["source"] = "bench"
+	elif drag_kind == "skill_slot":
+		payload["node_id"] = str(get_meta("node_id", ""))
+		payload["slot_key"] = str(get_meta("slot_key", ""))
+		payload["roster_id"] = str(get_meta("roster_id", ""))
 	set_drag_preview(_make_drag_preview())
 	return payload
 
@@ -257,6 +265,17 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return true
 	if drag_kind == "squad_slot" and kind == "roster":
 		return true
+	if drag_kind == "skill_slot":
+		var slot_key: String = str(get_meta("slot_key", ""))
+		if kind == "skill_node":
+			var node_type: String = str(payload.get("node_type", "active"))
+			if str(payload.get("roster_id", "")) != str(get_meta("roster_id", "")):
+				return false
+			if node_type == "passive":
+				return slot_key == "passive_0"
+			return slot_key.begins_with("active_")
+		if kind == "skill_slot":
+			return str(payload.get("roster_id", "")) == str(get_meta("roster_id", ""))
 	return false
 
 

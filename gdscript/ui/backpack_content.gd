@@ -733,8 +733,8 @@ func _on_doll_gui_input(event: InputEvent) -> void:
 
 
 func _show_portrait() -> void:
-	var overlay := get_tree().root.get_node_or_null("GameRoot/PortraitOverlay")
-	if overlay and overlay.has_method("show_portrait"):
-		overlay.call("show_portrait", _selected_unit_id)
+	var mgr := get_node_or_null("/root/PortraitWindowManager")
+	if mgr and mgr.has_method("ShowPortrait"):
+		mgr.call("ShowPortrait", _selected_unit_id, false)
 	else:
 		_set_detail("立绘预览未加载（占位）")

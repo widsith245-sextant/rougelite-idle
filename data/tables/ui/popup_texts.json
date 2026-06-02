@@ -13,9 +13,9 @@
     "footer": "消耗星图点数解锁全局加成"
   },
   "wonderland": {
-    "title": "奇境",
-    "info": "15 层 · 三选一词条 · 消耗奇境门票",
-    "enterLabel": "进入奇境",
-    "ticketLabel": "持有门票: —"
+    "title": "奇境 Run",
+    "info": "线性 5–8 房间 · 通关结算 Meta 奖励",
+    "enterLabel": "开始 Run",
+    "ticketLabel": "测试模式：免门票"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "pickIntervalWaves": 3,
+  "choicesPerPick": 3,
+  "cards": [
+    { "id": "card_atk_10", "name": "锋刃", "desc": "全队伤害 +10%", "effect": { "type": "TeamDamagePercent", "value": 10 } },
+    { "id": "card_hp_15", "name": "坚壁", "desc": "全队生命 +15%", "effect": { "type": "TeamMaxHpPercent", "value": 15 } },
+    { "id": "card_heal_20", "name": "复苏", "desc": "立即恢复 20% HP", "effect": { "type": "InstantHealPercent", "value": 20 } },
+    { "id": "card_spd_12", "name": "疾行", "desc": "移速 +12%", "effect": { "type": "TeamMoveSpeedPercent", "value": 12 } },
+    { "id": "card_crit_8", "name": "精准", "desc": "暴击率 +8%", "effect": { "type": "TeamCritPercent", "value": 8 } },
+    { "id": "card_gold_run", "name": "贪婪", "desc": "Run 内击杀金币 +25%", "effect": { "type": "RunGoldBonusPercent", "value": 25 } }
+  ]
+}

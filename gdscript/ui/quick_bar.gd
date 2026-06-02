@@ -37,8 +37,22 @@ func _ready() -> void:
 	%CultivationButton.pressed.connect(_open_popup.bind(POPUP_IDS.cultivation))
 	%WonderlandButton.pressed.connect(_open_popup.bind(POPUP_IDS.wonderland))
 	%StageButton.pressed.connect(_open_popup.bind(POPUP_IDS.stage))
+	if has_node("%PortraitButton"):
+		%PortraitButton.pressed.connect(_open_portrait_preview)
 
 	_set_expanded(false, false)
+
+
+func _open_portrait_preview() -> void:
+	var party := get_node_or_null("/root/PartyManager")
+	if party == null:
+		return
+	var unit_id := "ally_a"
+	if party.has_method("GetUnitIdForSlot"):
+		unit_id = str(party.call("GetUnitIdForSlot", 0))
+	var mgr := get_node_or_null("/root/PortraitWindowManager")
+	if mgr and mgr.has_method("ShowPortrait"):
+		mgr.call("ShowPortrait", unit_id, false)
 
 
 func _on_toggle_pressed() -> void:

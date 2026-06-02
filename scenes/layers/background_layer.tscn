@@ -1,7 +1,10 @@
-[gd_scene load_steps=1 format=3 uid="uid://background_layer_scene"]
+[gd_scene load_steps=2 format=3 uid="uid://background_layer_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/background_layer.gd" id="1_script"]
 
 [node name="BackgroundLayer" type="CanvasLayer"]
 layer = 0
+script = ExtResource("1_script")
 
 [node name="ScrollRoot" type="Control" parent="."]
 layout_mode = 3
@@ -19,9 +22,31 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0.1, 0.12, 1)
+color = Color(0.0784314, 0.0941176, 0.121569, 1)
+
+[node name="GridOverlay" type="ColorRect" parent="ScrollRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.2, 0.24, 0.25)
+
+[node name="WonderBand" type="ColorRect" parent="ScrollRoot"]
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0.45, 0.22, 0.62, 0.35)
 
 [node name="Hint" type="Label" parent="ScrollRoot"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

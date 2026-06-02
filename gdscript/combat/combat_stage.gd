@@ -18,6 +18,10 @@ const OverheadHudScene := preload("res://scenes/ui/components/unit_overhead_hud.
 @onready var _enemy_spawn: Node2D = %EnemySpawn
 @onready var _vfx_manager: Node2D = %VfxManager
 @onready var _camera: Camera2D = %BattleCamera
+@onready var _stage_bg: ColorRect = %StageBg
+
+const TRAINING_STAGE_TINT := Color(1.0, 1.0, 1.0, 1.0)
+const WONDERLAND_STAGE_TINT := Color(0.85, 0.75, 1.0, 1.0)
 
 var _ally_nodes: Dictionary = {}
 var _enemy_nodes: Dictionary = {}
@@ -63,6 +67,8 @@ func _connect_event_bus(event_bus: Node) -> void:
 		event_bus.connect("SquadChanged", _on_squad_changed)
 	if event_bus.has_signal("UnitHpChanged"):
 		event_bus.connect("UnitHpChanged", _on_unit_hp_changed)
+	if event_bus.has_signal("RunVisualModeChanged"):
+		event_bus.connect("RunVisualModeChanged", _on_run_visual_mode_changed)
 
 
 func _on_march_state_changed(is_marching: bool) -> void:
@@ -71,6 +77,14 @@ func _on_march_state_changed(is_marching: bool) -> void:
 		_apply_march_walk()
 	else:
 		_stop_march_walk()
+
+
+func _on_run_visual_mode_changed(mode: String) -> void:
+	if _stage_bg == null:
+		return
+	var target := WONDERLAND_STAGE_TINT if mode == "wonderland" else TRAINING_STAGE_TINT
+	var tw := create_tween()
+	tw.tween_property(_stage_bg, "modulate", target, 0.3)
 
 
 func _on_squad_changed() -> void:

@@ -18,6 +18,7 @@ const SLOT_CELL_SIZE := Vector2(64, 64)
 var _selected_roster_id: String = ""
 var _selected_slot_index: int = -1
 var _preview_doll: Node2D
+var _preview_unit_id: String = ""
 
 
 func _ready() -> void:
@@ -143,6 +144,7 @@ func _select_first_roster() -> void:
 
 func _show_roster(roster_id: String, unit_id: String) -> void:
 	_selected_roster_id = roster_id
+	_preview_unit_id = unit_id
 	if _doll_host:
 		for child in _doll_host.get_children():
 			child.queue_free()
@@ -152,7 +154,18 @@ func _show_roster(roster_id: String, unit_id: String) -> void:
 			_preview_doll.scale = Vector2(0.9, 0.9)
 		if _doll_host.get_script() == RosterDragScript:
 			_doll_host.set("roster_id", roster_id)
+		if not _doll_host.gui_input.is_connected(_on_preview_doll_input):
+			_doll_host.gui_input.connect(_on_preview_doll_input)
 	_refresh_stats_summary(unit_id)
+
+
+func _on_preview_doll_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT and not _preview_unit_id.is_empty():
+			var mgr := get_node_or_null("/root/PortraitWindowManager")
+			if mgr and mgr.has_method("ShowPortrait"):
+				mgr.call("ShowPortrait", _preview_unit_id, false)
 
 
 func _refresh_stats_summary(unit_id: String) -> void:

@@ -5,6 +5,7 @@ using RougeliteIdle.Core;
 using RougeliteIdle.Core.Enums;
 using RougeliteIdle.Loot;
 using RougeliteIdle.Meta;
+using RougeliteIdle.Run;
 
 namespace RougeliteIdle.Stats;
 
@@ -211,6 +212,7 @@ public partial class StatsService : Node
 		}
 
 		ApplyEarlyGameCaps(stats, unit);
+		ApplyRunBuffModifiers(stats, unit);
 		stats.AddIncreased(StatId.Damage, _meta.GlobalStatBonusPercent);
 		if (_db != null)
 		{
@@ -235,6 +237,42 @@ public partial class StatsService : Node
 		if (stats.GetBase(StatId.Defense) > 0f)
 		{
 			stats.SetBase(StatId.Defense, stats.GetBase(StatId.Defense) * caps.GetMultiplier("Defense"));
+		}
+	}
+
+	private static void ApplyRunBuffModifiers(UnitStats stats, CombatUnitData unit)
+	{
+		if (!unit.IsAlly)
+		{
+			return;
+		}
+
+		var tree = Engine.GetMainLoop() as SceneTree;
+		var runCard = tree?.Root.GetNodeOrNull<RunCardManager>("/root/RunCardManager");
+		if (runCard == null || !runCard.HasActiveBuffs)
+		{
+			return;
+		}
+
+		var buffs = runCard.GetAggregatedBuffs();
+		if (buffs.DamagePercent > 0f)
+		{
+			stats.AddIncreased(StatId.Damage, buffs.DamagePercent / 100f);
+		}
+
+		if (buffs.MaxHpPercent > 0f)
+		{
+			stats.AddIncreased(StatId.MaxHp, buffs.MaxHpPercent / 100f);
+		}
+
+		if (buffs.MoveSpeedPercent > 0f)
+		{
+			stats.AddIncreased(StatId.MoveSpeed, buffs.MoveSpeedPercent / 100f);
+		}
+
+		if (buffs.CritPercent > 0f)
+		{
+			stats.AddFlat(StatId.CritRate, buffs.CritPercent / 100f);
 		}
 	}
 

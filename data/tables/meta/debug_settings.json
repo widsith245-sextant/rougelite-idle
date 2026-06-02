@@ -1,3 +1,6 @@
 {
-  "combatTraceEnabled": true
+  "combatTraceEnabled": true,
+  "skipWonderlandTicket": true,
+  "unlockPassiveSkillSlots": true,
+  "maxActiveSkillSlotsOverride": 2
 }
