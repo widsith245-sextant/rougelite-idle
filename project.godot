@@ -35,7 +35,11 @@ RunSessionManager="*res://Scripts/Run/RunSessionManager.cs"
 RunCardManager="*res://Scripts/Run/RunCardManager.cs"
 PortraitWindowManager="*res://Scripts/Run/PortraitWindowManager.cs"
 BroadcastWindowManager="*res://Scripts/Run/BroadcastWindowManager.cs"
+LogWindowManager="*res://Scripts/Core/LogWindowManager.cs"
+OfflineRewardsWindowManager="*res://Scripts/Meta/OfflineRewardsWindowManager.cs"
 SaveBootstrap="*res://Scripts/Save/SaveBootstrap.cs"
+StageProgressionManager="*res://Scripts/Meta/StageProgressionManager.cs"
+GameSettingsManager="*res://Scripts/Core/GameSettingsManager.cs"
 
 [display]
 
@@ -44,6 +48,8 @@ window/size/viewport_height=150
 window/size/resizable=false
 window/size/borderless=true
 window/size/extend_to_title=true
+window/dpi/allow_hidpi=true
+window/dpi/window_scale_override=0
 window/subwindows/embed_subwindows=false
 window/stretch/mode="canvas_items"
 

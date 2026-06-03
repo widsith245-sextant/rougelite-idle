@@ -16,6 +16,8 @@
     "title": "奇境 Run",
     "info": "线性 5–8 房间 · 通关结算 Meta 奖励",
     "enterLabel": "开始 Run",
-    "ticketLabel": "测试模式：免门票"
+    "ticketLabel": "测试模式：免门票",
+    "enterFailedNoTicket": "奇境门票不足，无法开始",
+    "enterFailedGeneric": "无法开始 Run，请稍后重试"
   }
 }

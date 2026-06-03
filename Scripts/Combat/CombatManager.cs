@@ -167,6 +167,14 @@ public partial class CombatManager : Node
 			return;
 		}
 
+		var stageProg = GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
+		if (stageProg != null && !stageProg.IsUnlocked(stageId))
+		{
+			_eventBus.EmitCombatBroadcast($"关卡尚未解锁：{stageId}", "meta");
+			GetNodeOrNull<GameLogger>("/root/GameLogger")?.LogCombatWarn($"SetStageId rejected locked stage={stageId}");
+			return;
+		}
+
 		_currentStageId = stageId;
 		_partyWipeHandled = false;
 		StartEncounter();

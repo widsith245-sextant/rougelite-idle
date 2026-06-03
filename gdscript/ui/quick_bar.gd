@@ -4,7 +4,7 @@ extends Control
 
 const COLLAPSED_HEIGHT := 18.0
 const EXPANDED_HEIGHT := 30.0
-const EXPANDED_WIDTH := 500.0
+const EXPANDED_WIDTH := 640.0
 const TWEEN_DURATION := 0.2
 
 const POPUP_IDS := {
@@ -15,6 +15,9 @@ const POPUP_IDS := {
 	"wonderland": 4,
 	"star_chart": 3,
 	"stage": 6,
+	"settings": 8,
+	"log": 9,
+	"offline": 10,
 }
 
 @onready var _bar_anchor: Control = %BarAnchor
@@ -37,6 +40,12 @@ func _ready() -> void:
 	%CultivationButton.pressed.connect(_open_popup.bind(POPUP_IDS.cultivation))
 	%WonderlandButton.pressed.connect(_open_popup.bind(POPUP_IDS.wonderland))
 	%StageButton.pressed.connect(_open_popup.bind(POPUP_IDS.stage))
+	if has_node("%SettingsButton"):
+		%SettingsButton.pressed.connect(_open_popup.bind(POPUP_IDS.settings))
+	if has_node("%LogButton"):
+		%LogButton.pressed.connect(_on_log_pressed)
+	if has_node("%OfflineButton"):
+		%OfflineButton.pressed.connect(_on_offline_pressed)
 	if has_node("%PortraitButton"):
 		%PortraitButton.pressed.connect(_open_portrait_preview)
 
@@ -66,6 +75,18 @@ func _on_collapse_pressed() -> void:
 func _open_popup(popup_id: int) -> void:
 	if _popup_manager and _popup_manager.has_method("open_popup"):
 		_popup_manager.open_popup(popup_id)
+
+
+func _on_log_pressed() -> void:
+	var mgr := get_node_or_null("/root/LogWindowManager")
+	if mgr and mgr.has_method("Toggle"):
+		mgr.call("Toggle")
+
+
+func _on_offline_pressed() -> void:
+	var mgr := get_node_or_null("/root/OfflineRewardsWindowManager")
+	if mgr and mgr.has_method("ShowPendingIfAny"):
+		mgr.call("ShowPendingIfAny")
 
 
 func _set_expanded(expanded: bool, animate: bool) -> void:

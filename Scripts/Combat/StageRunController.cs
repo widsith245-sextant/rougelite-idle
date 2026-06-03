@@ -273,6 +273,8 @@ public sealed class StageRunController
 
 		var prog = combat.GetProgressionManager();
 		prog?.GrantStageComplete(_stage.StageId, _stage.StageLevel);
+		var stageProg = combat.GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
+		stageProg?.MarkStageCleared(_stage.StageId);
 		combat.RestoreAllAlliesHpToMax(prog?.GetStageClearHealPercent() ?? 1f);
 		_runProgress = 0f;
 		_currentWaveIndex = 0;

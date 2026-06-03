@@ -25,6 +25,7 @@ grow_vertical = 2
 theme_override_constants/separation = 6
 
 [node name="Hint" type="Label" parent="VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 10
 text = "开战前选择关卡（选中后立即生效）"

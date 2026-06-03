@@ -2,7 +2,7 @@
   "initialGold": 0,
   "goldCap": 999999,
   "initialStarChartPoints": 0,
-  "initialWonderlandTickets": 0,
+  "initialWonderlandTickets": 3,
   "salvageGoldPerItemLevel": 5,
   "identifyGoldCost": 0,
   "offlineStarChartPerHour": 1

@@ -1,0 +1,82 @@
+[gd_scene load_steps=2 format=3 uid="uid://offline_rewards_window_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/offline_rewards_window.gd" id="1_script"]
+
+[node name="OfflineRewardsWindow" type="Window"]
+initial_position = 1
+size = Vector2i(360, 240)
+visible = false
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "离线挂机收益"
+horizontal_alignment = 1
+
+[node name="ElapsedLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "离线时长: —"
+horizontal_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "金币: +0"
+horizontal_alignment = 1
+
+[node name="ExpLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "经验: +0"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 9
+text = "公式说明"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Root/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+
+[node name="ClaimButton" type="Button" parent="Root/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "领取"
+
+[node name="LaterButton" type="Button" parent="Root/VBox/Buttons"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "稍后"

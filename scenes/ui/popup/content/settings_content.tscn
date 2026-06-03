@@ -1,0 +1,94 @@
+[gd_scene load_steps=2 format=3 uid="uid://settings_content"]
+
+[ext_resource type="Script" path="res://gdscript/ui/settings_content.gd" id="1_script"]
+
+[node name="SettingsContent" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="WindowHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "窗口"
+
+[node name="RememberWindowCheck" type="CheckBox" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "记住主窗位置"
+
+[node name="ResetWindowButton" type="Button" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "重置主窗位置"
+
+[node name="DisplayHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "显示"
+
+[node name="CombatTraceCheck" type="CheckBox" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "战斗日志追踪"
+
+[node name="IdentifyRevealCheck" type="CheckBox" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "鉴定 Reveal 动画"
+
+[node name="IntervalRow" type="HBoxContainer" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IntervalLabel" type="Label" parent="Scroll/VBox/IntervalRow"]
+layout_mode = 2
+text = "鉴定间隔倍率"
+
+[node name="IntervalOption" type="OptionButton" parent="Scroll/VBox/IntervalRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DataHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "数据"
+
+[node name="OpenSaveDirButton" type="Button" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "打开存档目录"
+
+[node name="ResetProgressButton" type="Button" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "重置进度"
+
+[node name="StatusLabel" type="Label" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = ""
+autowrap_mode = 3

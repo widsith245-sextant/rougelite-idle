@@ -14,6 +14,9 @@ public partial class SaveManager : Node
 
 	public bool HasSave => FileAccess.FileExists(SavePath);
 
+	/// <summary>Last session timestamp from the most recent LoadGame call.</summary>
+	public long LoadedLastSessionUnix { get; private set; }
+
 	public void SaveGame()
 	{
 		var loot = GetNode<LootManager>("/root/LootManager");
@@ -24,10 +27,11 @@ public partial class SaveManager : Node
 		var skills = GetNode<CharacterSkillManager>("/root/CharacterSkillManager");
 		var combat = GetNode<CombatManager>("/root/CombatManager");
 		var rosterProg = GetNode<RosterProgressionManager>("/root/RosterProgressionManager");
+		var stageProg = GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
 
 		var data = new SaveData
 		{
-			Version = 2,
+			Version = 3,
 			LastSessionUnix = (long)Time.GetUnixTimeFromSystem(),
 			StarChartPoints = meta.StarChartPoints,
 			GlobalStatBonusPercent = meta.GlobalStatBonusPercent,
@@ -46,6 +50,8 @@ public partial class SaveManager : Node
 			SkillEquippedByRoster = skills.ExportEquippedSkills(),
 			Combat = combat.ExportCombatSave(),
 			RosterProgress = rosterProg.ExportProgress(),
+			UnlockedStageIds = stageProg?.ExportUnlockedStageIds() ?? new List<string>(),
+			ClearedStageIds = stageProg?.ExportClearedStageIds() ?? new List<string>(),
 		};
 
 		var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = false });
@@ -111,7 +117,25 @@ public partial class SaveManager : Node
 		var combat = GetNode<CombatManager>("/root/CombatManager");
 		combat.SetPendingCombatSave(data.Combat);
 
+		var stageProg = GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
+		stageProg?.Restore(
+			data.UnlockedStageIds,
+			data.ClearedStageIds,
+			data.Version,
+			data.Combat?.StageId);
+
+		LoadedLastSessionUnix = data.LastSessionUnix;
 		return true;
+	}
+
+	public void DeleteSave()
+	{
+		if (!HasSave)
+		{
+			return;
+		}
+
+		DirAccess.RemoveAbsolute(ProjectSettings.GlobalizePath(SavePath));
 	}
 
 	public void StampSessionTime()

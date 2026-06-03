@@ -10,10 +10,6 @@ const DEBUG_SETTINGS_PATH := "res://data/tables/meta/debug_settings.json"
 @onready var _enter_button: Button = %EnterButton
 @onready var _rest_panel: HBoxContainer = %RestPanel
 @onready var _rest_button: Button = %RestButton
-@onready var _reward_panel: VBoxContainer = %RewardPanel
-@onready var _reward_gold: Button = %RewardGold
-@onready var _reward_heal: Button = %RewardHeal
-@onready var _reward_exp: Button = %RewardExp
 @onready var _abandon_button: Button = %AbandonButton
 @onready var _ticket_label: Label = %TicketLabel
 
@@ -24,12 +20,6 @@ func _ready() -> void:
 		_enter_button.pressed.connect(_on_enter_pressed)
 	if _rest_button:
 		_rest_button.pressed.connect(_on_rest_pressed)
-	if _reward_gold:
-		_reward_gold.pressed.connect(_on_reward_pressed.bind(0))
-	if _reward_heal:
-		_reward_heal.pressed.connect(_on_reward_pressed.bind(1))
-	if _reward_exp:
-		_reward_exp.pressed.connect(_on_reward_pressed.bind(2))
 	if _abandon_button:
 		_abandon_button.pressed.connect(_on_abandon_pressed)
 	var event_bus := get_node_or_null("/root/EventBus")
@@ -41,6 +31,7 @@ func _ready() -> void:
 func refresh() -> void:
 	_apply_texts()
 	_sync_from_run()
+	_update_enter_button_state()
 
 
 func _apply_texts() -> void:
@@ -53,7 +44,6 @@ func _apply_texts() -> void:
 		_info.text = str(data.get("info", "线性 5–8 房间 · 通关结算 Meta 奖励"))
 	if _enter_button and not _is_run_active():
 		_enter_button.text = str(data.get("enterLabel", "开始 Run"))
-		_enter_button.disabled = false
 	if _ticket_label:
 		if _skip_wonderland_ticket():
 			_ticket_label.text = str(data.get("ticketLabel", "测试模式：免门票"))
@@ -65,6 +55,24 @@ func _apply_texts() -> void:
 				if snap is Dictionary:
 					tickets = int(snap.get("wonderland_tickets", 0))
 			_ticket_label.text = "持有门票: %d" % tickets
+
+
+func _update_enter_button_state() -> void:
+	if _enter_button == null or _is_run_active():
+		return
+	if _skip_wonderland_ticket():
+		_enter_button.disabled = false
+		return
+	var prog := get_node_or_null("/root/ProgressionManager")
+	var tickets := 0
+	if prog:
+		var snap: Variant = prog.call("GetHudSnapshot")
+		if snap is Dictionary:
+			tickets = int(snap.get("wonderland_tickets", 0))
+	_enter_button.disabled = tickets < 1
+	if tickets < 1 and _status:
+		var texts := _load_section("wonderland")
+		_status.text = str(texts.get("enterFailedNoTicket", "奇境门票不足"))
 
 
 func _sync_from_run() -> void:
@@ -89,7 +97,7 @@ func _sync_from_run() -> void:
 		else:
 			_progress.text = "房间 —/—"
 
-	if _status:
+	if _status and not _enter_button.disabled:
 		_status.text = "状态: %s" % _state_label(state)
 
 	var active := state not in ["Idle", "RunComplete", "RunFailed"]
@@ -100,8 +108,6 @@ func _sync_from_run() -> void:
 		_abandon_button.visible = active
 	if _rest_panel:
 		_rest_panel.visible = active and awaiting and room_type == "rest"
-	if _reward_panel:
-		_reward_panel.visible = false
 
 
 func _set_idle_ui() -> void:
@@ -111,13 +117,10 @@ func _set_idle_ui() -> void:
 		_status.text = "状态: 待机"
 	if _enter_button:
 		_enter_button.visible = true
-		_enter_button.disabled = false
 	if _abandon_button:
 		_abandon_button.visible = false
 	if _rest_panel:
 		_rest_panel.visible = false
-	if _reward_panel:
-		_reward_panel.visible = false
 
 
 func _is_run_active() -> bool:
@@ -133,12 +136,32 @@ func _is_run_active() -> bool:
 
 func _on_enter_pressed() -> void:
 	var run := get_node_or_null("/root/RunSessionManager")
-	if run and run.has_method("StartRun"):
-		var ok: bool = bool(run.call("StartRun"))
-		if ok:
-			var popup_mgr := get_tree().root.get_node_or_null("GameRoot/PopupManager")
-			if popup_mgr and popup_mgr.has_method("close_popup"):
-				popup_mgr.call("close_popup", 4)
+	if run == null:
+		return
+	var ok := false
+	if run.has_method("TryStartRun"):
+		ok = bool(run.call("TryStartRun"))
+	elif run.has_method("StartRun"):
+		ok = bool(run.call("StartRun"))
+	if ok:
+		if _status:
+			_status.text = "Run 进行中 — 见左上奇境 HUD"
+		await get_tree().create_timer(0.3).timeout
+		var popup_mgr := get_tree().root.get_node_or_null("GameRoot/PopupManager")
+		if popup_mgr and popup_mgr.has_method("close_popup"):
+			popup_mgr.call("close_popup", 4)
+	else:
+		var reason := ""
+		if run.has_method("GetLastStartFailureReason"):
+			reason = str(run.call("GetLastStartFailureReason"))
+		if reason.is_empty():
+			var texts := _load_section("wonderland")
+			reason = str(texts.get("enterFailedGeneric", "无法开始 Run"))
+		if _status:
+			_status.text = reason
+		var logger := get_node_or_null("/root/GameLogger")
+		if logger and logger.has_method("Log"):
+			logger.call("Log", "Run", 2, reason)
 	refresh()
 
 
@@ -146,13 +169,6 @@ func _on_rest_pressed() -> void:
 	var run := get_node_or_null("/root/RunSessionManager")
 	if run and run.has_method("ApplyRestHeal"):
 		run.call("ApplyRestHeal")
-	refresh()
-
-
-func _on_reward_pressed(choice: int) -> void:
-	var run := get_node_or_null("/root/RunSessionManager")
-	if run and run.has_method("ApplyRewardChoice"):
-		run.call("ApplyRewardChoice", choice)
 	refresh()
 
 

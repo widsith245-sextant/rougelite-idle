@@ -294,7 +294,36 @@ public partial class LootManager : Node
 	public Godot.Collections.Dictionary? IdentifyNextAsDictionary(int currentStageLevel)
 	{
 		var item = IdentifyNext(currentStageLevel);
-		return item == null ? null : ItemToDictionary(item);
+		if (item == null)
+		{
+			return null;
+		}
+
+		var dict = ItemToDictionary(item);
+		_eventBus.EmitItemIdentified(dict);
+		return dict;
+	}
+
+	public Godot.Collections.Array IdentifyBatchAsDictionaries(int currentStageLevel, int maxCount)
+	{
+		var result = new Godot.Collections.Array();
+		if (maxCount <= 0)
+		{
+			maxCount = _unidentifiedChests.Count;
+		}
+
+		while (_unidentifiedChests.Count > 0 && result.Count < maxCount)
+		{
+			var dict = IdentifyNextAsDictionary(currentStageLevel);
+			if (dict == null)
+			{
+				break;
+			}
+
+			result.Add(dict);
+		}
+
+		return result;
 	}
 
 	public Godot.Collections.Array GetIdentifiedItemsSnapshot()

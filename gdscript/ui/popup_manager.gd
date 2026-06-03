@@ -10,6 +10,7 @@ enum PopupId {
 	CHARACTER_STATS = 5,
 	STAGE_SELECT = 6,
 	RUN_CARD_PICK = 7,
+	SETTINGS = 8,
 }
 
 const RUN_CARD_PICK_SIZE := Vector2i(640, 320)
@@ -23,6 +24,7 @@ const POPUP_TITLES := {
 	PopupId.CHARACTER_STATS: "详细属性",
 	PopupId.STAGE_SELECT: "关卡",
 	PopupId.RUN_CARD_PICK: "选择增益卡牌",
+	PopupId.SETTINGS: "设置",
 }
 
 const CONTENT_SCENES := {
@@ -34,6 +36,7 @@ const CONTENT_SCENES := {
 	PopupId.CHARACTER_STATS: preload("res://scenes/ui/popup/content/detailed_stats_content.tscn"),
 	PopupId.STAGE_SELECT: preload("res://scenes/ui/popup/content/stage_select_content.tscn"),
 	PopupId.RUN_CARD_PICK: preload("res://scenes/ui/popup/content/run_card_pick_content.tscn"),
+	PopupId.SETTINGS: preload("res://scenes/ui/popup/content/settings_content.tscn"),
 }
 
 const WindowBaseScene := preload("res://scenes/ui/popup/popup_window_base.tscn")
@@ -106,6 +109,7 @@ func _get_or_create_window(popup_id: int) -> Window:
 	window.popup_title = POPUP_TITLES.get(popup_id, "Panel")
 
 	get_tree().root.add_child(window)
+	SatelliteWindow.configure(window)
 
 	var content_root: Control = window.get_content_root()
 	var content: Control = CONTENT_SCENES[popup_id].instantiate()

@@ -2,6 +2,8 @@ extends CanvasLayer
 
 ## Full-screen-ish chest identify reveal overlay.
 
+signal reveal_finished
+
 @onready var _panel: PanelContainer = %Panel
 @onready var _title: Label = %Title
 @onready var _affix_box: VBoxContainer = %AffixBox
@@ -102,6 +104,7 @@ func _finish(skip_tween_kill: bool = false) -> void:
 	var gate := get_node_or_null("/root/UiFxGate")
 	if gate and gate.has_method("release"):
 		gate.call("release")
+	reveal_finished.emit()
 
 
 func _on_panel_input(event: InputEvent) -> void:

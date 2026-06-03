@@ -215,6 +215,12 @@ public partial class ProgressionManager : Node
 		var rosterProg = GetNodeOrNull<RosterProgressionManager>("/root/RosterProgressionManager");
 		var avgLevel = rosterProg?.GetAverageActiveRosterLevel(party) ?? 1;
 		var mul = ComputeRewardMultiplier(avgLevel, stageLevel);
+		var band = EarlyGameCapsLoader.Get().EarlyStageBand;
+		if (band != null && stageLevel <= band.MaxStageLevel)
+		{
+			mul *= band.RewardMultiplier;
+		}
+
 		rosterProg?.GrantExpToActiveSquad(reward.Exp * mul);
 		AddGold(Mathf.RoundToInt(reward.Gold * mul));
 	}

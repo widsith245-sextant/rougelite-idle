@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://game_root_scene"]
+[gd_scene load_steps=13 format=3 uid="uid://game_root_scene"]
 
 [ext_resource type="PackedScene" uid="uid://background_layer_scene" path="res://scenes/layers/background_layer.tscn" id="1_bg"]
 [ext_resource type="PackedScene" uid="uid://combat_stage_layer_scene" path="res://scenes/layers/combat_stage.tscn" id="2_combat"]
@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://quick_bar_scene" path="res://scenes/layers/quick_bar.tscn" id="4_quickbar"]
 [ext_resource type="Script" path="res://gdscript/ui/popup_manager.gd" id="5_popup_mgr"]
 [ext_resource type="Script" path="res://gdscript/main/window_chrome.gd" id="6_window_chrome"]
+[ext_resource type="Script" path="res://gdscript/main/window_drag_controller.gd" id="7_window_drag"]
 
 [node name="GameRoot" type="Control"]
 layout_mode = 3
@@ -23,6 +24,9 @@ custom_minimum_size = Vector2(400, 150)
 
 [node name="WindowChrome" type="Node" parent="."]
 script = ExtResource("6_window_chrome")
+
+[node name="WindowDragController" type="Node" parent="."]
+script = ExtResource("7_window_drag")
 
 [node name="BackgroundLayer" parent="." instance=ExtResource("1_bg")]
 

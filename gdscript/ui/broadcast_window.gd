@@ -20,6 +20,7 @@ const CATEGORY_COLORS := {
 var _pending: Array = []
 var _active_labels: Array = []
 var _stagger_timer: float = 0.0
+var _last_main_pos := Vector2i(-99999, -99999)
 
 
 func _ready() -> void:
@@ -28,9 +29,8 @@ func _ready() -> void:
 	min_size = WINDOW_SIZE
 	max_size = WINDOW_SIZE
 	borderless = true
-	always_on_top = true
-	transient = true
 	unresizable = true
+	SatelliteWindow.configure(self)
 	visible = true
 	_position_above_main()
 	var event_bus := get_node_or_null("/root/EventBus")
@@ -39,7 +39,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	_position_above_main()
+	var main := get_tree().root.get_node_or_null("GameRoot")
+	if main:
+		var main_win := main.get_window()
+		if main_win and main_win.position != _last_main_pos:
+			_position_above_main()
 	if _pending.is_empty():
 		return
 	_stagger_timer -= delta
@@ -58,7 +62,16 @@ func _position_above_main() -> void:
 	if main_win == null:
 		return
 	var pos := main_win.position
-	position = Vector2i(pos.x, pos.y - WINDOW_SIZE.y - 4)
+	var main_size := main_win.size
+	var screen := DisplayServer.window_get_current_screen()
+	var usable := DisplayServer.screen_get_usable_rect(screen)
+	var gap := 4
+	var above_y := pos.y - WINDOW_SIZE.y - gap
+	if above_y >= usable.position.y:
+		position = Vector2i(pos.x, above_y)
+	else:
+		position = Vector2i(pos.x, pos.y + main_size.y + gap)
+	_last_main_pos = pos
 
 
 func _on_combat_broadcast(message: String, category: String) -> void:

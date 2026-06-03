@@ -208,6 +208,11 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "鉴定"
 
+[node name="BatchIdentifyButton" type="Button" parent="MainVBox/FooterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "批量鉴定"
+
 [node name="SalvageButton" type="Button" parent="MainVBox/FooterHBox"]
 unique_name_in_owner = true
 layout_mode = 2

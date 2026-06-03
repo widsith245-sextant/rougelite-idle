@@ -18,9 +18,8 @@ func _ready() -> void:
 	title = "立绘"
 	size = Vector2i(220, 280)
 	min_size = Vector2i(220, 280)
-	always_on_top = true
-	transient = true
 	borderless = false
+	SatelliteWindow.configure(self)
 	visible = false
 	close_requested.connect(_finish)
 	if _panel:

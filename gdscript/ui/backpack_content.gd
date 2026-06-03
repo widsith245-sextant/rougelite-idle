@@ -11,6 +11,8 @@ const SLOT_TYPES := [
 ]
 const SLOT_LABELS := ["武", "甲", "头", "手", "靴", "饰", "背", "奇"]
 const ALL_UNIT_IDS := ["ally_a", "ally_b", "ally_c"]
+const IDENTIFY_DELAY := 0.55
+const REVEAL_WAIT := 0.9
 
 @onready var _unit_selector: OptionButton = %UnitSelector
 @onready var _level_label: Label = %LevelLabel
@@ -29,6 +31,7 @@ const ALL_UNIT_IDS := ["ally_a", "ally_b", "ally_c"]
 @onready var _equip_button: Button = %EquipButton
 @onready var _unequip_button: Button = %UnequipButton
 @onready var _identify_button: Button = %IdentifyButton
+@onready var _batch_identify_button: Button = %BatchIdentifyButton
 @onready var _salvage_button: Button = %SalvageButton
 @onready var _unlock_button: Button = %UnlockButton
 @onready var _inspect_button: Button = %InspectButton
@@ -44,6 +47,7 @@ var _cells_built := false
 var _tooltip_root: PanelContainer
 var _tooltip_title: Label
 var _tooltip_body: Label
+var _batch_identifying := false
 
 
 func _ready() -> void:
@@ -53,6 +57,8 @@ func _ready() -> void:
 	_equip_button.pressed.connect(_on_equip_pressed)
 	_unequip_button.pressed.connect(_on_unequip_pressed)
 	_identify_button.pressed.connect(_on_identify_pressed)
+	if _batch_identify_button:
+		_batch_identify_button.pressed.connect(_on_batch_identify_pressed)
 	_salvage_button.pressed.connect(_on_salvage_pressed)
 	if _unlock_button:
 		_unlock_button.pressed.connect(_on_unlock_pressed)
@@ -582,10 +588,68 @@ func _on_unequip_pressed() -> void:
 
 
 func _on_identify_pressed() -> void:
+	if _batch_identifying:
+		return
+	_identify_one()
+
+
+func _on_batch_identify_pressed() -> void:
+	if _batch_identifying:
+		return
+	_run_batch_identify()
+
+
+func _run_batch_identify() -> void:
 	var loot := get_node_or_null("/root/LootManager")
 	if loot == null:
 		return
-	var result: Variant = loot.call("IdentifyNextAsDictionary", 1)
+	var count: int = int(loot.call("GetUnidentifiedCount"))
+	if count <= 0:
+		_set_detail("没有待鉴定的宝箱")
+		return
+
+	var log_mgr := get_node_or_null("/root/LogWindowManager")
+	if log_mgr and log_mgr.has_method("Show"):
+		log_mgr.call("Show")
+
+	_batch_identifying = true
+	_set_identify_buttons_enabled(false)
+	_set_detail("批量鉴定中… 0/%d" % count)
+
+	var done := 0
+	while true:
+		if not is_inside_tree():
+			break
+		var remaining: int = int(loot.call("GetUnidentifiedCount"))
+		if remaining <= 0:
+			break
+		var result: Variant = loot.call("IdentifyNextAsDictionary", _get_identify_stage_level())
+		if result == null:
+			break
+		var data: Dictionary = result
+		done += 1
+		_set_detail("批量鉴定 %d · [%s] %s" % [
+			done,
+			_quality_label(str(data.get("quality", "common"))),
+			data.get("display_name", "?"),
+		])
+		await _play_identify_reveal(data)
+		await get_tree().create_timer(_get_identify_delay()).timeout
+
+	_batch_identifying = false
+	_set_identify_buttons_enabled(true)
+	_set_detail("批量鉴定完成 · 共 %d 件" % done)
+	refresh()
+	if _content_tab and _content_tab.current_tab == 1:
+		_content_tab.current_tab = 0
+		_on_content_tab_changed(0)
+
+
+func _identify_one() -> void:
+	var loot := get_node_or_null("/root/LootManager")
+	if loot == null:
+		return
+	var result: Variant = loot.call("IdentifyNextAsDictionary", _get_identify_stage_level())
 	if result == null:
 		_set_detail("没有待鉴定的宝箱")
 	else:
@@ -595,13 +659,51 @@ func _on_identify_pressed() -> void:
 			data.get("display_name", "?"),
 			data.get("item_level", 0),
 		])
-		var overlay := get_tree().root.get_node_or_null("GameRoot/ChestRevealOverlay")
-		if overlay and overlay.has_method("play_reveal"):
-			overlay.call("play_reveal", data)
+		await _play_identify_reveal(data)
 	refresh()
 	if _content_tab and _content_tab.current_tab == 1:
 		_content_tab.current_tab = 0
 		_on_content_tab_changed(0)
+
+
+func _get_identify_stage_level() -> int:
+	var roster := get_node_or_null("/root/RosterProgressionManager")
+	var party := get_node_or_null("/root/PartyManager")
+	if roster and party and roster.has_method("GetAverageActiveRosterLevel"):
+		return int(roster.call("GetAverageActiveRosterLevel", party))
+	return 1
+
+
+func _set_identify_buttons_enabled(enabled: bool) -> void:
+	if _identify_button:
+		_identify_button.disabled = not enabled
+	if _batch_identify_button:
+		_batch_identify_button.disabled = not enabled
+
+
+func _get_identify_delay() -> float:
+	var settings := get_node_or_null("/root/GameSettingsManager")
+	if settings and settings.has_method("GetIdentifyIntervalMultiplier"):
+		return IDENTIFY_DELAY * float(settings.call("GetIdentifyIntervalMultiplier"))
+	return IDENTIFY_DELAY
+
+
+func _play_identify_reveal(data: Dictionary):
+	var settings := get_node_or_null("/root/GameSettingsManager")
+	if settings and settings.has_method("GetIdentifyRevealEnabled"):
+		if not bool(settings.call("GetIdentifyRevealEnabled")):
+			return
+	var overlay := get_tree().root.get_node_or_null("GameRoot/ChestRevealOverlay")
+	if overlay == null or not overlay.has_method("play_reveal"):
+		await get_tree().create_timer(REVEAL_WAIT).timeout
+		return
+	if overlay.has_signal("reveal_finished"):
+		var finished := overlay.reveal_finished
+		overlay.call("play_reveal", data)
+		await finished
+	else:
+		overlay.call("play_reveal", data)
+		await get_tree().create_timer(REVEAL_WAIT).timeout
 
 
 func _on_cell_hovered(index: int, entered: bool) -> void:

@@ -46,8 +46,18 @@ public static class EarlyGameCapsLoader
 		public Dictionary<string, float> PlayerStatMultipliers { get; set; } = new();
 		public int PlayerInitialLevelCap { get; set; } = 10;
 		public int BagSlotsVisible { get; set; } = 48;
+		public string StageUnlockMode { get; set; } = "sequential_clear";
+		public List<string> InitialUnlockedStages { get; set; } = new();
+		public EarlyStageBand? EarlyStageBand { get; set; }
 
 		public float GetMultiplier(string key, float fallback = 1f) =>
 			PlayerStatMultipliers.GetValueOrDefault(key, fallback);
+	}
+
+	public sealed class EarlyStageBand
+	{
+		public int MaxStageLevel { get; set; } = 3;
+		public Dictionary<string, float> AllyStatMultipliers { get; set; } = new();
+		public float RewardMultiplier { get; set; } = 1f;
 	}
 }

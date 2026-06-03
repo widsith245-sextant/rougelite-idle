@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using Godot;
+using RougeliteIdle.Core;
 
 namespace RougeliteIdle.Meta;
 
@@ -11,12 +12,14 @@ public partial class MetaManager : Node
 
 	private readonly Dictionary<string, StarChartNodeEntry> _starNodes = new();
 	private readonly HashSet<string> _purchasedStarNodes = new();
+	private EventBus _eventBus = null!;
 
 	public int StarChartPoints { get; private set; }
 	public float GlobalStatBonusPercent { get; private set; }
 
 	public override void _Ready()
 	{
+		_eventBus = GetNode<EventBus>("/root/EventBus");
 		LoadStarChartTree();
 	}
 
@@ -82,6 +85,7 @@ public partial class MetaManager : Node
 		StarChartPoints -= node.CostStarPoints;
 		_purchasedStarNodes.Add(nodeId);
 		RecalculateStarBonus();
+		_eventBus.EmitStarChartChanged();
 		return true;
 	}
 

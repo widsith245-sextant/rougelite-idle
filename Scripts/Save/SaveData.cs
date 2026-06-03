@@ -4,14 +4,14 @@ namespace RougeliteIdle.Save;
 
 public sealed class SaveData
 {
-	public int Version { get; set; } = 2;
+	public int Version { get; set; } = 3;
 	public long LastSessionUnix { get; set; }
 
 	public int StarChartPoints { get; set; }
 	public float GlobalStatBonusPercent { get; set; }
 	public List<string> StarChartPurchasedNodes { get; set; } = new();
 
-	public int TeamLevel { get; set; } = 1;
+	public int TeamLevel { get; set; } = 1; // Deprecated: legacy fallback for RosterProgress migration
 	public float TeamExp { get; set; }
 	public int Gold { get; set; }
 	public int WonderlandTickets { get; set; }
@@ -31,6 +31,8 @@ public sealed class SaveData
 
 	public CombatSaveDto? Combat { get; set; }
 	public Dictionary<string, RosterProgressDto> RosterProgress { get; set; } = new();
+	public List<string> UnlockedStageIds { get; set; } = new();
+	public List<string> ClearedStageIds { get; set; } = new();
 }
 
 public sealed class RosterProgressDto

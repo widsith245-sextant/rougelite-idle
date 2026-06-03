@@ -62,6 +62,12 @@ public partial class EventBus : Node
 	public delegate void RosterLevelChangedEventHandler(string rosterId);
 
 	[Signal]
+	public delegate void RosterExpChangedEventHandler(string rosterId);
+
+	[Signal]
+	public delegate void StarChartChangedEventHandler();
+
+	[Signal]
 	public delegate void RunSessionChangedEventHandler(string state, int roomIndex, int roomTotal, string roomType);
 
 	[Signal]
@@ -75,6 +81,15 @@ public partial class EventBus : Node
 
 	[Signal]
 	public delegate void RunCardPickOfferedEventHandler();
+
+	[Signal]
+	public delegate void ItemIdentifiedEventHandler(Godot.Collections.Dictionary itemData);
+
+	[Signal]
+	public delegate void StageClearedEventHandler(string stageId);
+
+	[Signal]
+	public delegate void StageUnlockedEventHandler(string stageId);
 
 	public void EmitPositionChanged(string entityId, float oldX, float newX)
 	{
@@ -171,6 +186,16 @@ public partial class EventBus : Node
 		EmitSignal(SignalName.RosterLevelChanged, rosterId);
 	}
 
+	public void EmitRosterExpChanged(string rosterId)
+	{
+		EmitSignal(SignalName.RosterExpChanged, rosterId);
+	}
+
+	public void EmitStarChartChanged()
+	{
+		EmitSignal(SignalName.StarChartChanged);
+	}
+
 	public void EmitRunSessionChanged(string state, int roomIndex, int roomTotal, string roomType)
 	{
 		EmitSignal(SignalName.RunSessionChanged, state, roomIndex, roomTotal, roomType);
@@ -194,5 +219,20 @@ public partial class EventBus : Node
 	public void EmitRunCardPickOffered()
 	{
 		EmitSignal(SignalName.RunCardPickOffered);
+	}
+
+	public void EmitItemIdentified(Godot.Collections.Dictionary itemData)
+	{
+		EmitSignal(SignalName.ItemIdentified, itemData);
+	}
+
+	public void EmitStageCleared(string stageId)
+	{
+		EmitSignal(SignalName.StageCleared, stageId);
+	}
+
+	public void EmitStageUnlocked(string stageId)
+	{
+		EmitSignal(SignalName.StageUnlocked, stageId);
 	}
 }

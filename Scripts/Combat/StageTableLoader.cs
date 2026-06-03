@@ -146,6 +146,60 @@ public static class StageTableLoader
 		var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 		_catalogCache = JsonSerializer.Deserialize<StageCatalogRoot>(file.GetAsText(), options) ?? new StageCatalogRoot();
 	}
+
+	public static IReadOnlyList<StageLevelEntry> GetOrderedCatalogEntries()
+	{
+		EnsureCatalogLoaded();
+		var result = new List<StageLevelEntry>();
+		if (_catalogCache?.Chapters == null)
+		{
+			return result;
+		}
+
+		foreach (var chapter in _catalogCache.Chapters)
+		{
+			if (chapter.Levels == null)
+			{
+				continue;
+			}
+
+			result.AddRange(chapter.Levels.Where(l => !string.IsNullOrEmpty(l.StageId)));
+		}
+
+		return result;
+	}
+
+	public static string GetNextStageId(string stageId)
+	{
+		if (string.IsNullOrEmpty(stageId))
+		{
+			return string.Empty;
+		}
+
+		var entries = GetOrderedCatalogEntries();
+		for (var i = 0; i < entries.Count; i++)
+		{
+			if (!entries[i].StageId.Equals(stageId, System.StringComparison.Ordinal))
+			{
+				continue;
+			}
+
+			return i + 1 < entries.Count ? entries[i + 1].StageId : string.Empty;
+		}
+
+		return string.Empty;
+	}
+
+	public static string GetUnlockRequirement(string stageId)
+	{
+		if (string.IsNullOrEmpty(stageId))
+		{
+			return string.Empty;
+		}
+
+		var hit = GetOrderedCatalogEntries().FirstOrDefault(e => e.StageId == stageId);
+		return hit?.UnlockFrom ?? string.Empty;
+	}
 }
 
 public sealed class StageDefinition

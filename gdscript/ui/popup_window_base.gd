@@ -21,10 +21,9 @@ func _ready() -> void:
 
 	# 独立系统窗口：由 project.godot 的 embed_subwindows=false 控制；
 	# 弹窗挂到 get_tree().root（见 popup_manager.gd），勿用已移除的 embedded 属性。
-	always_on_top = true
 	exclusive = false
-	transient = true
 	unresizable = false
+	SatelliteWindow.configure(self)
 	borderless = false
 
 	size = POPUP_SIZE

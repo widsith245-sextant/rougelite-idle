@@ -57,7 +57,9 @@ public partial class RosterProgressionManager : Node
 		var state = _progress[rosterId];
 		state.Exp += amount;
 		var leveled = false;
-		while (state.Exp >= GetExpRequiredForNextLevel(rosterId) && state.Level < _table.MaxTeamLevel)
+		var levelCap = EarlyGameCapsLoader.Get().PlayerInitialLevelCap;
+		var maxLevel = Mathf.Min(_table.MaxTeamLevel, levelCap);
+		while (state.Exp >= GetExpRequiredForNextLevel(rosterId) && state.Level < maxLevel)
 		{
 			state.Exp -= GetExpRequiredForNextLevel(rosterId);
 			state.Level++;
@@ -67,6 +69,10 @@ public partial class RosterProgressionManager : Node
 		if (leveled)
 		{
 			_eventBus.EmitRosterLevelChanged(rosterId);
+		}
+		else
+		{
+			_eventBus.EmitRosterExpChanged(rosterId);
 		}
 	}
 

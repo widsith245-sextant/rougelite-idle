@@ -116,6 +116,27 @@ custom_minimum_size = Vector2(52, 22)
 theme_override_font_sizes/font_size = 9
 text = "关卡"
 
+[node name="SettingsButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(52, 22)
+theme_override_font_sizes/font_size = 9
+text = "设置"
+
+[node name="LogButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(40, 22)
+theme_override_font_sizes/font_size = 9
+text = "日志"
+
+[node name="OfflineButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(40, 22)
+theme_override_font_sizes/font_size = 9
+text = "离线"
+
 [node name="CollapseButton" type="Button" parent="QuickBar/BarAnchor/ExpandedRow"]
 unique_name_in_owner = true
 layout_mode = 2

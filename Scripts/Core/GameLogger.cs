@@ -14,6 +14,9 @@ public partial class GameLogger : Node
 		Error,
 	}
 
+	[Signal]
+	public delegate void LogLineAddedEventHandler(string line);
+
 	private const int RingBufferSize = 200;
 	private const string SettingsPath = "res://data/tables/meta/debug_settings.json";
 
@@ -22,11 +25,23 @@ public partial class GameLogger : Node
 
 	public bool CombatTraceEnabled => _combatTraceEnabled;
 
+	public void SetCombatTraceEnabled(bool enabled)
+	{
+		_combatTraceEnabled = enabled;
+	}
+
 	public override void _Ready()
 	{
 		LoadSettings();
 		var eventBus = GetNodeOrNull<EventBus>("/root/EventBus");
-		if (eventBus == null || !_combatTraceEnabled)
+		if (eventBus == null)
+		{
+			return;
+		}
+
+		eventBus.ItemIdentified += OnItemIdentified;
+
+		if (!_combatTraceEnabled)
 		{
 			return;
 		}
@@ -47,6 +62,8 @@ public partial class GameLogger : Node
 			_ringBuffer.Dequeue();
 		}
 
+		EmitSignal(SignalName.LogLineAdded, line);
+
 		switch (level)
 		{
 			case LogLevel.Warn:
@@ -65,6 +82,8 @@ public partial class GameLogger : Node
 
 	public void LogCombatWarn(string message) => Log("Combat", LogLevel.Warn, message);
 
+	public void LogLoot(string message) => Log("Loot", LogLevel.Info, message);
+
 	public Godot.Collections.Array GetRecentLines(int maxLines = 50)
 	{
 		var result = new Godot.Collections.Array();
@@ -76,6 +95,15 @@ public partial class GameLogger : Node
 		}
 
 		return result;
+	}
+
+	private void OnItemIdentified(Godot.Collections.Dictionary itemData)
+	{
+		var quality = itemData.GetValueOrDefault("quality", "common").AsString();
+		var displayName = itemData.GetValueOrDefault("display_name", "?").AsString();
+		var itemLevel = itemData.GetValueOrDefault("item_level", 0).AsInt32();
+		var slot = itemData.GetValueOrDefault("slot", "").AsString();
+		LogLoot($"鉴定获得 [{quality}] {displayName} iLvl {itemLevel} · 部位 {slot}");
 	}
 
 	private void OnDamageDealt(string sourceId, string targetId, float amount, bool isCrit)

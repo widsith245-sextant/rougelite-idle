@@ -36,6 +36,7 @@ public partial class RunSessionManager : Node
 	private RunSessionState _state = RunSessionState.Idle;
 	private int _roomsCleared;
 	private bool _awaitingRoomAction;
+	private string _lastStartFailureReason = string.Empty;
 
 	public RunSessionState State => _state;
 	public int CurrentRoomIndex => _currentRoomIndex;
@@ -43,6 +44,8 @@ public partial class RunSessionManager : Node
 	public bool IsActive => _state != RunSessionState.Idle
 		&& _state != RunSessionState.RunComplete
 		&& _state != RunSessionState.RunFailed;
+
+	public string GetLastStartFailureReason() => _lastStartFailureReason;
 
 	public float GetEnemyStatMultiplier() =>
 		_pool.EnemyStatMultiplier > 0f ? _pool.EnemyStatMultiplier : 12f;
@@ -102,19 +105,33 @@ public partial class RunSessionManager : Node
 
 	public Godot.Collections.Array GetActiveCardsSnapshot() => _runCards.GetActiveCardsSnapshot();
 
-	public bool StartRun(int? seed = null)
+	public bool StartRun(int? seed = null) => TryStartRun(seed);
+
+	public bool TryStartRun(int? seed = null)
 	{
+		_lastStartFailureReason = string.Empty;
+
+		if (_state == RunSessionState.InRoom)
+		{
+			_lastStartFailureReason = "已有进行中的 Run";
+			return false;
+		}
+
 		if (_state != RunSessionState.Idle
 			&& _state != RunSessionState.RunComplete
 			&& _state != RunSessionState.RunFailed
 			&& _state != RunSessionState.RoomCleared)
 		{
+			_lastStartFailureReason = "当前状态无法开始 Run";
 			return false;
 		}
+
+		ResetToIdleIfTerminal();
 
 		var debug = DebugSettingsLoader.Get();
 		if (!debug.SkipWonderlandTicket && _progression.WonderlandTickets < 1)
 		{
+			_lastStartFailureReason = "奇境门票不足";
 			_eventBus.EmitCombatBroadcast("奇境门票不足", "run");
 			return false;
 		}
@@ -122,6 +139,7 @@ public partial class RunSessionManager : Node
 		if (!debug.SkipWonderlandTicket)
 		{
 			_progression.TrySpendWonderlandTicket();
+			GetNodeOrNull<SaveBootstrap>("/root/SaveBootstrap")?.RequestSave();
 		}
 
 		if (seed.HasValue)
@@ -133,6 +151,7 @@ public partial class RunSessionManager : Node
 		BuildRoomQueue();
 		if (_roomQueue.Count == 0)
 		{
+			_lastStartFailureReason = "房间队列生成失败";
 			_eventBus.EmitCombatBroadcast("房间队列生成失败", "run");
 			return false;
 		}
@@ -153,6 +172,24 @@ public partial class RunSessionManager : Node
 		return true;
 	}
 
+	private void ResetToIdleIfTerminal()
+	{
+		if (_state != RunSessionState.RunComplete
+			&& _state != RunSessionState.RunFailed
+			&& _state != RunSessionState.RoomCleared)
+		{
+			return;
+		}
+
+		_roomQueue.Clear();
+		_currentRoomIndex = 0;
+		_roomsCleared = 0;
+		_awaitingRoomAction = false;
+		_state = RunSessionState.Idle;
+		_combat.RunRogueliteActive = false;
+		EmitState();
+	}
+
 	public void EnterCurrentRoom()
 	{
 		var room = GetCurrentRoom();
@@ -169,16 +206,21 @@ public partial class RunSessionManager : Node
 		switch (room.Type)
 		{
 			case "combat":
+				_combat.SetRunPaused(false);
 				if (!string.IsNullOrEmpty(room.StageId))
 				{
-					_combat.SetStageId(room.StageId);
+					var stageId = ResolveCombatStageId(room.StageId);
+					room.StageId = stageId;
+					_combat.SetStageId(stageId);
 				}
 
 				break;
 			case "rest":
+				_combat.SetRunPaused(true);
 				_awaitingRoomAction = true;
 				break;
 			case "reward":
+				_combat.SetRunPaused(true);
 				_runCards.BeginRoomRewardPick();
 				break;
 		}
@@ -265,7 +307,12 @@ public partial class RunSessionManager : Node
 		}
 
 		var room = GetCurrentRoom();
-		if (room == null || room.Type != "combat" || room.StageId != stageId)
+		if (room == null || room.Type != "combat")
+		{
+			return;
+		}
+
+		if (_combat.GetCurrentStageId() != stageId)
 		{
 			return;
 		}
@@ -355,8 +402,23 @@ public partial class RunSessionManager : Node
 	private void BuildRoomQueue()
 	{
 		var length = _rng.RandiRange(_pool.RunLength.Min, _pool.RunLength.Max);
-		var combatTemplates = _pool.Templates.Where(t => t.Type == "combat").ToList();
+		var stageProg = GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
+		var combatTemplates = _pool.Templates
+			.Where(t => t.Type == "combat")
+			.Where(t => string.IsNullOrEmpty(t.StageId) || stageProg == null || stageProg.IsUnlocked(t.StageId))
+			.ToList();
 		var specialTemplates = _pool.Templates.Where(t => t.Type != "combat").ToList();
+
+		if (combatTemplates.Count == 0 && stageProg != null)
+		{
+			combatTemplates.Add(new RunRoomDefinition
+			{
+				Id = "combat_fallback",
+				Type = "combat",
+				StageId = stageProg.GetHighestUnlockedStageId(),
+				Weight = 1,
+			});
+		}
 
 		for (var i = 0; i < length - 1; i++)
 		{
@@ -372,12 +434,47 @@ public partial class RunSessionManager : Node
 
 		if (_pool.BossRoom != null)
 		{
-			_roomQueue.Add(_pool.BossRoom);
+			var boss = _pool.BossRoom;
+			if (stageProg != null
+				&& !string.IsNullOrEmpty(boss.StageId)
+				&& !stageProg.IsUnlocked(boss.StageId))
+			{
+				GD.PushWarning($"Boss stage {boss.StageId} locked; using highest unlocked stage.");
+				_eventBus.EmitCombatBroadcast("Boss 关未解锁，已降级", "run");
+				boss = new RunRoomDefinition
+				{
+					Id = boss.Id,
+					Type = boss.Type,
+					StageId = stageProg.GetHighestUnlockedStageId(),
+					Weight = boss.Weight,
+				};
+			}
+
+			_roomQueue.Add(boss);
 		}
 		else if (combatTemplates.Count > 0)
 		{
 			_roomQueue.Add(PickWeighted(combatTemplates));
 		}
+	}
+
+	private string ResolveCombatStageId(string requestedStageId)
+	{
+		if (string.IsNullOrEmpty(requestedStageId))
+		{
+			return requestedStageId;
+		}
+
+		var stageProg = GetNodeOrNull<StageProgressionManager>("/root/StageProgressionManager");
+		if (stageProg == null || stageProg.IsUnlocked(requestedStageId))
+		{
+			return requestedStageId;
+		}
+
+		var fallback = stageProg.GetHighestUnlockedStageId();
+		GD.PushWarning($"Run room stage {requestedStageId} locked; using {fallback}");
+		_eventBus.EmitCombatBroadcast($"奇境战斗关降级为 {fallback}", "run");
+		return fallback;
 	}
 
 	private RunRoomDefinition PickWeighted(IReadOnlyList<RunRoomDefinition> candidates)
