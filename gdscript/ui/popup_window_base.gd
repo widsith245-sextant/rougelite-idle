@@ -50,6 +50,7 @@ func show_popup() -> void:
 	SatelliteWindow.place_popup_beside_main(self, self)
 	visible = true
 	show()
+	SatelliteWindow.ensure_transient_parent(self)
 	var wid := get_window_id()
 	if wid >= 0:
 		DisplayServer.window_move_to_foreground(wid)

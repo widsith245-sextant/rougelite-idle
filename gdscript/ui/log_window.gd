@@ -42,6 +42,7 @@ func show_log() -> void:
 	_load_recent()
 	visible = true
 	show()
+	SatelliteWindow.ensure_transient_parent(self)
 
 
 func hide_log() -> void:

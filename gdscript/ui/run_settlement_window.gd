@@ -54,6 +54,7 @@ func show_settlement(data: Dictionary) -> void:
 	popup_centered()
 	visible = true
 	show()
+	SatelliteWindow.ensure_transient_parent(self)
 
 
 func hide_window() -> void:

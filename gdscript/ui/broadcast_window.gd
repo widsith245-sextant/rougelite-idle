@@ -33,6 +33,7 @@ func _ready() -> void:
 	SatelliteWindow.configure(self, true)
 	visible = true
 	_position_above_main()
+	SatelliteWindow.ensure_transient_parent(self)
 	var event_bus := get_node_or_null("/root/EventBus")
 	if event_bus and event_bus.has_signal("CombatBroadcast"):
 		event_bus.connect("CombatBroadcast", _on_combat_broadcast)

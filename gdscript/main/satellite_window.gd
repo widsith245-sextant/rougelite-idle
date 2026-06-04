@@ -5,6 +5,7 @@ extends RefCounted
 
 const BACKGROUND_COLOR := Color(0.0784314, 0.0941176, 0.121569, 1.0)
 const HEADER_BG_COLOR := Color(0.1, 0.12, 0.15, 1.0)
+const MAX_TRANSIENT_ATTEMPTS := 12
 
 static var _transient_links: Dictionary = {}
 
@@ -15,17 +16,27 @@ static func configure(win: Window, borderless: bool = true, always_on_top: bool 
 	win.borderless = borderless
 	win.always_on_top = always_on_top
 	win.transient = true
-	_apply_transient_parent.call_deferred(win)
 
 
-static func _apply_transient_parent(win: Window) -> void:
+static func ensure_transient_parent(win: Window, attempt: int = 0) -> void:
 	if not is_instance_valid(win):
+		return
+	if attempt > MAX_TRANSIENT_ATTEMPTS:
 		return
 	var main_win := get_main_window(win)
 	if main_win == null:
 		return
 	var win_id := win.get_window_id()
 	var main_id := main_win.get_window_id()
+	if win_id == 0:
+		if win.is_inside_tree():
+			var tree := win.get_tree()
+			if tree:
+				tree.process_frame.connect(
+					func() -> void: ensure_transient_parent(win, attempt + 1),
+					CONNECT_ONE_SHOT,
+				)
+		return
 	if win_id == main_id:
 		return
 	if int(_transient_links.get(win_id, -1)) == main_id:

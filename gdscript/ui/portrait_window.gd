@@ -61,6 +61,7 @@ func show_portrait(unit_id: String, damaged: bool = false) -> void:
 	popup_centered()
 	visible = true
 	show()
+	SatelliteWindow.ensure_transient_parent(self)
 	if _panel:
 		_panel.modulate.a = 0.0
 		_panel.scale = Vector2(0.85, 0.85)
