@@ -28,9 +28,10 @@
 
 ### Tier 2 — 管理弹窗（640×480）
 
-- 基类：`popup_window_base.gd` — 挂 `get_tree().root`，独立 OS 窗口
-- **全部 satellite 窗 `borderless=true`** + 深色 `ColorRect` 背景（`SatelliteWindow.BACKGROUND_COLOR`）
-- 管理：`popup_manager.gd` — 单例式开关各 content 场景
+- 基类：`popup_window_base.gd` — 挂 `get_tree().root`，独立 OS 窗口（`embed_subwindows=false`）
+- **管理弹窗**：`borderless=false`、创建用 `CallDeferred(add_child)`、`show_popup` 时 `place_popup_beside_main` + `window_move_to_foreground`
+- **播报/立绘等**：可无标题栏（`borderless=true`），`SatelliteWindow.BACKGROUND_COLOR` 深色底
+- 管理：`popup_manager.gd` — `_pending_open` 队列，窗口 `tree_entered` 后再注入 content
 
 | 键 | Content 场景 |
 |----|--------------|

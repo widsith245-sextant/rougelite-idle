@@ -9,11 +9,11 @@ const HEADER_BG_COLOR := Color(0.1, 0.12, 0.15, 1.0)
 static var _transient_links: Dictionary = {}
 
 
-static func configure(win: Window, borderless: bool = true) -> void:
+static func configure(win: Window, borderless: bool = true, always_on_top: bool = false) -> void:
 	if win == null:
 		return
 	win.borderless = borderless
-	win.always_on_top = false
+	win.always_on_top = always_on_top
 	win.transient = true
 	_apply_transient_parent.call_deferred(win)
 
@@ -72,3 +72,17 @@ static func get_main_window_rect(from: Node) -> Rect2i:
 	if main_win == null:
 		return Rect2i()
 	return Rect2i(main_win.position, main_win.size)
+
+
+static func place_popup_beside_main(win: Window, from: Node, gap: int = 8) -> void:
+	if win == null:
+		return
+	var main_rect := get_main_window_rect(from)
+	if main_rect.size == Vector2i.ZERO:
+		win.popup_centered()
+		return
+	var x := main_rect.position.x - win.size.x - gap
+	var y := main_rect.position.y
+	if x < 0:
+		x = main_rect.position.x + main_rect.size.x + gap
+	win.position = Vector2i(x, y)

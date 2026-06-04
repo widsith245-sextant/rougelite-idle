@@ -46,21 +46,22 @@ const CONTENT_SCENES := {
 const WindowBaseScene := preload("res://scenes/ui/popup/popup_window_base.tscn")
 
 var _windows: Dictionary = {}
+var _building: Dictionary = {}
+var _pending_open: Array = []
 var _pending_stats_unit_id: String = "ally_a"
 
 
 func open_popup(popup_id: int) -> void:
+	if _building.get(popup_id, false):
+		if popup_id not in _pending_open:
+			_pending_open.append(popup_id)
+		return
 	var window: Window = _get_or_create_window(popup_id)
-	window.show_popup()
-	var content_root: Control = window.get_content_root()
-	if content_root.get_child_count() > 0:
-		var content: Node = content_root.get_child(0)
-		if popup_id == PopupId.CHARACTER_STATS and content.has_method("set_unit_id"):
-			content.call("set_unit_id", _pending_stats_unit_id)
-		if content.has_method("refresh") and content.is_node_ready():
-			content.refresh()
-		elif content.has_method("refresh"):
-			content.call_deferred("refresh")
+	if window == null or not window.is_inside_tree():
+		if popup_id not in _pending_open:
+			_pending_open.append(popup_id)
+		return
+	_show_popup_window(popup_id, window)
 
 
 func open_character_stats(unit_id: String = "") -> void:
@@ -70,19 +71,7 @@ func open_character_stats(unit_id: String = "") -> void:
 
 
 func open_run_card_pick() -> void:
-	var window: Window = _get_or_create_window(PopupId.RUN_CARD_PICK)
-	window.size = RUN_CARD_PICK_SIZE
-	window.min_size = RUN_CARD_PICK_SIZE
-	window.max_size = RUN_CARD_PICK_SIZE
-	window.popup_title = POPUP_TITLES.get(PopupId.RUN_CARD_PICK, "选择增益卡牌")
-	if window.has_method("set_close_enabled"):
-		window.call("set_close_enabled", false)
-	window.show_popup()
-	var content_root: Control = window.get_content_root()
-	if content_root.get_child_count() > 0:
-		var content: Node = content_root.get_child(0)
-		if content.has_method("refresh"):
-			content.refresh()
+	_open_special_popup(PopupId.RUN_CARD_PICK, RUN_CARD_PICK_SIZE, "选择增益卡牌", false)
 
 
 func close_run_card_pick() -> void:
@@ -93,19 +82,7 @@ func close_run_card_pick() -> void:
 
 
 func open_run_relic_pick() -> void:
-	var window: Window = _get_or_create_window(PopupId.RUN_RELIC_PICK)
-	window.size = RUN_RELIC_PICK_SIZE
-	window.min_size = RUN_RELIC_PICK_SIZE
-	window.max_size = RUN_RELIC_PICK_SIZE
-	window.popup_title = POPUP_TITLES.get(PopupId.RUN_RELIC_PICK, "选择遗物")
-	if window.has_method("set_close_enabled"):
-		window.call("set_close_enabled", false)
-	window.show_popup()
-	var content_root: Control = window.get_content_root()
-	if content_root.get_child_count() > 0:
-		var content: Node = content_root.get_child(0)
-		if content.has_method("refresh"):
-			content.refresh()
+	_open_special_popup(PopupId.RUN_RELIC_PICK, RUN_RELIC_PICK_SIZE, "选择遗物", false)
 
 
 func close_run_relic_pick() -> void:
@@ -115,13 +92,39 @@ func close_run_relic_pick() -> void:
 		window.call("set_close_enabled", true)
 
 
+func _open_special_popup(popup_id: int, popup_size: Vector2i, title: String, close_enabled: bool) -> void:
+	if _building.get(popup_id, false):
+		if popup_id not in _pending_open:
+			_pending_open.append(popup_id)
+		return
+	var window: Window = _get_or_create_window(popup_id)
+	if window == null or not window.is_inside_tree():
+		if popup_id not in _pending_open:
+			_pending_open.append(popup_id)
+		return
+	window.size = popup_size
+	window.min_size = popup_size
+	window.max_size = popup_size
+	window.popup_title = title
+	if window.has_method("set_close_enabled"):
+		window.call("set_close_enabled", close_enabled)
+	_show_popup_window(popup_id, window)
+
+
 func close_popup(popup_id: int) -> void:
 	if _windows.has(popup_id):
 		_windows[popup_id].hide_popup()
 
 
 func toggle_popup(popup_id: int) -> void:
-	var window: Window = _get_or_create_window(popup_id)
+	if _building.get(popup_id, false):
+		if popup_id not in _pending_open:
+			_pending_open.append(popup_id)
+		return
+	if not _windows.has(popup_id):
+		open_popup(popup_id)
+		return
+	var window: Window = _windows[popup_id]
 	if window.visible:
 		window.hide_popup()
 	else:
@@ -131,26 +134,64 @@ func toggle_popup(popup_id: int) -> void:
 func _get_or_create_window(popup_id: int) -> Window:
 	if _windows.has(popup_id):
 		return _windows[popup_id]
+	if _building.get(popup_id, false):
+		return null
 
+	_building[popup_id] = true
 	var window: Window = WindowBaseScene.instantiate()
 	window.popup_title = POPUP_TITLES.get(popup_id, "Panel")
+	_windows[popup_id] = window
+	get_tree().root.call_deferred("add_child", window)
+	window.tree_entered.connect(_on_popup_window_entered.bind(popup_id), CONNECT_ONE_SHOT)
+	return window
 
-	get_tree().root.add_child(window)
-	# popup_window_base._ready 会调用 SatelliteWindow.configure，避免重复配置。
+
+func _on_popup_window_entered(popup_id: int) -> void:
+	var window: Window = _windows.get(popup_id, null)
+	if window == null or not is_instance_valid(window):
+		_building.erase(popup_id)
+		_flush_pending()
+		return
 
 	var content_root: Control = window.get_content_root()
-	var content: Control = CONTENT_SCENES[popup_id].instantiate()
-	content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_root.add_child(content)
-	if content.has_method("refresh"):
-		content.tree_entered.connect(func() -> void:
-			if popup_id == PopupId.CHARACTER_STATS and content.has_method("set_unit_id"):
-				content.call("set_unit_id", _pending_stats_unit_id)
-			if content.has_method("refresh"):
-				content.refresh()
-		, CONNECT_ONE_SHOT)
+	if content_root.get_child_count() == 0:
+		var content: Control = CONTENT_SCENES[popup_id].instantiate()
+		content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		content_root.add_child(content)
+		if content.has_method("refresh"):
+			content.tree_entered.connect(func() -> void:
+				if popup_id == PopupId.CHARACTER_STATS and content.has_method("set_unit_id"):
+					content.call("set_unit_id", _pending_stats_unit_id)
+				if content.has_method("refresh"):
+					content.refresh()
+			, CONNECT_ONE_SHOT)
 
-	_windows[popup_id] = window
-	return window
+	_building.erase(popup_id)
+	if popup_id in _pending_open:
+		_pending_open.erase(popup_id)
+		_show_popup_window(popup_id, window)
+	_flush_pending()
+
+
+func _flush_pending() -> void:
+	if _pending_open.is_empty():
+		return
+	var ids: Array = _pending_open.duplicate()
+	_pending_open.clear()
+	for pid in ids:
+		open_popup(pid)
+
+
+func _show_popup_window(popup_id: int, window: Window) -> void:
+	window.show_popup()
+	var content_root: Control = window.get_content_root()
+	if content_root.get_child_count() > 0:
+		var content: Node = content_root.get_child(0)
+		if popup_id == PopupId.CHARACTER_STATS and content.has_method("set_unit_id"):
+			content.call("set_unit_id", _pending_stats_unit_id)
+		if content.has_method("refresh") and content.is_node_ready():
+			content.refresh()
+		elif content.has_method("refresh"):
+			content.call_deferred("refresh")

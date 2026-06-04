@@ -23,7 +23,8 @@ func _ready() -> void:
 	# 弹窗挂到 get_tree().root（见 popup_manager.gd），勿用已移除的 embedded 属性。
 	exclusive = false
 	unresizable = false
-	SatelliteWindow.configure(self, true)
+	SatelliteWindow.configure(self, false, true)
+	borderless = false
 
 	size = POPUP_SIZE
 	min_size = POPUP_SIZE
@@ -46,9 +47,12 @@ func _apply_root_layout() -> void:
 
 func show_popup() -> void:
 	_apply_root_layout()
-	popup_centered()
+	SatelliteWindow.place_popup_beside_main(self, self)
 	visible = true
 	show()
+	var wid := get_window_id()
+	if wid >= 0:
+		DisplayServer.window_move_to_foreground(wid)
 
 
 func hide_popup() -> void:

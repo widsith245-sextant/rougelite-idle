@@ -14,9 +14,11 @@
 
 ## 多段伤害
 
-- `vfx_manager.spawn_damage_number_staggered(amount, pos, opts)` 支持 `sequence_index` 水平 spread（12px/段）
-- 同帧多 hit 使用 `STAGGER_DELAY = 0.08s` 错开
+- `vfx_manager.spawn_damage_number_staggered(amount, anchor_node, opts)`：跳字**必须**挂在目标 doll（`Node2D`）下，本地坐标上浮，随单位与相机平移同步
+- 禁止仅用 `CombatWorld` 固定 `global_position` 生成跳字（会在相机跟随时相对漂移出屏）
+- 支持 `sequence_index` 水平 spread（12px/段）；同帧多 hit 使用 `STAGGER_DELAY = 0.08s` 错开
 - `opts.target_id` 用于 per-target 序号计数
+- `combat_stage._resolve_damage_anchor` 解析 `_enemy_nodes` / `_ally_nodes` 后传入 VfxManager
 
 ## HUD 效果条
 

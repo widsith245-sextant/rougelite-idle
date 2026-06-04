@@ -255,16 +255,17 @@ func _on_damage_dealt(
 	if _vfx_manager == null:
 		return
 
-	var world_pos: Vector2 = _unit_positions.get(target_id, _enemy_spawn.global_position)
+	var anchor: Node2D = _resolve_damage_anchor(target_id)
 	var category := display_tag if not display_tag.is_empty() else damage_type
 	var opts := {
 		"category": category if not category.is_empty() else "physical",
 		"is_crit": is_crit,
 		"target_id": target_id,
 	}
-	if _vfx_manager.has_method("spawn_damage_number_staggered"):
-		_vfx_manager.spawn_damage_number_staggered(amount, world_pos, opts)
+	if anchor != null and _vfx_manager.has_method("spawn_damage_number_staggered"):
+		_vfx_manager.spawn_damage_number_staggered(amount, anchor, opts)
 	elif _vfx_manager.has_method("spawn_damage_number"):
+		var world_pos: Vector2 = _unit_positions.get(target_id, _enemy_spawn.global_position)
 		_vfx_manager.spawn_damage_number(amount, world_pos, opts)
 
 	if is_crit and _ally_nodes.has(_source_id):
@@ -272,6 +273,20 @@ func _on_damage_dealt(
 		if doll.has_method("apply_hit_stop"):
 			doll.apply_hit_stop(0.05)
 			_hit_stop_timer = 0.05
+
+
+func _resolve_damage_anchor(target_id: String) -> Node2D:
+	if target_id.is_empty():
+		return null
+	if _enemy_nodes.has(target_id):
+		var enemy: Node2D = _enemy_nodes[target_id]
+		if enemy != null and is_instance_valid(enemy):
+			return enemy
+	if _ally_nodes.has(target_id):
+		var ally: Node2D = _ally_nodes[target_id]
+		if ally != null and is_instance_valid(ally):
+			return ally
+	return null
 
 
 func _on_combat_effect_applied(_target_id: String, _effect_id: String, _display_name: String, _category: String, _pile: int, _intensity: float) -> void:

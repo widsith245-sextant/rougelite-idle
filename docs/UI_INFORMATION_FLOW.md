@@ -21,7 +21,7 @@
 | — | PopupManager | 逻辑节点，不绘制 |
 | 10 | GmToolsLayer | F8 GM 面板 |
 
-**卫星窗**：`popup_window_base.tscn` → 挂 `root`，640×480，`embed_subwindows=false`。
+**卫星窗**：`popup_window_base.tscn` → `root.CallDeferred(add_child)`，640×480，显示时贴主窗左侧并置前。
 
 ---
 
