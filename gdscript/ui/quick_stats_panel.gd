@@ -3,7 +3,6 @@ extends Control
 ## Right-side compact stat strip (leader ally_a).
 
 const LEADER_ID := "ally_a"
-const DISPLAY_KEYS: Array[String] = UiLabelsLoader.get_stat_compare_keys()
 
 @onready var _grid: GridContainer = %StatGrid
 
@@ -25,7 +24,7 @@ var _poll_accum: float = 0.0
 
 
 func _build_labels() -> void:
-	for key in DISPLAY_KEYS:
+	for key in UiLabelsLoader.STAT_COMPARE_KEYS:
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 0)
 		var title := Label.new()
@@ -64,7 +63,7 @@ func _refresh_from_service() -> void:
 func _apply_snapshot(snap: Dictionary) -> void:
 	if _grid == null:
 		return
-	for key in DISPLAY_KEYS:
+	for key in UiLabelsLoader.STAT_COMPARE_KEYS:
 		var node := _grid.find_child("Val_%s" % key, true, false)
 		if node == null:
 			continue

@@ -2,8 +2,6 @@ extends Control
 
 ## Eight-stat compare strip: base → final (Δ colored).
 
-const DISPLAY_KEYS: Array[String] = UiLabelsLoader.get_stat_compare_keys()
-
 @onready var _grid: GridContainer = %StatGrid
 @onready var _range_hint: Label = %RangeHint
 
@@ -37,7 +35,7 @@ func refresh(unit_id: String, preview_item: Dictionary = {}) -> void:
 func _build_labels() -> void:
 	if _grid == null:
 		return
-	for key in DISPLAY_KEYS:
+	for key in UiLabelsLoader.STAT_COMPARE_KEYS:
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 0)
 		var title := Label.new()
@@ -54,7 +52,7 @@ func _build_labels() -> void:
 
 
 func _apply_snapshot(snap: Dictionary) -> void:
-	for key in DISPLAY_KEYS:
+	for key in UiLabelsLoader.STAT_COMPARE_KEYS:
 		var node: Label = _value_nodes.get(key)
 		if node == null:
 			continue
