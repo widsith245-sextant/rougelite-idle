@@ -76,6 +76,21 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text = "数据"
 
+[node name="ToolsHeader" type="Label" parent="Scroll/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "工具"
+
+[node name="ToggleLogButton" type="Button" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "打开/关闭日志"
+
+[node name="PortraitButton" type="Button" parent="Scroll/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "立绘预览"
+
 [node name="OpenSaveDirButton" type="Button" parent="Scroll/VBox"]
 unique_name_in_owner = true
 layout_mode = 2

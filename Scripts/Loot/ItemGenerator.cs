@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Godot;
 using RougeliteIdle.Core.Enums;
+using RougeliteIdle.Stats;
 
 namespace RougeliteIdle.Loot;
 
@@ -59,6 +60,7 @@ public static class ItemGenerator
 			BaseStatMin = template.BaseStatMin,
 			BaseStatMax = template.BaseStatMax,
 			EffectId = template.EffectId,
+			ClassId = template.ClassId,
 		};
 
 		item.RolledBaseStat = rng.RandfRange(item.BaseStatMin, item.BaseStatMax);
@@ -74,15 +76,27 @@ public static class ItemGenerator
 			});
 		}
 
-		for (var i = 0; i < qualityMeta.BonusAffixCount && template.AffixDefinitions.Count > 0; i++)
+		for (var i = 0; i < qualityMeta.BonusAffixCount; i++)
 		{
-			var affix = template.AffixDefinitions[rng.RandiRange(0, template.AffixDefinitions.Count - 1)];
+			var rolled = AffixPoolLoader.RollForSlot(template.Slot, rng);
+			if (rolled != null)
+			{
+				item.Affixes.Add(rolled);
+				continue;
+			}
+
+			if (template.AffixDefinitions.Count == 0)
+			{
+				break;
+			}
+
+			var fallback = template.AffixDefinitions[rng.RandiRange(0, template.AffixDefinitions.Count - 1)];
 			item.Affixes.Add(new AffixRoll
 			{
-				Id = affix.Id,
-				DisplayName = affix.DisplayName,
-				Value = rng.RandfRange(affix.Min, affix.Max),
-				IsPrimary = affix.IsPrimary,
+				Id = fallback.Id,
+				DisplayName = fallback.DisplayName,
+				Value = rng.RandfRange(fallback.Min, fallback.Max),
+				IsPrimary = fallback.IsPrimary,
 			});
 		}
 
@@ -100,6 +114,7 @@ public static class ItemGenerator
 			BaseStatMin = entry.BaseStatMin,
 			BaseStatMax = entry.BaseStatMax,
 			EffectId = entry.EffectId,
+			ClassId = entry.ClassId ?? string.Empty,
 		};
 
 		if (entry.Affixes == null)
@@ -135,6 +150,7 @@ public static class ItemGenerator
 		public string Id { get; set; } = string.Empty;
 		public string DisplayName { get; set; } = string.Empty;
 		public string Slot { get; set; } = string.Empty;
+		public string? ClassId { get; set; }
 		public int ItemLevel { get; set; }
 		public float BaseStatMin { get; set; }
 		public float BaseStatMax { get; set; }

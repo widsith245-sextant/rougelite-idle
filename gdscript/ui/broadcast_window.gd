@@ -30,7 +30,7 @@ func _ready() -> void:
 	max_size = WINDOW_SIZE
 	borderless = true
 	unresizable = true
-	SatelliteWindow.configure(self)
+	SatelliteWindow.configure(self, true)
 	visible = true
 	_position_above_main()
 	var event_bus := get_node_or_null("/root/EventBus")

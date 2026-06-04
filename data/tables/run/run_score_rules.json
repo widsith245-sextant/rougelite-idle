@@ -1,0 +1,11 @@
+{
+  "goldPerRoom": 15,
+  "goldSuccessBonus": 40,
+  "expPerRoom": 12,
+  "grades": [
+    { "grade": "S", "chestQuality": "legendary", "requiresSuccess": true, "maxDeaths": 0, "minRoomsCleared": 7 },
+    { "grade": "A", "chestQuality": "epic", "requiresSuccess": true, "maxDeaths": 1 },
+    { "grade": "B", "chestQuality": "rare", "requiresSuccess": true },
+    { "grade": "C", "chestQuality": "common", "requiresSuccess": false, "minRoomsCleared": 3 }
+  ]
+}

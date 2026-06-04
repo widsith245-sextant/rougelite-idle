@@ -59,6 +59,16 @@ func _cache_nodes() -> void:
 	_icon = %Icon
 	_name_label = %NameLabel
 	_count_label = %CountLabel
+	if _name_label:
+		_name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_name_label.max_lines_visible = 2
+		_name_label.add_theme_font_size_override("font_size", 7)
+
+
+func _set_name_label_text(text: String) -> void:
+	if _name_label == null:
+		return
+	_name_label.text = text
 
 
 func _flush_pending() -> void:
@@ -86,7 +96,8 @@ func _apply_item(display_name: String, item_level: int, count: int, quality: Str
 	if _name_label == null:
 		return
 	_has_item = true
-	_name_label.text = display_name.substr(0, mini(4, display_name.length()))
+	_set_name_label_text(display_name)
+	tooltip_text = display_name
 	_count_label.text = str(count) if count > 1 else ""
 	_count_label.visible = count > 1
 	var q: String = quality if not quality.is_empty() else _quality_from_level(item_level)
@@ -105,7 +116,8 @@ func _apply_chest(_display_name: String, quality: String) -> void:
 	if _name_label == null:
 		return
 	_has_item = true
-	_name_label.text = "箱"
+	_set_name_label_text("宝箱")
+	tooltip_text = _display_name if not _display_name.is_empty() else "未鉴定宝箱"
 	_count_label.visible = false
 	_current_quality = quality
 	_icon.color = _color_for_quality(quality)
@@ -127,8 +139,8 @@ func setup_roster(display_name: String, roster_id_param: String = "") -> void:
 		return
 	roster_id = roster_id_param
 	_has_item = not roster_id.is_empty()
-	var short := display_name.substr(0, mini(4, display_name.length()))
-	_name_label.text = short
+	_set_name_label_text(display_name)
+	tooltip_text = display_name
 	_count_label.visible = false
 	var q := PlaceholderSpriteFactory.quality_for_roster(roster_id)
 	_icon.color = PlaceholderSpriteFactory.color_for_roster(roster_id)
@@ -139,7 +151,8 @@ func _apply_slot(slot_label: String) -> void:
 	if _name_label == null:
 		return
 	_has_item = false
-	_name_label.text = slot_label
+	_set_name_label_text(slot_label)
+	tooltip_text = slot_label
 	_count_label.visible = false
 	_icon.color = Color(0.35, 0.4, 0.55, 1)
 	add_theme_stylebox_override("panel", _slot_style())
@@ -150,6 +163,7 @@ func clear_cell() -> void:
 	if _name_label == null:
 		return
 	_has_item = false
+	slot_type_name = ""
 	_name_label.text = ""
 	_count_label.visible = false
 	_icon.color = Color(0.18, 0.2, 0.24, 1)
@@ -238,6 +252,8 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"slot_type": slot_type_name,
 		"roster_id": roster_id,
 	}
+	if drag_kind == "bag" and has_meta("class_id"):
+		payload["class_id"] = str(get_meta("class_id", ""))
 	if drag_kind == "squad_slot":
 		payload["drag_kind"] = "roster"
 		payload["source"] = "squad_slot"
@@ -259,10 +275,12 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	var kind: String = str(payload.get("drag_kind", ""))
 	if drag_kind == "equip_slot" and kind == "bag":
 		if slot_type_name.is_empty():
-			return true
-		return str(payload.get("slot_type", "")) == slot_type_name or slot_type_name.is_empty()
+			return false
+		return str(payload.get("slot_type", "")) == slot_type_name
 	if drag_kind == "bag" and kind == "equip_slot":
-		return true
+		if _has_item:
+			return false
+		return _loot_has_bag_space()
 	if drag_kind == "squad_slot" and kind == "roster":
 		return true
 	if drag_kind == "skill_slot":
@@ -295,3 +313,10 @@ func _make_drag_preview() -> Control:
 	label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	preview.add_child(label)
 	return preview
+
+
+func _loot_has_bag_space() -> bool:
+	var loot := get_node_or_null("/root/LootManager")
+	if loot == null:
+		return false
+	return bool(loot.call("HasBagSpace"))

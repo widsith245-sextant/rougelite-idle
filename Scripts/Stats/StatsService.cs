@@ -158,10 +158,26 @@ public partial class StatsService : Node
 	public UnitStats BuildForUnit(CombatUnitData unit)
 	{
 		var stats = BuildBaseForUnit(unit);
-		ApplyEquipment(stats, unit.Id);
+		var combat = GetNodeOrNull<CombatManager>("/root/CombatManager");
+		if (combat != null && combat.RunRogueliteActive && unit.IsAlly)
+		{
+			ApplyRunRelicModifiers(stats);
+		}
+		else
+		{
+			ApplyEquipment(stats, unit.Id);
+		}
+
 		stats.RecalculateDerived();
 		ApplyToUnitHp(unit, stats);
 		return stats;
+	}
+
+	private static void ApplyRunRelicModifiers(UnitStats stats)
+	{
+		var tree = Engine.GetMainLoop() as SceneTree;
+		var relics = tree?.Root.GetNodeOrNull<RunRelicManager>("/root/RunRelicManager");
+		relics?.ApplyRelicModifiers(stats);
 	}
 
 	public UnitStats BuildBaseForUnit(CombatUnitData unit)
@@ -317,7 +333,8 @@ public partial class StatsService : Node
 			const float equipmentScale = 0.4f;
 			if (item.RolledBaseStat > 0f)
 			{
-				stats.AddFlat(StatId.Damage, item.RolledBaseStat * equipmentScale);
+				var baseStat = MapBaseStatForSlot(item.Slot, item.RolledBaseStat);
+				stats.AddFlat(baseStat.statId, baseStat.value * equipmentScale);
 			}
 
 			foreach (var affix in item.Affixes)
@@ -331,6 +348,20 @@ public partial class StatsService : Node
 				}
 			}
 		}
+	}
+
+	private static (StatId statId, float value) MapBaseStatForSlot(RougeliteIdle.Core.Enums.SlotType slot, float rolled)
+	{
+		return slot switch
+		{
+			RougeliteIdle.Core.Enums.SlotType.Armor or RougeliteIdle.Core.Enums.SlotType.Helmet
+				or RougeliteIdle.Core.Enums.SlotType.Gloves or RougeliteIdle.Core.Enums.SlotType.Boots
+				=> (StatId.Defense, rolled),
+			RougeliteIdle.Core.Enums.SlotType.Weapon => (StatId.Damage, rolled),
+			RougeliteIdle.Core.Enums.SlotType.BackAccessory or RougeliteIdle.Core.Enums.SlotType.Trinket
+				=> (StatId.MoveSpeed, rolled * 0.5f),
+			_ => (StatId.Damage, rolled),
+		};
 	}
 
 	private static void ApplyToUnitHp(CombatUnitData unit, UnitStats stats)

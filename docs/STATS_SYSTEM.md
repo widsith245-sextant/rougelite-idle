@@ -48,4 +48,6 @@
 | `data/tables/character/character_skill_trees.json` | 角色技能树 UI/装配 |
 | `data/tables/meta/db_tree.json` | 刷DB 金币 Meta |
 | `data/tables/meta/early_game_caps.json` | 初期数值上限 |
-| `data/tables/ui/stat_labels.json` | UI 文案 |
+| `data/tables/ui/stat_labels.json` | 属性中文全名（`stats.*.displayName`）；对比条经 `UiLabelsLoader` |
+| `data/tables/ui/slot_labels.json` | 8 装备槽中文全名 |
+| `data/tables/ui/ui_asset_manifest.json` | UI 资产替换清单 |

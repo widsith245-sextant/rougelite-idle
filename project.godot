@@ -33,6 +33,9 @@ CharacterSkillManager="*res://Scripts/Meta/CharacterSkillManager.cs"
 UiFxGate="*res://gdscript/ui/ui_fx_gate.gd"
 RunSessionManager="*res://Scripts/Run/RunSessionManager.cs"
 RunCardManager="*res://Scripts/Run/RunCardManager.cs"
+RunRelicManager="*res://Scripts/Run/RunRelicManager.cs"
+RunStatsAggregator="*res://Scripts/Run/RunStatsAggregator.cs"
+RunSettlementWindowManager="*res://Scripts/Run/RunSettlementWindowManager.cs"
 PortraitWindowManager="*res://Scripts/Run/PortraitWindowManager.cs"
 BroadcastWindowManager="*res://Scripts/Run/BroadcastWindowManager.cs"
 LogWindowManager="*res://Scripts/Core/LogWindowManager.cs"
@@ -48,14 +51,21 @@ window/size/viewport_height=150
 window/size/resizable=false
 window/size/borderless=true
 window/size/extend_to_title=true
-window/dpi/allow_hidpi=true
-window/dpi/window_scale_override=0
 window/subwindows/embed_subwindows=false
 window/stretch/mode="canvas_items"
+window/dpi/window_scale_override=0
 
 [dotnet]
 
 project/assembly_name="Rougelite_Idle"
+
+[input]
+
+toggle_gm={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194332,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
+]
+}
 
 [physics]
 

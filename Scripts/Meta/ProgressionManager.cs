@@ -171,7 +171,8 @@ public partial class ProgressionManager : Node
 		if (combat != null && combat.RunRogueliteActive)
 		{
 			var runCard = GetNodeOrNull<RunCardManager>("/root/RunCardManager");
-			var bonus = runCard?.GetRunGoldBonusPercent() ?? 0f;
+			var runRelic = GetNodeOrNull<RunRelicManager>("/root/RunRelicManager");
+			var bonus = (runCard?.GetRunGoldBonusPercent() ?? 0f) + (runRelic?.GetRunGoldBonusPercent() ?? 0f);
 			if (bonus > 0f)
 			{
 				goldGrant = Mathf.RoundToInt(goldGrant * (1f + bonus / 100f));
@@ -194,9 +195,33 @@ public partial class ProgressionManager : Node
 		_rng.Randomize();
 		if (_rng.Randf() <= reward.Chest.Chance)
 		{
-			loot.AddPendingChest(reward.Chest.Quality);
-			_eventBus?.EmitCombatBroadcast($"获得 {reward.Chest.Quality} 宝箱", "reward");
+			var rewardTier = EnemyTemplateLoader.GetRewardTier(enemyId);
+			var chestQuality = ResolveChestQualityWithRewardTier(reward.Chest.Quality, rewardTier);
+			loot.AddPendingChest(chestQuality);
+			_eventBus?.EmitCombatBroadcast($"获得 {chestQuality} 宝箱", "reward");
 		}
+	}
+
+	internal static string ResolveChestQualityWithRewardTier(string baseQuality, int rewardTier)
+	{
+		var ladder = new[] { "common", "rare", "epic" };
+		var baseIdx = 0;
+		for (var i = 0; i < ladder.Length; i++)
+		{
+			if (string.Equals(ladder[i], baseQuality, StringComparison.OrdinalIgnoreCase))
+			{
+				baseIdx = i;
+				break;
+			}
+		}
+
+		var minIdx = rewardTier switch
+		{
+			>= 5 => 2,
+			>= 3 => 1,
+			_ => 0,
+		};
+		return ladder[Mathf.Max(baseIdx, minIdx)];
 	}
 
 	public void GrantStageComplete(string stageId, int stageLevel = 1)

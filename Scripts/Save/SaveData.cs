@@ -51,6 +51,7 @@ public sealed class ItemSaveDto
 	public float RolledBaseStat { get; set; }
 	public string EffectId { get; set; } = string.Empty;
 	public List<AffixSaveDto> Affixes { get; set; } = new();
+	public string ClassId { get; set; } = string.Empty;
 }
 
 public sealed class AffixSaveDto

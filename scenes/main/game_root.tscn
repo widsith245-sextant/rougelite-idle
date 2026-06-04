@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://game_root_scene"]
+[gd_scene load_steps=15 format=3 uid="uid://game_root_scene"]
 
 [ext_resource type="PackedScene" uid="uid://background_layer_scene" path="res://scenes/layers/background_layer.tscn" id="1_bg"]
 [ext_resource type="PackedScene" uid="uid://combat_stage_layer_scene" path="res://scenes/layers/combat_stage.tscn" id="2_combat"]
@@ -9,11 +9,14 @@
 [ext_resource type="PackedScene" uid="uid://chest_reveal_overlay_scene" path="res://scenes/layers/chest_reveal_overlay.tscn" id="3f_reveal"]
 [ext_resource type="PackedScene" uid="uid://run_hud_scene" path="res://scenes/layers/run_hud.tscn" id="3i_runhud"]
 [ext_resource type="PackedScene" uid="uid://quick_bar_scene" path="res://scenes/layers/quick_bar.tscn" id="4_quickbar"]
+[ext_resource type="PackedScene" uid="uid://settings_dock_scene" path="res://scenes/layers/settings_dock.tscn" id="4b_settings_dock"]
 [ext_resource type="Script" path="res://gdscript/ui/popup_manager.gd" id="5_popup_mgr"]
 [ext_resource type="Script" path="res://gdscript/main/window_chrome.gd" id="6_window_chrome"]
 [ext_resource type="Script" path="res://gdscript/main/window_drag_controller.gd" id="7_window_drag"]
+[ext_resource type="PackedScene" path="res://scenes/ui/gm/gm_tools_layer.tscn" id="8_gm_layer"]
 
 [node name="GameRoot" type="Control"]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -49,5 +52,9 @@ layer = 3
 
 [node name="QuickBarLayer" parent="." instance=ExtResource("4_quickbar")]
 
+[node name="SettingsDockLayer" parent="." instance=ExtResource("4b_settings_dock")]
+
 [node name="PopupManager" type="Node" parent="."]
 script = ExtResource("5_popup_mgr")
+
+[node name="GmToolsLayer" parent="." instance=ExtResource("8_gm_layer")]

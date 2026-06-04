@@ -75,8 +75,17 @@ func _load_labels() -> void:
 	if file == null:
 		return
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	if typeof(parsed) == TYPE_DICTIONARY:
-		_label_map = parsed
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var stats_block: Variant = parsed.get("stats", parsed)
+	if typeof(stats_block) != TYPE_DICTIONARY:
+		return
+	for key in stats_block.keys():
+		var val: Variant = stats_block[key]
+		if typeof(val) == TYPE_DICTIONARY:
+			_label_map[str(key)] = str(val.get("displayName", key))
+		else:
+			_label_map[str(key)] = str(val)
 
 
 func _fill_section(box: VBoxContainer, keys: Array, snap: Dictionary, use_compare: bool) -> void:

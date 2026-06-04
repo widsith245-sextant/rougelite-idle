@@ -70,6 +70,14 @@ public sealed class StageRunController
 		EmitProgress();
 	}
 
+	public void EnterRunPause()
+	{
+		_activeWave = null;
+		State = StageRunState.Marching;
+		EmitMarchState(true);
+		EmitProgress();
+	}
+
 	public void Tick(float dt, CombatManager combat)
 	{
 		switch (State)
@@ -123,7 +131,7 @@ public sealed class StageRunController
 			}
 
 			var oldX = ally.PositionX;
-			_battlefield.MarchRight(ally, _stage.MarchSpeed, dt);
+			_battlefield.MarchRight(ally, _stage.MarchSpeed, dt, combat.Allies);
 			combat.EmitPositionChange(ally, oldX);
 		}
 	}

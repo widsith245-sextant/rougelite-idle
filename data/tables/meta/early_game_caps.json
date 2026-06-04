@@ -1,7 +1,8 @@
 {
   "defaultMaxActiveSlots": 1,
-  "defaultMaxActiveSkillSlots": 1,
-  "passiveSlotsUnlocked": false,
+  "defaultMaxActiveSkillSlots": 2,
+  "defaultMaxPassiveSkillSlots": 1,
+  "passiveSlotsUnlocked": true,
   "playerStatMultipliers": {
     "MaxHp": 0.72,
     "BaseAttack": 0.68,

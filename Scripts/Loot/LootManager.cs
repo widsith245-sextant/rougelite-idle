@@ -26,7 +26,9 @@ public partial class LootManager : Node
 
 	private EventBus _eventBus = null!;
 	private string _activePendingQuality = "common";
+	private string _lastEquipError = string.Empty;
 
+	public int BagCapacity => EarlyGameCapsLoader.Get().BagSlotsVisible;
 	public IReadOnlyList<ItemData> UnidentifiedChests => _unidentifiedChests;
 	public IReadOnlyList<ItemData> IdentifiedItems => _identifiedItems;
 	public string ActivePendingQuality => _activePendingQuality;
@@ -112,6 +114,17 @@ public partial class LootManager : Node
 		}
 
 		return false;
+	}
+
+	public string GrantRunSettlementChest(string quality)
+	{
+		if (string.IsNullOrEmpty(quality))
+		{
+			quality = "common";
+		}
+
+		AddPendingChest(quality);
+		return quality;
 	}
 
 	public bool OpenOnePendingChest() => OpenOnePendingChest(_activePendingQuality);
@@ -236,22 +249,60 @@ public partial class LootManager : Node
 		return result;
 	}
 
-	public bool EquipByBagIndex(int bagIndex, string unitId = DefaultEquipUnitId)
+	public int GetIdentifiedCount() => _identifiedItems.Count;
+
+	public int GetBagCapacity() => BagCapacity;
+
+	public int GetBagUsed() => _identifiedItems.Count;
+
+	public bool HasBagSpace() => _identifiedItems.Count < BagCapacity;
+
+	public bool CanIdentify() => _unidentifiedChests.Count > 0 && HasBagSpace();
+
+	public string GetLastEquipError() => _lastEquipError;
+
+	public bool CanEquipByBagIndex(int bagIndex, string unitId = DefaultEquipUnitId)
 	{
+		_lastEquipError = string.Empty;
 		if (bagIndex < 0 || bagIndex >= _identifiedItems.Count)
 		{
+			_lastEquipError = "无效的背包格";
+			return false;
+		}
+
+		return CanUnitEquipItem(unitId, _identifiedItems[bagIndex], out _lastEquipError);
+	}
+
+	public bool EquipByBagIndex(int bagIndex, string unitId = DefaultEquipUnitId)
+	{
+		_lastEquipError = string.Empty;
+		if (bagIndex < 0 || bagIndex >= _identifiedItems.Count)
+		{
+			_lastEquipError = "无效的背包格";
 			return false;
 		}
 
 		EnsureUnit(unitId);
 		var item = _identifiedItems[bagIndex];
-		var equipped = _equippedByUnit[unitId];
-		if (equipped.TryGetValue(item.Slot, out var previous) && previous.Id == item.Id)
+		if (!CanUnitEquipItem(unitId, item, out var classError))
 		{
+			_lastEquipError = classError;
 			return false;
 		}
 
-		// Move currently equipped item back to inventory first.
+		var equipped = _equippedByUnit[unitId];
+		if (equipped.TryGetValue(item.Slot, out var previous) && previous.Id == item.Id)
+		{
+			_lastEquipError = "已装备该物品";
+			return false;
+		}
+
+		if (equipped.TryGetValue(item.Slot, out previous) && !HasBagSpace())
+		{
+			_lastEquipError = "背包已满，无法替换装备";
+			return false;
+		}
+
 		if (equipped.TryGetValue(item.Slot, out previous))
 		{
 			_identifiedItems.Add(previous);
@@ -262,6 +313,26 @@ public partial class LootManager : Node
 		_eventBus.EmitEquipmentChanged(unitId);
 		_eventBus.EmitStatsChanged(unitId);
 		EmitLootChanged();
+		return true;
+	}
+
+	public bool TryUnequip(SlotType slot, string unitId = DefaultEquipUnitId)
+	{
+		_lastEquipError = string.Empty;
+		EnsureUnit(unitId);
+		if (!_equippedByUnit[unitId].ContainsKey(slot))
+		{
+			_lastEquipError = "该槽位无装备";
+			return false;
+		}
+
+		if (!HasBagSpace())
+		{
+			_lastEquipError = "背包已满";
+			return false;
+		}
+
+		Unequip(slot, unitId);
 		return true;
 	}
 
@@ -283,12 +354,11 @@ public partial class LootManager : Node
 	{
 		if (!Enum.TryParse<SlotType>(slotName, true, out var slot))
 		{
+			_lastEquipError = "无效槽位";
 			return false;
 		}
 
-		var had = _equippedByUnit.GetValueOrDefault(unitId)?.ContainsKey(slot) ?? false;
-		Unequip(slot, unitId);
-		return had;
+		return TryUnequip(slot, unitId);
 	}
 
 	public Godot.Collections.Dictionary? IdentifyNextAsDictionary(int currentStageLevel)
@@ -356,7 +426,29 @@ public partial class LootManager : Node
 
 	public int GetUnidentifiedCount() => _unidentifiedChests.Count;
 
-	public int GetIdentifiedCount() => _identifiedItems.Count;
+	private bool CanUnitEquipItem(string unitId, ItemData item, out string error)
+	{
+		error = string.Empty;
+		if (item.Slot != SlotType.Weapon && item.Slot != SlotType.Armor)
+		{
+			return true;
+		}
+
+		if (string.IsNullOrEmpty(item.ClassId) || item.ClassId.Equals("any", StringComparison.OrdinalIgnoreCase))
+		{
+			return true;
+		}
+
+		var party = GetNodeOrNull<PartyManager>("/root/PartyManager");
+		var classId = party?.GetClassIdForUnit(unitId) ?? string.Empty;
+		if (classId != item.ClassId)
+		{
+			error = "职业不符，无法穿戴";
+			return false;
+		}
+
+		return true;
+	}
 
 	public void SalvageByIndex(int index)
 	{
@@ -390,6 +482,7 @@ public partial class LootManager : Node
 			{ "item_level", item.ItemLevel },
 			{ "rolled_base_stat", item.RolledBaseStat },
 			{ "slot", item.Slot.ToString() },
+			{ "class_id", item.ClassId ?? string.Empty },
 			{ "effect_id", item.EffectId ?? string.Empty },
 			{ "affixes", affixes },
 		};
@@ -405,6 +498,13 @@ public partial class LootManager : Node
 	{
 		if (_unidentifiedChests.Count == 0)
 		{
+			_lastEquipError = "没有待鉴定的宝箱";
+			return null;
+		}
+
+		if (!HasBagSpace())
+		{
+			_lastEquipError = "背包已满";
 			return null;
 		}
 
@@ -600,6 +700,7 @@ public partial class LootManager : Node
 			ItemLevel = item.ItemLevel,
 			RolledBaseStat = item.RolledBaseStat,
 			EffectId = item.EffectId ?? string.Empty,
+			ClassId = item.ClassId ?? string.Empty,
 			Affixes = affixes,
 		};
 	}
@@ -614,6 +715,7 @@ public partial class LootManager : Node
 			ItemLevel = dto.ItemLevel,
 			RolledBaseStat = dto.RolledBaseStat,
 			EffectId = string.IsNullOrEmpty(dto.EffectId) ? null : dto.EffectId,
+			ClassId = dto.ClassId ?? string.Empty,
 		};
 
 		if (Enum.TryParse<SlotType>(dto.Slot, true, out var slot))

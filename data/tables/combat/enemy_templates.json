@@ -114,6 +114,29 @@
         "skillMultiplier": 1.3,
         "moveTags": [{ "kind": "Charge", "distance": 12 }]
       }
+    },
+    {
+      "id": "goblin_archer",
+      "displayName": "哥布林弓手",
+      "archetype": "trash",
+      "tags": ["goblin", "ranged"],
+      "level": 3,
+      "maxHp": 220,
+      "speed": 12,
+      "baseAttack": 18,
+      "atkSpeed": 2.2,
+      "atkRange": 120,
+      "moveSpeed": 200,
+      "hitBoxRadius": 10,
+      "rewardTier": 2,
+      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "onHitEffects": [{ "id": "MARK_TAKEDAMAGE", "chance": 0.25 }],
+      "onDeathEffects": [],
+      "activeSkill": {
+        "id": "enemy_strike",
+        "skillMultiplier": 0.85,
+        "moveTags": []
+      }
     }
   ]
 }

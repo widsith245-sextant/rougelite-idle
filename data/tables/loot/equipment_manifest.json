@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-02",
+  "sourceTemplatePath": "res://data/tables/loot/equipment_templates.json",
+  "slotOrder": [
+    "Weapon",
+    "Armor",
+    "Helmet",
+    "Gloves",
+    "Boots",
+    "HeadAccessory",
+    "BackAccessory",
+    "Trinket"
+  ],
+  "slotDisplayNamesRef": "res://data/tables/ui/slot_labels.json",
+  "slotDisplayNames": ["武器", "护甲", "头盔", "手套", "靴子", "头部饰品", "背部饰品", "饰品"],
+  "equipRules": {
+    "classRestrictedSlots": ["Weapon", "Armor"],
+    "classRestrictionMode": "strict",
+    "classRestrictionDescription": "Weapon/Armor with non-empty classId must match PartyManager.GetClassIdForUnit(unitId); empty or any allows all.",
+    "bagCanStoreAnyClass": true,
+    "bagCapacity": 48,
+    "bagCapacitySource": "early_game_caps.json bagSlotsVisible",
+    "perUnitEquippedSlots": 8,
+    "defaultUnitIds": ["ally_a", "ally_b", "ally_c"]
+  },
+  "lootRules": {
+    "identifyTemplateSelection": "uniform_random_all_templates",
+    "identifyRequiresBagSpace": true,
+    "pendingChestMaxAccumulatePerQuality": 5,
+    "chestQualities": ["common", "rare", "epic"],
+    "rewardTierMinQuality": {
+      "tierGte3": "rare",
+      "tierGte5": "epic"
+    },
+    "newGameStartingUnidentifiedChests": 3,
+    "trainingBonusChestAfterIdentifyChance": 0.1,
+    "trainingBonusChestMax": 5
+  },
+  "baseStatMapping": {
+    "Weapon": "Damage",
+    "Armor": "Defense",
+    "Helmet": "Defense",
+    "Gloves": "Defense",
+    "Boots": "Defense",
+    "BackAccessory": "MoveSpeed_x0.5",
+    "Trinket": "MoveSpeed_x0.5",
+    "HeadAccessory": "Damage_default"
+  },
+  "units": [
+    {
+      "unitId": "ally_a",
+      "rosterId": "vanguard_a",
+      "classId": "Vanguard_01",
+      "displayName": "先锋剑士",
+      "defaultActiveOnNewGame": true
+    },
+    {
+      "unitId": "ally_b",
+      "rosterId": "sniper_b",
+      "classId": "Sniper_01",
+      "displayName": "狙击手",
+      "defaultActiveOnNewGame": false,
+      "unlockDbNodeId": "db_roster_sniper"
+    },
+    {
+      "unitId": "ally_c",
+      "rosterId": "mage_c",
+      "classId": "Mage_01",
+      "displayName": "大法师",
+      "defaultActiveOnNewGame": false,
+      "unlockDbNodeId": "db_roster_mage"
+    }
+  ],
+  "rosterClasses": [
+    {
+      "rosterId": "vanguard_a",
+      "classId": "Vanguard_01",
+      "displayName": "先锋剑士",
+      "defaultSlot": 0
+    },
+    {
+      "rosterId": "sniper_b",
+      "classId": "Sniper_01",
+      "displayName": "狙击手",
+      "unlockDbNodeId": "db_roster_sniper"
+    },
+    {
+      "rosterId": "mage_c",
+      "classId": "Mage_01",
+      "displayName": "大法师",
+      "unlockDbNodeId": "db_roster_mage"
+    },
+    {
+      "rosterId": "support_d",
+      "classId": "Support_01",
+      "displayName": "支援医师",
+      "unlockDbNodeId": "db_roster_support"
+    },
+    {
+      "rosterId": "berserker_e",
+      "classId": "Berserker_01",
+      "displayName": "狂战士",
+      "unlockDbNodeId": "db_roster_berserker"
+    }
+  ],
+  "templateCount": 15,
+  "slotsWithTemplates": 7,
+  "slotsWithoutTemplates": ["HeadAccessory"],
+  "items": [
+    {
+      "id": "vanguard_sword_t1",
+      "displayName": "制式长剑",
+      "slot": "Weapon",
+      "classId": "Vanguard_01",
+      "itemLevel": 5,
+      "baseStatMin": 14.0,
+      "baseStatMax": 20.0,
+      "affixIds": ["primary_atk", "sub_crit"]
+    },
+    {
+      "id": "vanguard_plate_t1",
+      "displayName": "重甲胸铠",
+      "slot": "Armor",
+      "classId": "Vanguard_01",
+      "itemLevel": 6,
+      "baseStatMin": 22.0,
+      "baseStatMax": 32.0,
+      "affixIds": ["primary_armor", "sub_hp"]
+    },
+    {
+      "id": "sniper_rifle_t1",
+      "displayName": "狙击步枪",
+      "slot": "Weapon",
+      "classId": "Sniper_01",
+      "itemLevel": 5,
+      "baseStatMin": 18.0,
+      "baseStatMax": 26.0,
+      "affixIds": ["primary_atk", "sub_crit"]
+    },
+    {
+      "id": "sniper_vest_t1",
+      "displayName": "轻甲外披",
+      "slot": "Armor",
+      "classId": "Sniper_01",
+      "itemLevel": 5,
+      "baseStatMin": 12.0,
+      "baseStatMax": 18.0,
+      "affixIds": ["primary_armor"]
+    },
+    {
+      "id": "mage_staff_t1",
+      "displayName": "奥术法杖",
+      "slot": "Weapon",
+      "classId": "Mage_01",
+      "itemLevel": 5,
+      "baseStatMin": 16.0,
+      "baseStatMax": 24.0,
+      "affixIds": ["primary_atk"]
+    },
+    {
+      "id": "mage_robe_t1",
+      "displayName": "法师长袍",
+      "slot": "Armor",
+      "classId": "Mage_01",
+      "itemLevel": 5,
+      "baseStatMin": 10.0,
+      "baseStatMax": 16.0,
+      "affixIds": ["primary_armor", "sub_hp"]
+    },
+    {
+      "id": "support_rod_t1",
+      "displayName": "医杖",
+      "slot": "Weapon",
+      "classId": "Support_01",
+      "itemLevel": 5,
+      "baseStatMin": 10.0,
+      "baseStatMax": 16.0,
+      "affixIds": ["primary_atk", "sub_hp"]
+    },
+    {
+      "id": "support_vest_t1",
+      "displayName": "医护背心",
+      "slot": "Armor",
+      "classId": "Support_01",
+      "itemLevel": 5,
+      "baseStatMin": 14.0,
+      "baseStatMax": 20.0,
+      "affixIds": ["primary_armor"]
+    },
+    {
+      "id": "berserker_axe_t1",
+      "displayName": "狂战斧",
+      "slot": "Weapon",
+      "classId": "Berserker_01",
+      "itemLevel": 6,
+      "baseStatMin": 20.0,
+      "baseStatMax": 28.0,
+      "affixIds": ["primary_atk"]
+    },
+    {
+      "id": "berserker_chain_t1",
+      "displayName": "链甲",
+      "slot": "Armor",
+      "classId": "Berserker_01",
+      "itemLevel": 6,
+      "baseStatMin": 18.0,
+      "baseStatMax": 26.0,
+      "affixIds": ["primary_armor"]
+    },
+    {
+      "id": "common_helmet_t1",
+      "displayName": "巡逻头盔",
+      "slot": "Helmet",
+      "classId": null,
+      "itemLevel": 4,
+      "baseStatMin": 8.0,
+      "baseStatMax": 14.0,
+      "affixIds": ["primary_armor"]
+    },
+    {
+      "id": "common_gloves_t1",
+      "displayName": "战术手套",
+      "slot": "Gloves",
+      "classId": null,
+      "itemLevel": 4,
+      "baseStatMin": 6.0,
+      "baseStatMax": 10.0,
+      "affixIds": ["primary_atk"]
+    },
+    {
+      "id": "common_boots_t1",
+      "displayName": "行军靴",
+      "slot": "Boots",
+      "classId": null,
+      "itemLevel": 4,
+      "baseStatMin": 5.0,
+      "baseStatMax": 9.0,
+      "affixIds": ["primary_speed"]
+    },
+    {
+      "id": "wing_t1_01",
+      "displayName": "夜翼披风",
+      "slot": "BackAccessory",
+      "classId": null,
+      "itemLevel": 8,
+      "baseStatMin": 4.0,
+      "baseStatMax": 8.0,
+      "effectId": "001",
+      "affixIds": ["primary_speed"]
+    },
+    {
+      "id": "common_trinket_t1",
+      "displayName": "幸运符",
+      "slot": "Trinket",
+      "classId": null,
+      "itemLevel": 4,
+      "baseStatMin": 3.0,
+      "baseStatMax": 6.0,
+      "affixIds": ["sub_crit"]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "tokenLabels": {
+    "@gauge_full": "行动条满时",
+    "@action_end": "行动结束后",
+    "@damaged": "受到伤害时",
+    "@deal_damage": "造成伤害时",
+    "@move_end(Charge)": "Charge 位移结束后",
+    "@move_end(Retreat)": "Retreat 位移结束后",
+    "@swap": "换位后",
+    "@is_frontline": "位于最前排时",
+    "@is_backline": "位于最后排时",
+    "@behind_target": "从背后攻击时",
+    "@interval(2)": "每 2 秒"
+  },
+  "categoryColors": {
+    "buff": "#7ec8ff",
+    "debuff": "#ff7e7e",
+    "mark": "#ffaa44",
+    "control": "#c8a0ff",
+    "tactic": "#ffe066",
+    "combo": "#88ffcc",
+    "resource": "#66ddaa"
+  }
+}

@@ -2,5 +2,6 @@
   "combatTraceEnabled": true,
   "skipWonderlandTicket": true,
   "unlockPassiveSkillSlots": true,
-  "maxActiveSkillSlotsOverride": 2
+  "maxActiveSkillSlotsOverride": 2,
+  "gmToolsEnabled": true
 }

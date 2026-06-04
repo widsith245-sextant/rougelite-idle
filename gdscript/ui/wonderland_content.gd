@@ -146,6 +146,7 @@ func _on_enter_pressed() -> void:
 	if ok:
 		if _status:
 			_status.text = "Run 进行中 — 见左上奇境 HUD"
+		_refresh_stage_progress_bar()
 		await get_tree().create_timer(0.3).timeout
 		var popup_mgr := get_tree().root.get_node_or_null("GameRoot/PopupManager")
 		if popup_mgr and popup_mgr.has_method("close_popup"):
@@ -222,3 +223,9 @@ func _skip_wonderland_ticket() -> bool:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return true
 	return bool(parsed.get("skipWonderlandTicket", true))
+
+
+func _refresh_stage_progress_bar() -> void:
+	var bar := get_tree().root.get_node_or_null("GameRoot/StageProgressLayer/StageProgressBar")
+	if bar and bar.has_method("refresh_markers"):
+		bar.call_deferred("refresh_markers")

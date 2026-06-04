@@ -24,6 +24,7 @@ public partial class DbManager : Node
 
 	public int MaxActiveSlots { get; private set; } = 1;
 	public int MaxActiveSkillSlots { get; private set; } = 1;
+	public int MaxPassiveSkillSlots { get; private set; } = 2;
 	public bool PassiveSlotsUnlocked { get; private set; }
 	public float GlobalMaxHpPercent { get; private set; }
 	public float GlobalDamagePercent { get; private set; }
@@ -126,6 +127,7 @@ public partial class DbManager : Node
 		var caps = EarlyGameCapsLoader.Get();
 		MaxActiveSlots = caps.DefaultMaxActiveSlots;
 		MaxActiveSkillSlots = caps.DefaultMaxActiveSkillSlots;
+		MaxPassiveSkillSlots = caps.DefaultMaxPassiveSkillSlots;
 		PassiveSlotsUnlocked = caps.PassiveSlotsUnlocked;
 
 		var debug = DebugSettingsLoader.Get();

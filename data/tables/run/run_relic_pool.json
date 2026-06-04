@@ -1,0 +1,15 @@
+{
+  "choicesPerPick": 3,
+  "relics": [
+    { "id": "relic_sharp_edge", "name": "锋利刃片", "desc": "全队伤害 +8%", "effect": { "type": "TeamDamagePercent", "value": 8 } },
+    { "id": "relic_iron_heart", "name": "铁心护符", "desc": "全队生命 +10%", "effect": { "type": "TeamMaxHpPercent", "value": 10 } },
+    { "id": "relic_swift_boots", "name": "迅捷之靴", "desc": "移速 +10%", "effect": { "type": "TeamMoveSpeedPercent", "value": 10 } },
+    { "id": "relic_eagle_eye", "name": "鹰眼透镜", "desc": "暴击率 +6%", "effect": { "type": "TeamCritPercent", "value": 6 } },
+    { "id": "relic_blood_vial", "name": "血瓶残片", "desc": "立即恢复 15% HP", "effect": { "type": "InstantHealPercent", "value": 15 } },
+    { "id": "relic_war_banner", "name": "战旗残片", "desc": "全队伤害 +5% · 生命 +5%", "effect": { "type": "TeamDamagePercent", "value": 5, "secondaryType": "TeamMaxHpPercent", "secondaryValue": 5 } },
+    { "id": "relic_gold_charm", "name": "贪婪护符", "desc": "Run 内击杀金币 +20%", "effect": { "type": "RunGoldBonusPercent", "value": 20 } },
+    { "id": "relic_focus_crystal", "name": "聚焦水晶", "desc": "暴击率 +4% · 伤害 +4%", "effect": { "type": "TeamCritPercent", "value": 4, "secondaryType": "TeamDamagePercent", "secondaryValue": 4 } },
+    { "id": "relic_vanguard_plate", "name": "先锋甲片", "desc": "生命 +12%", "effect": { "type": "TeamMaxHpPercent", "value": 12 } },
+    { "id": "relic_arcane_shard", "name": "奥术碎片", "desc": "伤害 +6% · 移速 +6%", "effect": { "type": "TeamDamagePercent", "value": 6, "secondaryType": "TeamMoveSpeedPercent", "secondaryValue": 6 } }
+  ]
+}

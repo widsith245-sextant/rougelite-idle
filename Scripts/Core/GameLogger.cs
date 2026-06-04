@@ -25,6 +25,8 @@ public partial class GameLogger : Node
 
 	public bool CombatTraceEnabled => _combatTraceEnabled;
 
+	public bool GetGmToolsEnabled() => DebugSettingsLoader.Get().GmToolsEnabled;
+
 	public void SetCombatTraceEnabled(bool enabled)
 	{
 		_combatTraceEnabled = enabled;
@@ -106,7 +108,7 @@ public partial class GameLogger : Node
 		LogLoot($"鉴定获得 [{quality}] {displayName} iLvl {itemLevel} · 部位 {slot}");
 	}
 
-	private void OnDamageDealt(string sourceId, string targetId, float amount, bool isCrit)
+	private void OnDamageDealt(string sourceId, string targetId, float amount, bool isCrit, string damageType, string displayTag)
 	{
 		if (!_combatTraceEnabled)
 		{

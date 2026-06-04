@@ -112,6 +112,8 @@ public sealed class CombatEffectRunner
 			RemainingDuration = def.Duration,
 			TickTimer = def.TickInterval,
 			Stacks = 1,
+			Pile = 1,
+			Priority = def.Priority,
 			SourceAttackSnapshot = source.Stats.GetFinal(StatId.Damage),
 		});
 

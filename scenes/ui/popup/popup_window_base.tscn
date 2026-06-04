@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://popup_window_base_scene"]
+[gd_scene load_steps=3 format=3 uid="uid://popup_window_base_scene"]
 
 [ext_resource type="Script" path="res://gdscript/ui/popup_window_base.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.1, 0.12, 0.15, 1)
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
 
 [node name="PopupWindowBase" type="Window"]
 oversampling_override = 1.0
@@ -17,6 +24,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="Background" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0784314, 0.0941176, 0.121569, 1)
+
 [node name="VBox" type="VBoxContainer" parent="Root"]
 layout_mode = 1
 anchors_preset = 15
@@ -26,22 +43,28 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="Header" type="HBoxContainer" parent="Root/VBox"]
+[node name="Header" type="PanelContainer" parent="Root/VBox"]
 custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="HeaderRow" type="HBoxContainer" parent="Root/VBox/Header"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="Root/VBox/Header"]
+[node name="TitleLabel" type="Label" parent="Root/VBox/Header/HeaderRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.88, 0.9, 0.94, 1)
 theme_override_font_sizes/font_size = 14
 text = "Panel"
 
-[node name="CloseButton" type="Button" parent="Root/VBox/Header"]
+[node name="CloseButton" type="Button" parent="Root/VBox/Header/HeaderRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "X"
+theme_override_font_sizes/font_size = 10
+text = "关闭"
 
 [node name="ContentRoot" type="Control" parent="Root/VBox"]
 unique_name_in_owner = true

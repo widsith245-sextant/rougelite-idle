@@ -8,7 +8,22 @@ public partial class EventBus : Node
 	public delegate void PositionChangedEventHandler(string entityId, float oldX, float newX);
 
 	[Signal]
-	public delegate void DamageDealtEventHandler(string sourceId, string targetId, float amount, bool isCrit);
+	public delegate void DamageDealtEventHandler(
+		string sourceId,
+		string targetId,
+		float amount,
+		bool isCrit,
+		string damageType,
+		string displayTag);
+
+	[Signal]
+	public delegate void CombatEffectAppliedEventHandler(
+		string targetId,
+		string effectId,
+		string displayName,
+		string category,
+		int pile,
+		float intensity);
 
 	[Signal]
 	public delegate void UnitHpChangedEventHandler(string entityId, float currentHp, float maxHp);
@@ -83,7 +98,16 @@ public partial class EventBus : Node
 	public delegate void RunCardPickOfferedEventHandler();
 
 	[Signal]
+	public delegate void RunRelicPickOfferedEventHandler();
+
+	[Signal]
+	public delegate void RunSettlementReadyEventHandler();
+
+	[Signal]
 	public delegate void ItemIdentifiedEventHandler(Godot.Collections.Dictionary itemData);
+
+	[Signal]
+	public delegate void SquadSwappedEventHandler(int slotA, int slotB);
 
 	[Signal]
 	public delegate void StageClearedEventHandler(string stageId);
@@ -91,14 +115,34 @@ public partial class EventBus : Node
 	[Signal]
 	public delegate void StageUnlockedEventHandler(string stageId);
 
+	[Signal]
+	public delegate void StageIdChangedEventHandler(string stageId);
+
 	public void EmitPositionChanged(string entityId, float oldX, float newX)
 	{
 		EmitSignal(SignalName.PositionChanged, entityId, oldX, newX);
 	}
 
-	public void EmitDamageDealt(string sourceId, string targetId, float amount, bool isCrit = false)
+	public void EmitDamageDealt(
+		string sourceId,
+		string targetId,
+		float amount,
+		bool isCrit = false,
+		string damageType = "physical",
+		string displayTag = "")
 	{
-		EmitSignal(SignalName.DamageDealt, sourceId, targetId, amount, isCrit);
+		EmitSignal(SignalName.DamageDealt, sourceId, targetId, amount, isCrit, damageType, displayTag);
+	}
+
+	public void EmitCombatEffectApplied(
+		string targetId,
+		string effectId,
+		string displayName,
+		string category,
+		int pile,
+		float intensity)
+	{
+		EmitSignal(SignalName.CombatEffectApplied, targetId, effectId, displayName, category, pile, intensity);
 	}
 
 	public void EmitUnitHpChanged(string entityId, float currentHp, float maxHp)
@@ -221,9 +265,24 @@ public partial class EventBus : Node
 		EmitSignal(SignalName.RunCardPickOffered);
 	}
 
+	public void EmitRunRelicPickOffered()
+	{
+		EmitSignal(SignalName.RunRelicPickOffered);
+	}
+
+	public void EmitRunSettlementReady()
+	{
+		EmitSignal(SignalName.RunSettlementReady);
+	}
+
 	public void EmitItemIdentified(Godot.Collections.Dictionary itemData)
 	{
 		EmitSignal(SignalName.ItemIdentified, itemData);
+	}
+
+	public void EmitSquadSwapped(int slotA, int slotB)
+	{
+		EmitSignal(SignalName.SquadSwapped, slotA, slotB);
 	}
 
 	public void EmitStageCleared(string stageId)
@@ -234,5 +293,10 @@ public partial class EventBus : Node
 	public void EmitStageUnlocked(string stageId)
 	{
 		EmitSignal(SignalName.StageUnlocked, stageId);
+	}
+
+	public void EmitStageIdChanged(string stageId)
+	{
+		EmitSignal(SignalName.StageIdChanged, stageId);
 	}
 }

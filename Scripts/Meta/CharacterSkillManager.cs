@@ -68,9 +68,17 @@ public partial class CharacterSkillManager : Node
 
 		if (node.NodeType == "passive")
 		{
-			if (slotKey != "passive_0")
+			if (!slotKey.StartsWith("passive_", StringComparison.Ordinal))
 			{
 				_lastEquipError = "被动技能只能装入被动槽";
+				return false;
+			}
+
+			var passIdx = int.Parse(slotKey["passive_".Length..]);
+			var maxPassive = _db?.MaxPassiveSkillSlots ?? 2;
+			if (passIdx >= maxPassive)
+			{
+				_lastEquipError = "被动槽未解锁";
 				return false;
 			}
 
@@ -201,9 +209,51 @@ public partial class CharacterSkillManager : Node
 		return dict;
 	}
 
+	public Godot.Collections.Dictionary GetSkillDisplaySnapshot(string rosterId, string nodeId)
+	{
+		var result = new Godot.Collections.Dictionary();
+		if (!_trees.TryGetValue(rosterId, out var nodes))
+		{
+			return result;
+		}
+
+		var node = nodes.FirstOrDefault(n => n.Id == nodeId);
+		if (node == null)
+		{
+			return result;
+		}
+
+		var party = GetNodeOrNull<PartyManager>("/root/PartyManager");
+		var classId = party?.GetClassIdForRoster(rosterId) ?? string.Empty;
+		var display = ClassSkillsLoader.GetSkillDisplayEntry(classId, node.SkillId);
+		var tokens = display?.DescriptionTokens ?? new List<string>();
+		var effectsArr = new Godot.Collections.Array();
+		if (display?.AppliedEffects != null)
+		{
+			foreach (var ef in display.AppliedEffects)
+			{
+				effectsArr.Add(new Godot.Collections.Dictionary
+				{
+					{ "effect_id", ef.EffectId ?? string.Empty },
+					{ "pile", ef.Pile },
+					{ "intensity", ef.Intensity },
+					{ "target", ef.Target ?? "enemy" },
+				});
+			}
+		}
+
+		result["display_name"] = node.DisplayName;
+		result["node_type"] = node.NodeType;
+		result["skill_id"] = node.SkillId;
+		result["description_tokens"] = ToVariantArray(tokens);
+		result["applied_effects"] = effectsArr;
+		return result;
+	}
+
 	public void ApplySkillsToUnit(CombatUnitData unit, string rosterId)
 	{
 		EnsureRosterState(rosterId);
+		PruneEquippedSlots(rosterId);
 		if (!_equippedByRoster.TryGetValue(rosterId, out var equipped))
 		{
 			return;
@@ -226,14 +276,23 @@ public partial class CharacterSkillManager : Node
 			}
 		}
 
-		unit.ActiveSkill = unit.ActiveSkills.Count > 0 ? unit.ActiveSkills[0] : null;
+		unit.ActiveSkill = ClassSkillsLoader.GetGaugeSkill(unit.ActiveSkills) ?? (unit.ActiveSkills.Count > 0 ? unit.ActiveSkills[0] : null);
 
-		if (_db?.PassiveSlotsUnlocked == true && equipped.TryGetValue("passive_0", out var passiveId))
+		if (_db?.PassiveSlotsUnlocked == true)
 		{
-			var passive = ClassSkillsLoader.BuildPassive(unit.ClassId, passiveId);
-			if (passive != null)
+			var maxPassive = _db.MaxPassiveSkillSlots;
+			for (var p = 0; p < maxPassive; p++)
 			{
-				unit.Passives.Add(passive);
+				if (!equipped.TryGetValue($"passive_{p}", out var passiveId) || string.IsNullOrEmpty(passiveId))
+				{
+					continue;
+				}
+
+				var passive = ClassSkillsLoader.BuildPassive(unit.ClassId, passiveId);
+				if (passive != null)
+				{
+					unit.Passives.Add(passive);
+				}
 			}
 		}
 	}
@@ -272,6 +331,7 @@ public partial class CharacterSkillManager : Node
 		foreach (var pair in equipped)
 		{
 			_equippedByRoster[pair.Key] = new Dictionary<string, string>(pair.Value);
+			PruneEquippedSlots(pair.Key);
 		}
 
 		if (_unlockedNodes.Count == 0)
@@ -336,6 +396,36 @@ public partial class CharacterSkillManager : Node
 		if (!_equippedByRoster.ContainsKey(rosterId))
 		{
 			_equippedByRoster[rosterId] = new Dictionary<string, string>();
+		}
+	}
+
+	private void PruneEquippedSlots(string rosterId)
+	{
+		EnsureRosterState(rosterId);
+		var maxActive = _db?.MaxActiveSkillSlots ?? 2;
+		var maxPassive = _db?.MaxPassiveSkillSlots ?? 1;
+		var equipped = _equippedByRoster[rosterId];
+		var toRemove = new List<string>();
+		foreach (var key in equipped.Keys)
+		{
+			if (key.StartsWith("active_", StringComparison.Ordinal)
+				&& int.TryParse(key["active_".Length..], out var activeIndex)
+				&& activeIndex >= maxActive)
+			{
+				toRemove.Add(key);
+			}
+
+			if (key.StartsWith("passive_", StringComparison.Ordinal)
+				&& int.TryParse(key["passive_".Length..], out var passiveIndex)
+				&& passiveIndex >= maxPassive)
+			{
+				toRemove.Add(key);
+			}
+		}
+
+		foreach (var key in toRemove)
+		{
+			equipped.Remove(key);
 		}
 	}
 

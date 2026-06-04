@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using RougeliteIdle.Stats;
 
 namespace RougeliteIdle.Combat;
@@ -10,11 +10,12 @@ public static class UnitCombatAI
 {
 	public static void Tick(
 		CombatUnitData unit,
-		CombatUnitData? enemy,
+		CombatUnitData? target,
 		BattlefieldController battlefield,
-		float delta)
+		float delta,
+		IReadOnlyList<CombatUnitData>? obstacles = null)
 	{
-		if (unit.CurrentHp <= 0f || enemy == null || enemy.CurrentHp <= 0f)
+		if (unit.CurrentHp <= 0f || target == null || target.CurrentHp <= 0f)
 		{
 			return;
 		}
@@ -31,14 +32,14 @@ public static class UnitCombatAI
 			return;
 		}
 
-		if (battlefield.IsInAttackRange(unit, enemy))
+		if (battlefield.IsInAttackRange(unit, target))
 		{
 			unit.CombatState = UnitCombatState.InRange;
 			return;
 		}
 
-		battlefield.MoveTowardEnemy(unit, enemy, unit.Stats.GetFinal(StatId.MoveSpeed), delta);
-		if (unit.CombatState != UnitCombatState.Moving)
+		battlefield.MoveTowardEnemy(unit, target, unit.Stats.GetFinal(StatId.MoveSpeed), delta, obstacles);
+		if (unit.CombatState != UnitCombatState.Moving && unit.CombatState != UnitCombatState.InRange)
 		{
 			unit.CombatState = UnitCombatState.Moving;
 		}
@@ -46,7 +47,7 @@ public static class UnitCombatAI
 
 	public static bool TickNormalAttack(
 		CombatUnitData unit,
-		CombatUnitData enemy,
+		CombatUnitData target,
 		BattlefieldController battlefield,
 		float delta,
 		out bool isCrit)
@@ -57,7 +58,7 @@ public static class UnitCombatAI
 			return false;
 		}
 
-		if (!battlefield.IsInAttackRange(unit, enemy))
+		if (!battlefield.IsInAttackRange(unit, target))
 		{
 			return false;
 		}

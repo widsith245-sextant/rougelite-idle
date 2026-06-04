@@ -27,6 +27,21 @@ func _connect_bus() -> void:
 		event_bus.connect("RunProgressChanged", _on_run_progress_changed)
 	if event_bus.has_signal("WaveStarted"):
 		event_bus.connect("WaveStarted", _on_wave_started)
+	if event_bus.has_signal("StageIdChanged"):
+		event_bus.connect("StageIdChanged", _on_stage_changed)
+	if event_bus.has_signal("RunVisualModeChanged"):
+		event_bus.connect("RunVisualModeChanged", _on_stage_changed)
+
+
+func refresh_markers() -> void:
+	_current_progress = 0.0
+	_active_wave = -1
+	_load_wave_markers()
+	_sync_layout()
+
+
+func _on_stage_changed(_arg: Variant = null) -> void:
+	refresh_markers()
 
 
 func _load_wave_markers() -> void:

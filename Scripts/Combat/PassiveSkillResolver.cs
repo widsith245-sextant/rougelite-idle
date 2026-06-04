@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using RougeliteIdle.Stats;
 
@@ -22,7 +21,78 @@ public static class PassiveSkillResolver
 		ResolveReachFrontPassives(allies, primaryEnemy, positionEvents, results, metaPercent);
 		ResolveAllyMovedPassives(allies, primaryEnemy, positionEvents, results, metaPercent);
 		ResolvePointBlankPassives(allies, primaryEnemy, battlefield, results, metaPercent);
+		ResolveFrontLinePassives(allies, primaryEnemy, results, metaPercent);
+		ResolveXMovePassives(allies, primaryEnemy, positionEvents, results, metaPercent);
+
+		foreach (var ally in allies)
+		{
+			if (ally.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			results.AddRange(ActiveSkillTriggerResolver.ResolvePositionTriggers(
+				ally, allies, primaryEnemy, positionEvents, metaPercent));
+		}
+
 		return results;
+	}
+
+	private static void ResolveFrontLinePassives(
+		IReadOnlyList<CombatUnitData> allies,
+		CombatUnitData enemy,
+		List<PendingDamage> results,
+		float metaPercent)
+	{
+		foreach (var ally in allies)
+		{
+			if (ally.CurrentHp <= 0f || ally.PositionX > StatRegistry.FrontLineThresholdX)
+			{
+				continue;
+			}
+
+			foreach (var passive in ally.Passives)
+			{
+				if (passive.TriggerType != PassiveTriggerType.OnFrontLine || passive.SkillMultiplier <= 0f)
+				{
+					continue;
+				}
+
+				results.Add(CreateDamage(ally, enemy, passive.SkillMultiplier, metaPercent));
+			}
+		}
+	}
+
+	private static void ResolveXMovePassives(
+		IReadOnlyList<CombatUnitData> allies,
+		CombatUnitData enemy,
+		IReadOnlyList<PositionChangeEvent> positionEvents,
+		List<PendingDamage> results,
+		float metaPercent)
+	{
+		foreach (var change in positionEvents)
+		{
+			if (System.Math.Abs(change.Delta) < StatRegistry.PositionMoveThreshold)
+			{
+				continue;
+			}
+
+			var owner = FindUnit(allies, change.EntityId);
+			if (owner == null)
+			{
+				continue;
+			}
+
+			foreach (var passive in owner.Passives)
+			{
+				if (passive.TriggerType != PassiveTriggerType.OnXMove)
+				{
+					continue;
+				}
+
+				results.Add(CreateDamage(owner, enemy, passive.SkillMultiplier, metaPercent));
+			}
+		}
 	}
 
 	private static void ResolveReachFrontPassives(
@@ -95,7 +165,7 @@ public static class PassiveSkillResolver
 						continue;
 					}
 
-					if (Math.Abs(change.Delta) >= StatRegistry.PositionMoveThreshold)
+					if (System.Math.Abs(change.Delta) >= StatRegistry.PositionMoveThreshold)
 					{
 						triggeredByTeammate = true;
 						break;

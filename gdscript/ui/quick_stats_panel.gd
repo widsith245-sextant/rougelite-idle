@@ -3,16 +3,7 @@ extends Control
 ## Right-side compact stat strip (leader ally_a).
 
 const LEADER_ID := "ally_a"
-const DISPLAY_KEYS := [
-	["Level", "Lv"],
-	["MaxHp", "HP"],
-	["Dps", "DPS"],
-	["Damage", "DMG"],
-	["AtkSpeed", "Spd"],
-	["AtkRange", "Rng"],
-	["MoveSpeed", "Move"],
-	["CritRate", "Crit"],
-]
+const DISPLAY_KEYS: Array[String] = UiLabelsLoader.get_stat_compare_keys()
 
 @onready var _grid: GridContainer = %StatGrid
 
@@ -34,13 +25,11 @@ var _poll_accum: float = 0.0
 
 
 func _build_labels() -> void:
-	for row in DISPLAY_KEYS:
-		var key: String = row[0]
-		var short: String = row[1]
+	for key in DISPLAY_KEYS:
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 0)
 		var title := Label.new()
-		title.text = short
+		title.text = UiLabelsLoader.get_stat_display_name(key)
 		title.add_theme_font_size_override("font_size", 7)
 		var value := Label.new()
 		value.name = "Val_%s" % key
@@ -75,8 +64,7 @@ func _refresh_from_service() -> void:
 func _apply_snapshot(snap: Dictionary) -> void:
 	if _grid == null:
 		return
-	for row in DISPLAY_KEYS:
-		var key: String = row[0]
+	for key in DISPLAY_KEYS:
 		var node := _grid.find_child("Val_%s" % key, true, false)
 		if node == null:
 			continue

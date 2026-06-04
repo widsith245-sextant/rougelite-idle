@@ -1,30 +1,161 @@
 {
   "items": [
     {
-      "id": "blade_t1_01",
-      "displayName": "试作军刀",
+      "id": "vanguard_sword_t1",
+      "displayName": "制式长剑",
       "slot": "Weapon",
+      "classId": "Vanguard_01",
+      "itemLevel": 5,
+      "baseStatMin": 14.0,
+      "baseStatMax": 20.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 8.0, "max": 14.0, "isPrimary": true },
+        { "id": "sub_crit", "displayName": "暴击率", "min": 0.03, "max": 0.06, "isPrimary": false }
+      ]
+    },
+    {
+      "id": "vanguard_plate_t1",
+      "displayName": "重甲胸铠",
+      "slot": "Armor",
+      "classId": "Vanguard_01",
+      "itemLevel": 6,
+      "baseStatMin": 22.0,
+      "baseStatMax": 32.0,
+      "affixes": [
+        { "id": "primary_armor", "displayName": "护甲", "min": 15.0, "max": 25.0, "isPrimary": true },
+        { "id": "sub_hp", "displayName": "生命", "min": 30.0, "max": 50.0, "isPrimary": false }
+      ]
+    },
+    {
+      "id": "sniper_rifle_t1",
+      "displayName": "狙击步枪",
+      "slot": "Weapon",
+      "classId": "Sniper_01",
+      "itemLevel": 5,
+      "baseStatMin": 18.0,
+      "baseStatMax": 26.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 10.0, "max": 16.0, "isPrimary": true },
+        { "id": "sub_crit", "displayName": "暴击率", "min": 0.05, "max": 0.10, "isPrimary": false }
+      ]
+    },
+    {
+      "id": "sniper_vest_t1",
+      "displayName": "轻甲外披",
+      "slot": "Armor",
+      "classId": "Sniper_01",
       "itemLevel": 5,
       "baseStatMin": 12.0,
       "baseStatMax": 18.0,
-      "effectId": null,
       "affixes": [
-        {
-          "id": "primary_atk",
-          "displayName": "攻击力",
-          "min": 8.0,
-          "max": 14.0,
-          "defaultValue": 10.0,
-          "isPrimary": true
-        },
-        {
-          "id": "sub_crit",
-          "displayName": "暴击率",
-          "min": 0.03,
-          "max": 0.08,
-          "defaultValue": 0.05,
-          "isPrimary": false
-        }
+        { "id": "primary_armor", "displayName": "护甲", "min": 8.0, "max": 14.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "mage_staff_t1",
+      "displayName": "奥术法杖",
+      "slot": "Weapon",
+      "classId": "Mage_01",
+      "itemLevel": 5,
+      "baseStatMin": 16.0,
+      "baseStatMax": 24.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 12.0, "max": 18.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "mage_robe_t1",
+      "displayName": "法师长袍",
+      "slot": "Armor",
+      "classId": "Mage_01",
+      "itemLevel": 5,
+      "baseStatMin": 10.0,
+      "baseStatMax": 16.0,
+      "affixes": [
+        { "id": "primary_armor", "displayName": "护甲", "min": 6.0, "max": 12.0, "isPrimary": true },
+        { "id": "sub_hp", "displayName": "生命", "min": 20.0, "max": 40.0, "isPrimary": false }
+      ]
+    },
+    {
+      "id": "support_rod_t1",
+      "displayName": "医杖",
+      "slot": "Weapon",
+      "classId": "Support_01",
+      "itemLevel": 5,
+      "baseStatMin": 10.0,
+      "baseStatMax": 16.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 6.0, "max": 10.0, "isPrimary": true },
+        { "id": "sub_hp", "displayName": "生命", "min": 25.0, "max": 45.0, "isPrimary": false }
+      ]
+    },
+    {
+      "id": "support_vest_t1",
+      "displayName": "医护背心",
+      "slot": "Armor",
+      "classId": "Support_01",
+      "itemLevel": 5,
+      "baseStatMin": 14.0,
+      "baseStatMax": 20.0,
+      "affixes": [
+        { "id": "primary_armor", "displayName": "护甲", "min": 10.0, "max": 18.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "berserker_axe_t1",
+      "displayName": "狂战斧",
+      "slot": "Weapon",
+      "classId": "Berserker_01",
+      "itemLevel": 6,
+      "baseStatMin": 20.0,
+      "baseStatMax": 28.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 12.0, "max": 20.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "berserker_chain_t1",
+      "displayName": "链甲",
+      "slot": "Armor",
+      "classId": "Berserker_01",
+      "itemLevel": 6,
+      "baseStatMin": 18.0,
+      "baseStatMax": 26.0,
+      "affixes": [
+        { "id": "primary_armor", "displayName": "护甲", "min": 12.0, "max": 20.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "common_helmet_t1",
+      "displayName": "巡逻头盔",
+      "slot": "Helmet",
+      "itemLevel": 4,
+      "baseStatMin": 8.0,
+      "baseStatMax": 14.0,
+      "affixes": [
+        { "id": "primary_armor", "displayName": "护甲", "min": 5.0, "max": 10.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "common_gloves_t1",
+      "displayName": "战术手套",
+      "slot": "Gloves",
+      "itemLevel": 4,
+      "baseStatMin": 6.0,
+      "baseStatMax": 10.0,
+      "affixes": [
+        { "id": "primary_atk", "displayName": "攻击力", "min": 4.0, "max": 8.0, "isPrimary": true }
+      ]
+    },
+    {
+      "id": "common_boots_t1",
+      "displayName": "行军靴",
+      "slot": "Boots",
+      "itemLevel": 4,
+      "baseStatMin": 5.0,
+      "baseStatMax": 9.0,
+      "affixes": [
+        { "id": "primary_speed", "displayName": "速度", "min": 2.0, "max": 5.0, "isPrimary": true }
       ]
     },
     {
@@ -36,41 +167,18 @@
       "baseStatMax": 8.0,
       "effectId": "001",
       "affixes": [
-        {
-          "id": "primary_speed",
-          "displayName": "速度",
-          "min": 2.0,
-          "max": 6.0,
-          "defaultValue": 4.0,
-          "isPrimary": true
-        }
+        { "id": "primary_speed", "displayName": "速度", "min": 2.0, "max": 6.0, "isPrimary": true }
       ]
     },
     {
-      "id": "armor_t1_01",
-      "displayName": "巡逻胸甲",
-      "slot": "Armor",
-      "itemLevel": 6,
-      "baseStatMin": 20.0,
-      "baseStatMax": 30.0,
-      "effectId": null,
+      "id": "common_trinket_t1",
+      "displayName": "幸运符",
+      "slot": "Trinket",
+      "itemLevel": 4,
+      "baseStatMin": 3.0,
+      "baseStatMax": 6.0,
       "affixes": [
-        {
-          "id": "primary_armor",
-          "displayName": "护甲",
-          "min": 15.0,
-          "max": 25.0,
-          "defaultValue": 18.0,
-          "isPrimary": true
-        },
-        {
-          "id": "sub_hp",
-          "displayName": "生命",
-          "min": 30.0,
-          "max": 60.0,
-          "defaultValue": 40.0,
-          "isPrimary": false
-        }
+        { "id": "sub_crit", "displayName": "暴击率", "min": 0.02, "max": 0.05, "isPrimary": true }
       ]
     }
   ]

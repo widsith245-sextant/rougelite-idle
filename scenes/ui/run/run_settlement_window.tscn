@@ -1,0 +1,75 @@
+[gd_scene load_steps=2 format=3 uid="uid://run_settlement_window_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/run_settlement_window.gd" id="1_script"]
+
+[node name="RunSettlementWindow" type="Window"]
+initial_position = 1
+size = Vector2i(400, 320)
+visible = false
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.0784314, 0.0941176, 0.121569, 1)
+
+[node name="VBox" type="VBoxContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="GradeLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "评级: C"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "统计摘要"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RewardLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "金币 +0"
+horizontal_alignment = 1
+
+[node name="ChestLabel" type="Label" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "黄金宝箱: common"
+horizontal_alignment = 1
+
+[node name="ClaimButton" type="Button" parent="Root/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "领取宝箱"

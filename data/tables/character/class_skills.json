@@ -3,52 +3,66 @@
     {
       "classId": "Vanguard_01",
       "actives": [
-        { "id": "charge_strike", "skillMultiplier": 1.0, "moveTags": [{ "kind": "Charge", "distance": 20 }] },
-        { "id": "shield_bash", "skillMultiplier": 0.8, "moveTags": [{ "kind": "Retreat", "distance": 20 }] }
+        { "id": "charge_strike", "displayName": "冲锋斩", "skillMultiplier": 1.0, "triggerSlot": "active_0", "triggerKind": "GaugeFull", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Charge", "distance": 20 }], "appliedEffects": [{ "effectId": "CHARGE_ATTACK", "pile": 1, "intensity": 0, "target": "self" }], "descriptionTokens": ["@gauge_full", "@move_end(Charge)"] },
+        { "id": "combo_slash", "skillMultiplier": 0.9, "triggerSlot": "active_1", "triggerKind": "BasicAttackCount", "triggerParam": { "basicAttackThreshold": 3 }, "effectId": "", "moveTags": [] },
+        { "id": "shield_bash", "skillMultiplier": 0.8, "triggerSlot": "active_2", "triggerKind": "OnXMove", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Retreat", "distance": 20 }] },
+        { "id": "swap_guard", "skillMultiplier": 1.1, "triggerSlot": "active_3", "triggerKind": "OnForceSwap", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "ForceSwap", "distance": 0 }] }
       ],
       "passives": [
-        { "id": "hold_the_line", "triggerType": "OnFrontLine", "targetSlot": -1, "skillMultiplier": 0.0 }
+        { "id": "hold_the_line", "triggerType": "OnFrontLine", "targetSlot": -1, "skillMultiplier": 0.5, "effectId": "" },
+        { "id": "covering_fire", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.4, "effectId": "" }
       ]
     },
     {
       "classId": "Sniper_01",
       "actives": [
-        { "id": "basic_shot", "skillMultiplier": 1.0, "moveTags": [] },
-        { "id": "piercing_round", "skillMultiplier": 1.2, "moveTags": [] }
+        { "id": "basic_shot", "displayName": "普通射击", "skillMultiplier": 1.0, "triggerSlot": "active_0", "triggerKind": "GaugeFull", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [], "appliedEffects": [{ "effectId": "CRIT_RATE_UP", "pile": 2, "intensity": 0, "target": "self" }, { "effectId": "BACKSTAB", "pile": 1, "intensity": 2, "target": "self" }], "descriptionTokens": ["@gauge_full", "@behind_target"] },
+        { "id": "piercing_round", "skillMultiplier": 1.2, "triggerSlot": "active_1", "triggerKind": "BasicAttackCount", "triggerParam": { "basicAttackThreshold": 4 }, "effectId": "", "moveTags": [] },
+        { "id": "aim_retreat", "skillMultiplier": 0.85, "triggerSlot": "active_2", "triggerKind": "OnXMove", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Retreat", "distance": 30 }] },
+        { "id": "cross_swap_shot", "skillMultiplier": 1.3, "triggerSlot": "active_3", "triggerKind": "OnForceSwap", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "ForceSwap", "distance": 0 }] }
       ],
       "passives": [
-        { "id": "crossfire", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.5 },
-        { "id": "point_blank", "triggerType": "OnPointBlank", "targetSlot": 50, "skillMultiplier": 3.0 }
+        { "id": "crossfire", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.5, "effectId": "" },
+        { "id": "point_blank", "triggerType": "OnPointBlank", "targetSlot": 50, "skillMultiplier": 3.0, "effectId": "" }
       ]
     },
     {
       "classId": "Mage_01",
       "actives": [
-        { "id": "charge2_strike", "skillMultiplier": 1.0, "moveTags": [{ "kind": "Charge", "distance": 80 }] },
-        { "id": "backslide", "skillMultiplier": 0.6, "moveTags": [{ "kind": "Retreat", "distance": 60 }] }
+        { "id": "charge2_strike", "displayName": "魔导冲锋", "skillMultiplier": 1.0, "triggerSlot": "active_0", "triggerKind": "GaugeFull", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Charge", "distance": 80 }], "appliedEffects": [{ "effectId": "MARK_TIMER", "pile": 2, "intensity": 8, "target": "primary" }, { "effectId": "RESOURCE_STACK", "pile": 3, "intensity": 0, "target": "self" }], "descriptionTokens": ["@gauge_full"] },
+        { "id": "arc_bolt", "skillMultiplier": 0.75, "triggerSlot": "active_1", "triggerKind": "BasicAttackCount", "triggerParam": { "basicAttackThreshold": 3 }, "effectId": "", "moveTags": [] },
+        { "id": "backslide", "skillMultiplier": 0.6, "triggerSlot": "active_2", "triggerKind": "OnXMove", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Retreat", "distance": 60 }] },
+        { "id": "blink_swap", "skillMultiplier": 1.0, "triggerSlot": "active_3", "triggerKind": "OnForceSwap", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "ForceSwap", "distance": 0 }] }
       ],
       "passives": [
-        { "id": "entry_burst", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 2.0 }
+        { "id": "entry_burst", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 2.0, "effectId": "" },
+        { "id": "arcane_circle", "triggerType": "OnSquadSwap", "targetSlot": -1, "skillMultiplier": 0.6, "effectId": "" }
       ]
     },
     {
       "classId": "Support_01",
       "actives": [
-        { "id": "healing_pulse", "skillMultiplier": 0.5, "moveTags": [] },
-        { "id": "sanctuary", "skillMultiplier": 0.3, "moveTags": [{ "kind": "Retreat", "distance": 30 }] }
+        { "id": "healing_pulse", "displayName": "治疗脉冲", "skillMultiplier": 0.5, "triggerSlot": "active_0", "triggerKind": "GaugeFull", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [], "appliedEffects": [{ "effectId": "SHIELD", "pile": 2, "intensity": 0, "target": "self" }, { "effectId": "SPEED_UP", "pile": 1, "intensity": 0, "target": "self" }], "descriptionTokens": ["@gauge_full"] },
+        { "id": "renew_wave", "skillMultiplier": 0.4, "triggerSlot": "active_1", "triggerKind": "BasicAttackCount", "triggerParam": { "basicAttackThreshold": 5 }, "effectId": "", "moveTags": [] },
+        { "id": "sanctuary", "skillMultiplier": 0.3, "triggerSlot": "active_2", "triggerKind": "OnXMove", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Retreat", "distance": 30 }] },
+        { "id": "rescue_swap", "skillMultiplier": 0.45, "triggerSlot": "active_3", "triggerKind": "OnForceSwap", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "ForceSwap", "distance": 0 }] }
       ],
       "passives": [
-        { "id": "regen_aura", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.2 }
+        { "id": "regen_aura", "triggerType": "OnAnyAllyMoved", "targetSlot": -1, "skillMultiplier": 0.2, "effectId": "" },
+        { "id": "frontline_aid", "triggerType": "OnFrontLine", "targetSlot": -1, "skillMultiplier": 0.35, "effectId": "" }
       ]
     },
     {
       "classId": "Berserker_01",
       "actives": [
-        { "id": "frenzy_slash", "skillMultiplier": 1.5, "moveTags": [{ "kind": "Charge", "distance": 30 }] },
-        { "id": "blood_rush", "skillMultiplier": 2.0, "moveTags": [] }
+        { "id": "frenzy_slash", "displayName": "狂乱斩", "skillMultiplier": 1.5, "triggerSlot": "active_0", "triggerKind": "GaugeFull", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Charge", "distance": 30 }], "appliedEffects": [{ "effectId": "MARK_TAKEDAMAGE", "pile": 2, "intensity": 6, "target": "primary" }, { "effectId": "ACTION_POWER_UP", "pile": 2, "intensity": 0, "target": "self" }], "descriptionTokens": ["@gauge_full"] },
+        { "id": "blood_rush", "skillMultiplier": 2.0, "triggerSlot": "active_1", "triggerKind": "BasicAttackCount", "triggerParam": { "basicAttackThreshold": 2 }, "effectId": "", "moveTags": [] },
+        { "id": "blood_charge", "skillMultiplier": 1.3, "triggerSlot": "active_2", "triggerKind": "OnXMove", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "Charge", "distance": 40 }] },
+        { "id": "death_swap", "skillMultiplier": 1.8, "triggerSlot": "active_3", "triggerKind": "OnForceSwap", "triggerParam": { "basicAttackThreshold": 0 }, "effectId": "", "moveTags": [{ "kind": "ForceSwap", "distance": 0 }] }
       ],
       "passives": [
-        { "id": "rage_stack", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 1.2 }
+        { "id": "rage_stack", "triggerType": "OnSelfReachFront", "targetSlot": 0, "skillMultiplier": 1.2, "effectId": "" },
+        { "id": "blood_fury", "triggerType": "OnXMove", "targetSlot": -1, "skillMultiplier": 0.8, "effectId": "" }
       ]
     }
   ]

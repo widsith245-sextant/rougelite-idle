@@ -5,11 +5,34 @@
 | 类 | 职责 |
 |----|------|
 | `ActionQueue` | 按 Speed 读条，就绪单位入队 |
-| `BattlefieldController` | X 轴战场：行军、逼近、Charge/Retreat |
+| `BattlefieldController` | X 轴战场：行军、逼近、Charge/Retreat/ForceSwap |
 | `StageRunController` | 训练关：行军 → 波次触发 → 交战 → 复位 |
-| `CombatActionExecutor` | 执行主动技、结算伤害 |
-| `PassiveSkillResolver` | 监听换位触发被动 |
+| `CombatActionExecutor` | Gauge 主技能、普攻、换位技、伤害结算 |
+| `PassiveSkillResolver` | 换位/前线被动 |
+| `ActiveSkillTriggerResolver` | X 轴位移、ForceSwap、编组换位主动触发 |
 | `EventBus` | 向表现层广播信号 |
+
+## 六技能槽与触发模型
+
+每角色 **2 主动 + 1 被动** 装配（`active_0..1` / `passive_0`）；技能树仍保留 6 节点可选。
+
+| 槽位 | 触发 |
+|------|------|
+| `active_0` | ActionGauge 满（主技能 CD） |
+| `active_1..3` | 普攻计数达 `triggerParam.basicAttackThreshold` |
+| 含 `OnXMove` | Charge/Retreat 位移事件 |
+| 含 `OnForceSwap` | ForceSwap 阵位互换 |
+| 被动 | `OnFrontLine` / `OnAnyAllyMoved` / `OnSquadSwap` / `OnXMove` 等 |
+
+Gauge 未满时普攻造成 **0.35×** 基础伤害并递增 `BasicAttackCounter`。
+
+## 三种换位语义
+
+| 类型 | 触发点 |
+|------|--------|
+| X 轴 Charge/Retreat | `PositionChangeEvent` → Resolver |
+| 编组换位 | `PartyManager.SwapSquadSlots` → `EventBus.SquadSwapped` |
+| ForceSwap | 主动技 `moveTags: ForceSwap` → `BattlefieldController.ApplyForceSwap` |
 
 ## 训练关阶段循环
 
@@ -34,7 +57,9 @@ Marching ──(进度到达)──► Engaging ──(敌人全灭)──► Wa
 ally_a(40)  ally_b(72)  ally_c(104)
 ```
 
-`MoveTag`：`Charge` / `Retreat`，带 `distance` 像素。
+- 单位间 **HitBox 碰撞**：`BattlefieldController.ApplySeparation` 禁止穿模
+- 敌人仍攻击最前友方；**远程**单位在 `AtkRange` 内停步即可输出
+- `MoveTag`：`Charge` / `Retreat` / `ForceSwap`
 
 ## 经济与掉落
 

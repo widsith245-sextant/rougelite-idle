@@ -19,6 +19,21 @@
       "exp": 80,
       "gold": 35,
       "chest": { "chance": 0.8, "quality": "epic" }
+    },
+    "goblin_scout": {
+      "exp": 12,
+      "gold": 5,
+      "chest": { "chance": 0.15, "quality": "common" }
+    },
+    "goblin_archer": {
+      "exp": 14,
+      "gold": 6,
+      "chest": { "chance": 0.18, "quality": "common" }
+    },
+    "orc_brute": {
+      "exp": 22,
+      "gold": 10,
+      "chest": { "chance": 0.28, "quality": "rare" }
     }
   },
   "stageComplete": {

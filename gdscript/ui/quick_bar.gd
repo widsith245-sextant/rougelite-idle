@@ -1,67 +1,61 @@
 extends Control
 
-## Collapsible quick bar anchored to bottom-right.
+## Collapsible quick bar anchored to bottom-right (4 grouped entries).
 
 const COLLAPSED_HEIGHT := 18.0
 const EXPANDED_HEIGHT := 30.0
-const EXPANDED_WIDTH := 640.0
+const EXPANDED_WIDTH := 320.0
 const TWEEN_DURATION := 0.2
 
 const POPUP_IDS := {
 	"backpack": 0,
 	"squad": 1,
-	"skill": 2,
 	"cultivation": 3,
-	"wonderland": 4,
-	"star_chart": 3,
 	"stage": 6,
-	"settings": 8,
-	"log": 9,
-	"offline": 10,
+	"wonderland": 4,
 }
 
 @onready var _bar_anchor: Control = %BarAnchor
 @onready var _toggle_button: Button = %ToggleButton
 @onready var _expanded_row: HBoxContainer = %ExpandedRow
 @onready var _collapse_button: Button = %CollapseButton
+@onready var _adventure_button: MenuButton = %AdventureButton
+@onready var _adventure_menu: PopupMenu = %AdventureMenu
 
 var _expanded := false
 var _popup_manager: Node
 
 
 func _ready() -> void:
+	clip_contents = true
 	_popup_manager = get_node_or_null("/root/GameRoot/PopupManager")
 
 	_toggle_button.pressed.connect(_on_toggle_pressed)
 	_collapse_button.pressed.connect(_on_collapse_pressed)
 	%BackpackButton.pressed.connect(_open_popup.bind(POPUP_IDS.backpack))
 	%SquadButton.pressed.connect(_open_popup.bind(POPUP_IDS.squad))
-	%SkillButton.pressed.connect(_open_popup.bind(POPUP_IDS.skill))
 	%CultivationButton.pressed.connect(_open_popup.bind(POPUP_IDS.cultivation))
-	%WonderlandButton.pressed.connect(_open_popup.bind(POPUP_IDS.wonderland))
-	%StageButton.pressed.connect(_open_popup.bind(POPUP_IDS.stage))
-	if has_node("%SettingsButton"):
-		%SettingsButton.pressed.connect(_open_popup.bind(POPUP_IDS.settings))
-	if has_node("%LogButton"):
-		%LogButton.pressed.connect(_on_log_pressed)
-	if has_node("%OfflineButton"):
-		%OfflineButton.pressed.connect(_on_offline_pressed)
-	if has_node("%PortraitButton"):
-		%PortraitButton.pressed.connect(_open_portrait_preview)
+
+	if _adventure_menu:
+		_adventure_menu.clear()
+		_adventure_menu.add_item("训练关卡", POPUP_IDS.stage)
+		_adventure_menu.add_item("奇境 Run", POPUP_IDS.wonderland)
+		_adventure_menu.id_pressed.connect(_on_adventure_menu_id_pressed)
+	elif _adventure_button:
+		var menu: PopupMenu = _adventure_button.get_popup()
+		menu.clear()
+		menu.add_item("训练关卡", POPUP_IDS.stage)
+		menu.add_item("奇境 Run", POPUP_IDS.wonderland)
+		menu.id_pressed.connect(_on_adventure_menu_id_pressed)
+
+	if _expanded_row:
+		_expanded_row.alignment = BoxContainer.ALIGNMENT_BEGIN
 
 	_set_expanded(false, false)
 
 
-func _open_portrait_preview() -> void:
-	var party := get_node_or_null("/root/PartyManager")
-	if party == null:
-		return
-	var unit_id := "ally_a"
-	if party.has_method("GetUnitIdForSlot"):
-		unit_id = str(party.call("GetUnitIdForSlot", 0))
-	var mgr := get_node_or_null("/root/PortraitWindowManager")
-	if mgr and mgr.has_method("ShowPortrait"):
-		mgr.call("ShowPortrait", unit_id, false)
+func _on_adventure_menu_id_pressed(popup_id: int) -> void:
+	_open_popup(popup_id)
 
 
 func _on_toggle_pressed() -> void:
@@ -75,18 +69,6 @@ func _on_collapse_pressed() -> void:
 func _open_popup(popup_id: int) -> void:
 	if _popup_manager and _popup_manager.has_method("open_popup"):
 		_popup_manager.open_popup(popup_id)
-
-
-func _on_log_pressed() -> void:
-	var mgr := get_node_or_null("/root/LogWindowManager")
-	if mgr and mgr.has_method("Toggle"):
-		mgr.call("Toggle")
-
-
-func _on_offline_pressed() -> void:
-	var mgr := get_node_or_null("/root/OfflineRewardsWindowManager")
-	if mgr and mgr.has_method("ShowPendingIfAny"):
-		mgr.call("ShowPendingIfAny")
 
 
 func _set_expanded(expanded: bool, animate: bool) -> void:

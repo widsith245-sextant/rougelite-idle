@@ -55,6 +55,8 @@ func _connect_event_bus(event_bus: Node) -> void:
 		event_bus.connect("PositionChanged", _on_position_changed)
 	if event_bus.has_signal("DamageDealt"):
 		event_bus.connect("DamageDealt", _on_damage_dealt)
+	if event_bus.has_signal("CombatEffectApplied"):
+		event_bus.connect("CombatEffectApplied", _on_combat_effect_applied)
 	if event_bus.has_signal("CombatStateChanged"):
 		event_bus.connect("CombatStateChanged", _on_combat_state_changed)
 	if event_bus.has_signal("WaveStarted"):
@@ -242,21 +244,38 @@ func _logic_to_ally_local_x(logic_x: float) -> float:
 	return logic_x - _ally_slots.global_position.x
 
 
-func _on_damage_dealt(_source_id: String, target_id: String, amount: float, is_crit: bool = false) -> void:
+func _on_damage_dealt(
+	_source_id: String,
+	target_id: String,
+	amount: float,
+	is_crit: bool = false,
+	damage_type: String = "",
+	display_tag: String = "",
+) -> void:
 	if _vfx_manager == null:
 		return
 
 	var world_pos: Vector2 = _unit_positions.get(target_id, _enemy_spawn.global_position)
+	var category := display_tag if not display_tag.is_empty() else damage_type
+	var opts := {
+		"category": category if not category.is_empty() else "physical",
+		"is_crit": is_crit,
+		"target_id": target_id,
+	}
 	if _vfx_manager.has_method("spawn_damage_number_staggered"):
-		_vfx_manager.spawn_damage_number_staggered(amount, world_pos)
+		_vfx_manager.spawn_damage_number_staggered(amount, world_pos, opts)
 	elif _vfx_manager.has_method("spawn_damage_number"):
-		_vfx_manager.spawn_damage_number(amount, world_pos)
+		_vfx_manager.spawn_damage_number(amount, world_pos, opts)
 
 	if is_crit and _ally_nodes.has(_source_id):
 		var doll: Node = _ally_nodes[_source_id]
 		if doll.has_method("apply_hit_stop"):
 			doll.apply_hit_stop(0.05)
 			_hit_stop_timer = 0.05
+
+
+func _on_combat_effect_applied(_target_id: String, _effect_id: String, _display_name: String, _category: String, _pile: int, _intensity: float) -> void:
+	pass
 
 
 func _on_combat_state_changed(state: int) -> void:

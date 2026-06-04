@@ -44,7 +44,32 @@ public static class ClassSkillsLoader
 			TriggerType = ParseTrigger(skill.TriggerType),
 			TargetSlot = skill.TargetSlot,
 			SkillMultiplier = skill.SkillMultiplier,
+			EffectId = skill.EffectId ?? string.Empty,
 		};
+	}
+
+	public static CombatSkillDefinition? GetGaugeSkill(IReadOnlyList<CombatSkillDefinition> actives) =>
+		actives.FirstOrDefault(s => s.TriggerKind == SkillTriggerKind.GaugeFull)
+		?? (actives.Count > 0 ? actives[0] : null);
+
+	public static CombatSkillDefinition? GetBasicAttackTriggeredSkill(
+		IReadOnlyList<CombatSkillDefinition> actives,
+		int counter)
+	{
+		foreach (var skill in actives)
+		{
+			if (skill.TriggerKind != SkillTriggerKind.BasicAttackCount)
+			{
+				continue;
+			}
+
+			if (counter >= skill.TriggerParam.BasicAttackThreshold && skill.TriggerParam.BasicAttackThreshold > 0)
+			{
+				return skill;
+			}
+		}
+
+		return null;
 	}
 
 	private static ClassEntry? GetClass(string classId)
@@ -91,6 +116,14 @@ public static class ClassSkillsLoader
 		{
 			Id = entry.Id,
 			SkillMultiplier = entry.SkillMultiplier,
+			TriggerSlot = entry.TriggerSlot ?? "active_0",
+			TriggerKind = ParseTriggerKind(entry.TriggerKind),
+			EffectId = entry.EffectId ?? string.Empty,
+			TriggerParam = new SkillTriggerParam
+			{
+				BasicAttackThreshold = entry.TriggerParam?.BasicAttackThreshold ?? 3,
+				CooldownOverride = entry.TriggerParam?.CooldownOverride ?? 0f,
+			},
 		};
 
 		if (entry.MoveTags != null)
@@ -101,8 +134,55 @@ public static class ClassSkillsLoader
 			}
 		}
 
+		if (entry.AppliedEffects != null)
+		{
+			foreach (var applied in entry.AppliedEffects)
+			{
+				skill.AppliedEffects.Add(new AppliedEffectEntry
+				{
+					EffectId = applied.EffectId ?? string.Empty,
+					Pile = applied.Pile,
+					Intensity = applied.Intensity,
+					Target = applied.Target ?? "primary",
+				});
+			}
+		}
+
+		if (entry.DescriptionTokens != null)
+		{
+			skill.DescriptionTokens.AddRange(entry.DescriptionTokens);
+		}
+
 		return skill;
 	}
+
+	public static SkillDisplayEntry? GetSkillDisplayEntry(string classId, string skillId)
+	{
+		EnsureLoaded();
+		if (!_cache!.TryGetValue(classId, out var entry) || entry.Actives == null)
+		{
+			return null;
+		}
+
+		var skill = entry.Actives.FirstOrDefault(s => s.Id == skillId);
+		if (skill == null)
+		{
+			return null;
+		}
+
+		return new SkillDisplayEntry
+		{
+			Id = skill.Id,
+			DisplayName = skill.DisplayName ?? skill.Id,
+			DescriptionTokens = skill.DescriptionTokens ?? new List<string>(),
+			AppliedEffects = skill.AppliedEffects ?? new List<AppliedEffectJson>(),
+		};
+	}
+
+	private static SkillTriggerKind ParseTriggerKind(string? kind) =>
+		Enum.TryParse<SkillTriggerKind>(kind, true, out var parsed)
+			? parsed
+			: SkillTriggerKind.GaugeFull;
 
 	private static MoveTagKind ParseMoveKind(string kind) =>
 		Enum.TryParse<MoveTagKind>(kind, true, out var parsed) ? parsed : MoveTagKind.Charge;
@@ -127,8 +207,37 @@ public static class ClassSkillsLoader
 	private sealed class SkillEntry
 	{
 		public string Id { get; set; } = string.Empty;
+		public string? DisplayName { get; set; }
 		public float SkillMultiplier { get; set; } = 1f;
+		public string? TriggerSlot { get; set; }
+		public string? TriggerKind { get; set; }
+		public TriggerParamEntry? TriggerParam { get; set; }
+		public string? EffectId { get; set; }
 		public List<MoveTagEntry>? MoveTags { get; set; }
+		public List<AppliedEffectJson>? AppliedEffects { get; set; }
+		public List<string>? DescriptionTokens { get; set; }
+	}
+
+	public sealed class AppliedEffectJson
+	{
+		public string? EffectId { get; set; }
+		public int Pile { get; set; } = 1;
+		public float Intensity { get; set; }
+		public string? Target { get; set; }
+	}
+
+	public sealed class SkillDisplayEntry
+	{
+		public string Id { get; set; } = string.Empty;
+		public string DisplayName { get; set; } = string.Empty;
+		public List<string> DescriptionTokens { get; set; } = new();
+		public List<AppliedEffectJson> AppliedEffects { get; set; } = new();
+	}
+
+	private sealed class TriggerParamEntry
+	{
+		public int BasicAttackThreshold { get; set; } = 3;
+		public float CooldownOverride { get; set; }
 	}
 
 	private sealed class PassiveEntry
@@ -137,6 +246,7 @@ public static class ClassSkillsLoader
 		public string TriggerType { get; set; } = string.Empty;
 		public int TargetSlot { get; set; } = -1;
 		public float SkillMultiplier { get; set; } = 1f;
+		public string? EffectId { get; set; }
 	}
 
 	private sealed class MoveTagEntry

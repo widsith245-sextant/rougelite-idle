@@ -7,6 +7,8 @@ public enum PassiveTriggerType
 	OnAnyAllyMoved,
 	OnPointBlank,
 	OnFrontLine,
+	OnSquadSwap,
+	OnXMove,
 }
 
 public class PassiveSkillDefinition
@@ -15,4 +17,5 @@ public class PassiveSkillDefinition
 	public PassiveTriggerType TriggerType { get; set; }
 	public int TargetSlot { get; set; } = -1;
 	public float SkillMultiplier { get; set; } = 1f;
+	public string EffectId { get; set; } = string.Empty;
 }

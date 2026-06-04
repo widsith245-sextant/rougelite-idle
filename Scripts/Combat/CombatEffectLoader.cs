@@ -15,6 +15,25 @@ public static class CombatEffectLoader
 		return _cache != null && _cache.TryGetValue(effectId, out var def) ? def : null;
 	}
 
+	public static Godot.Collections.Array GetAllEffectIds()
+	{
+		EnsureLoaded();
+		var arr = new Godot.Collections.Array();
+		if (_cache == null)
+		{
+			return arr;
+		}
+
+		var ids = new List<string>(_cache.Keys);
+		ids.Sort();
+		foreach (var id in ids)
+		{
+			arr.Add(id);
+		}
+
+		return arr;
+	}
+
 	private static void EnsureLoaded()
 	{
 		if (_cache != null)
@@ -57,9 +76,18 @@ public sealed class CombatEffectDefinition
 {
 	public string Id { get; set; } = string.Empty;
 	public string DisplayName { get; set; } = string.Empty;
+	public string NameCn { get; set; } = string.Empty;
+	public List<string> TriggerConditions { get; set; } = new();
+	public string Formula { get; set; } = string.Empty;
+	public string Decay { get; set; } = string.Empty;
+	public int Priority { get; set; }
+	public string Category { get; set; } = string.Empty;
+	public string DisplayTag { get; set; } = string.Empty;
 	public float TickInterval { get; set; }
 	public float Duration { get; set; }
 	public int MaxStacks { get; set; } = 1;
+	public int MaxPile { get; set; } = 20;
+	public float ShieldBase { get; set; }
 	public float DamagePercentOfSource { get; set; }
 	public EffectStatModifier? StatModifier { get; set; }
 }
@@ -78,6 +106,10 @@ public sealed class ActiveCombatEffect
 	public float RemainingDuration { get; set; }
 	public float TickTimer { get; set; }
 	public int Stacks { get; set; } = 1;
+	public int Pile { get; set; } = 1;
+	public float Intensity { get; set; }
+	public float Shield { get; set; }
+	public int Priority { get; set; }
 	public float SourceAttackSnapshot { get; set; }
 }
 

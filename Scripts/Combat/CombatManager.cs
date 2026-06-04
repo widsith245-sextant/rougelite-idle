@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using RougeliteIdle.Core;
+using RougeliteIdle.Combat.Effects;
 using RougeliteIdle.Loot;
 using RougeliteIdle.Meta;
 using RougeliteIdle.Run;
@@ -32,6 +33,7 @@ public partial class CombatManager : Node
 	private readonly List<CombatUnitData> _allUnits = new();
 
 	private CombatActionExecutor _executor = null!;
+	private EffectTriggerBus _triggerBus = null!;
 	private EventBus _eventBus = null!;
 	private StatsService _statsService = null!;
 	private MetaManager _meta = null!;
@@ -65,8 +67,12 @@ public partial class CombatManager : Node
 		_meta = GetNode<MetaManager>("/root/MetaManager");
 		_loot = GetNode<LootManager>("/root/LootManager");
 		_progression = GetNode<ProgressionManager>("/root/ProgressionManager");
-		_executor = new CombatActionExecutor(_eventBus);
+		CombatEffectRegistry.BindEventBus(_eventBus);
+		var settlement = new CombatSettlementPipeline(_eventBus);
+		_triggerBus = new EffectTriggerBus(settlement);
+		_executor = new CombatActionExecutor(_eventBus, _triggerBus, this);
 		_eventBus.SquadChanged += OnSquadChanged;
+		_eventBus.SquadSwapped += OnSquadSwapped;
 	}
 
 	public void SetPendingCombatSave(CombatSaveDto? save) => _pendingCombatSave = save;
@@ -96,6 +102,68 @@ public partial class CombatManager : Node
 	private void OnSquadChanged()
 	{
 		ResyncPartyFromRoster();
+	}
+
+	private void OnSquadSwapped(int slotA, int slotB)
+	{
+		if (_stageRun == null || !_stageRun.IsEngaging)
+		{
+			return;
+		}
+
+		var enemy = GetFrontEnemy();
+		if (enemy == null || enemy.CurrentHp <= 0f)
+		{
+			return;
+		}
+
+		var pending = ActiveSkillTriggerResolver.ResolveSquadSwapTriggers(
+			_allies, enemy, _meta.GlobalStatBonusPercent);
+		_executor.ApplyPendingDamage(pending);
+		CheckEnemyDeath(enemy);
+	}
+
+	private void TickBasicAttacks(float dt)
+	{
+		if (_stageRun == null || !_stageRun.IsEngaging)
+		{
+			return;
+		}
+
+		foreach (var ally in _allies)
+		{
+			if (ally.CurrentHp <= 0f || ally.IsBlockingOutput || ActionGauge.IsReady(ally))
+			{
+				continue;
+			}
+
+			var enemy = GetTargetEnemyForAlly(ally);
+			if (enemy == null || enemy.CurrentHp <= 0f || !_battlefield.IsInAttackRange(ally, enemy))
+			{
+				continue;
+			}
+
+			ally.NormalAttackTimer += dt;
+			var atkSpeed = ally.Stats.GetFinal(StatId.AtkSpeed);
+			var interval = atkSpeed > 0.01f ? 1f / atkSpeed : 1.2f;
+			if (ally.NormalAttackTimer < interval)
+			{
+				continue;
+			}
+
+			ally.NormalAttackTimer = 0f;
+			_executor.ExecuteBasicAttack(ally, enemy, _allies, _battlefield, _meta.GlobalStatBonusPercent);
+			ally.BasicAttackCounter++;
+
+			var triggered = ClassSkillsLoader.GetBasicAttackTriggeredSkill(ally.ActiveSkills, ally.BasicAttackCounter);
+			if (triggered != null)
+			{
+				ally.BasicAttackCounter = 0;
+				_executor.ExecuteTurn(ally, _battlefield, _allies, enemy, _meta.GlobalStatBonusPercent, triggered);
+			}
+
+			CheckEnemyDeath(enemy);
+		}
 	}
 
 	public void ResyncPartyFromRoster()
@@ -178,6 +246,7 @@ public partial class CombatManager : Node
 		_currentStageId = stageId;
 		_partyWipeHandled = false;
 		StartEncounter();
+		_eventBus.EmitStageIdChanged(stageId);
 	}
 
 	public void RestartCurrentStage()
@@ -255,6 +324,7 @@ public partial class CombatManager : Node
 
 		var dt = (float)delta;
 		CheckPartyWipe();
+		TickBasicAttacks(dt);
 
 		if (TrainingMode && _stageRun != null)
 		{
@@ -275,6 +345,15 @@ public partial class CombatManager : Node
 		if (livingEnemies.Count > 0)
 		{
 			_executor.Effects.Tick(dt, _allUnits, _executor);
+			_triggerBus.Configure(new EffectHandlerServices
+			{
+				Battlefield = _battlefield,
+				Allies = _allies,
+				Enemies = _enemies,
+				Executor = _executor,
+				MetaPercent = _meta.GlobalStatBonusPercent,
+			});
+			_triggerBus.EmitToAllUnits(_allUnits, EffectTriggerKind.OnTimeElapsed, dt);
 			foreach (var enemy in livingEnemies)
 			{
 				TickHybridCombat(dt, enemy);
@@ -320,6 +399,10 @@ public partial class CombatManager : Node
 		}
 
 		_stageRun.OnEnemyKilled(this, enemy);
+		if (RunRogueliteActive)
+		{
+			GetNodeOrNull<Run.RunStatsAggregator>("/root/RunStatsAggregator")?.RecordKill();
+		}
 	}
 
 	public bool HasLivingEnemies() => _enemies.Any(e => e.CurrentHp > 0f);
@@ -407,6 +490,37 @@ public partial class CombatManager : Node
 		_eventBus.EmitCombatStateChanged(1);
 	}
 
+	public void ClearEngagementForRunPause()
+	{
+		var savedHp = new Dictionary<string, float>();
+		foreach (var ally in _allies)
+		{
+			savedHp[ally.Id] = ally.CurrentHp;
+		}
+
+		ClearAllEnemies();
+		_isResolving = false;
+		_pendingActor = null;
+		_actionQueue.Clear();
+		_processingUnitIds.Clear();
+
+		if (_stageRun != null)
+		{
+			_stageRun.EnterRunPause();
+		}
+
+		foreach (var ally in _allies)
+		{
+			if (!savedHp.TryGetValue(ally.Id, out var hp))
+			{
+				continue;
+			}
+
+			ally.CurrentHp = Mathf.Min(hp, ally.MaxHp);
+			_eventBus.EmitUnitHpChanged(ally.Id, ally.CurrentHp, ally.MaxHp);
+		}
+	}
+
 	public void DespawnActiveEnemy() => ClearAllEnemies();
 
 	public Godot.Collections.Array GetEnemySnapshot()
@@ -451,8 +565,9 @@ public partial class CombatManager : Node
 				continue;
 			}
 
+			var obstacles = CollectLivingObstacles(ally.Id);
 			var oldX = ally.PositionX;
-			UnitCombatAI.Tick(ally, target, _battlefield, dt);
+			UnitCombatAI.Tick(ally, target, _battlefield, dt, obstacles);
 			EmitPositionIfChanged(ally, oldX);
 
 			if (_processingUnitIds.Contains(ally.Id))
@@ -470,7 +585,7 @@ public partial class CombatManager : Node
 					null,
 					out isCrit,
 					ally.DamageType);
-				_executor.ApplyDamage(ally, target, damage, isCrit);
+				_executor.ApplyDamage(ally, target, damage, isCrit, "normal_attack", 1f);
 				_executor.Effects.TryApplyOnHitEffects(ally, target, ally.OnHitEffects);
 				ally.CombatState = UnitCombatState.InRange;
 				CheckEnemyDeath(target);
@@ -482,8 +597,9 @@ public partial class CombatManager : Node
 			var frontAlly = _battlefield.GetFrontAlly(_allies);
 			if (frontAlly != null && frontAlly.CurrentHp > 0f)
 			{
+				var obstacles = CollectLivingObstacles(focusEnemy.Id);
 				var oldEnemyX = focusEnemy.PositionX;
-				UnitCombatAI.Tick(focusEnemy, frontAlly, _battlefield, dt);
+				UnitCombatAI.Tick(focusEnemy, frontAlly, _battlefield, dt, obstacles);
 				EmitPositionIfChanged(focusEnemy, oldEnemyX);
 			}
 		}
@@ -567,7 +683,18 @@ public partial class CombatManager : Node
 
 			if (ActionGauge.IsReady(unit))
 			{
-				_actionQueue.TryEnqueue(unit);
+				if (_actionQueue.TryEnqueue(unit))
+				{
+					_triggerBus.Configure(new EffectHandlerServices
+					{
+						Battlefield = _battlefield,
+						Allies = _allies,
+						Enemies = _enemies,
+						Executor = _executor,
+						MetaPercent = _meta.GlobalStatBonusPercent,
+					});
+					_triggerBus.Emit(EffectTriggerKind.OnGaugeFull, unit);
+				}
 			}
 		}
 	}
@@ -591,7 +718,16 @@ public partial class CombatManager : Node
 	private void FinishSkillTurn(CombatUnitData actor)
 	{
 		var enemy = actor.IsAlly ? GetTargetEnemyForAlly(actor) : GetFrontEnemy();
-		var consumed = _executor.ExecuteTurn(actor, _battlefield, _allies, enemy, _meta.GlobalStatBonusPercent);
+		var gaugeSkill = ClassSkillsLoader.GetGaugeSkill(actor.ActiveSkills) ?? actor.ActiveSkill;
+		var obstacles = CollectLivingObstacles(actor.Id);
+		var consumed = _executor.ExecuteTurn(
+			actor,
+			_battlefield,
+			_allies,
+			enemy,
+			_meta.GlobalStatBonusPercent,
+			gaugeSkill,
+			obstacles);
 		if (consumed)
 		{
 			ActionGauge.Reset(actor);
@@ -659,6 +795,22 @@ public partial class CombatManager : Node
 		}
 
 		return null;
+	}
+
+	private List<CombatUnitData> CollectLivingObstacles(string? excludeId = null)
+	{
+		var list = new List<CombatUnitData>();
+		foreach (var unit in _allUnits)
+		{
+			if (unit.CurrentHp <= 0f || unit.Id == excludeId)
+			{
+				continue;
+			}
+
+			list.Add(unit);
+		}
+
+		return list;
 	}
 
 	public float GetAllyHpRatio()
@@ -939,5 +1091,162 @@ public partial class CombatManager : Node
 			ally.CurrentHp = ally.MaxHp * ratio;
 			_eventBus.EmitUnitHpChanged(ally.Id, ally.CurrentHp, ally.MaxHp);
 		}
+	}
+
+	public float GetMetaPercent() => _meta.GlobalStatBonusPercent;
+
+	public Godot.Collections.Array GetUnitEffectsSnapshot(string unitId)
+	{
+		var unit = FindUnit(unitId);
+		var arr = new Godot.Collections.Array();
+		if (unit == null)
+		{
+			return arr;
+		}
+
+		foreach (var effect in unit.ActiveEffects)
+		{
+			arr.Add(new Godot.Collections.Dictionary
+			{
+				{ "effect_id", effect.EffectId },
+				{ "pile", effect.Pile },
+				{ "intensity", effect.Intensity },
+				{ "shield", effect.Shield },
+			});
+		}
+
+		return arr;
+	}
+
+	public Godot.Collections.Array GetAllEffectIds() => CombatEffectLoader.GetAllEffectIds();
+
+	public Godot.Collections.Array GetScenarioList() => CombatScenarioLoader.GetScenarioList();
+
+	public void DebugRestartEncounter()
+	{
+		RestartCurrentStage();
+	}
+
+	public void DebugFillGauges()
+	{
+		foreach (var unit in _allUnits)
+		{
+			if (unit.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			unit.ActionGauge = ActionGauge.GaugeMax;
+		}
+	}
+
+	public void DebugForceAllyTurn(string allyId)
+	{
+		var ally = FindUnit(allyId);
+		if (ally == null || ally.CurrentHp <= 0f || _isResolving)
+		{
+			return;
+		}
+
+		ally.ActionGauge = ActionGauge.GaugeMax;
+		_triggerBus.Configure(new EffectHandlerServices
+		{
+			Battlefield = _battlefield,
+			Allies = _allies,
+			Enemies = _enemies,
+			Executor = _executor,
+			MetaPercent = _meta.GlobalStatBonusPercent,
+		});
+		_triggerBus.Emit(EffectTriggerKind.OnGaugeFull, ally);
+		_isResolving = true;
+		_resolveTimer = 0.05f;
+		_pendingActor = ally;
+		_processingUnitIds.Add(ally.Id);
+		_eventBus.EmitCombatActionStarted(ally.Id);
+	}
+
+	public void DebugSetFastMode(bool enabled)
+	{
+		Engine.TimeScale = enabled ? 2.5f : 1.0f;
+	}
+
+	public Godot.Collections.Dictionary GetDebugSnapshot()
+	{
+		var units = new Godot.Collections.Array();
+		foreach (var unit in _allUnits)
+		{
+			units.Add(new Godot.Collections.Dictionary
+			{
+				{ "id", unit.Id },
+				{ "gauge", unit.ActionGauge },
+				{ "hp", unit.CurrentHp },
+				{ "processing", _processingUnitIds.Contains(unit.Id) },
+			});
+		}
+
+		return new Godot.Collections.Dictionary
+		{
+			{ "queue_count", _actionQueue.Count },
+			{ "is_resolving", _isResolving },
+			{ "pending_actor", _pendingActor?.Id ?? string.Empty },
+			{ "waiting_respawn", false },
+			{ "respawn_timer", 0f },
+			{ "units", units },
+		};
+	}
+
+	public void DebugApplyEffect(string targetId, string effectId, int pile, float intensity)
+	{
+		var target = FindUnit(targetId);
+		var source = _allies.Count > 0 ? _allies[0] : target;
+		if (target == null || source == null)
+		{
+			return;
+		}
+
+		CombatEffectRegistry.TryApply(effectId, source, target, pile, intensity);
+	}
+
+	public void DebugClearEffects(string targetId)
+	{
+		var target = FindUnit(targetId);
+		if (target == null)
+		{
+			return;
+		}
+
+		CombatEffectRegistry.ClearEffects(target);
+	}
+
+	public void DebugEmitTrigger(string kindName, string unitId)
+	{
+		var unit = FindUnit(unitId);
+		if (unit == null || !System.Enum.TryParse<EffectTriggerKind>(kindName, true, out var kind))
+		{
+			return;
+		}
+
+		_triggerBus.Configure(new EffectHandlerServices
+		{
+			Battlefield = _battlefield,
+			Allies = _allies,
+			Enemies = _enemies,
+			Executor = _executor,
+			MetaPercent = _meta.GlobalStatBonusPercent,
+		});
+		_triggerBus.Emit(kind, unit);
+	}
+
+	public void DebugLoadScenario(string scenarioId) => CombatScenarioLoader.Apply(scenarioId, this);
+
+	public void DebugPreviewDamageNumber(string category, float amount, float worldX)
+	{
+		var target = GetFrontEnemy() ?? (_allies.Count > 0 ? _allies[0] : null);
+		if (target == null)
+		{
+			return;
+		}
+
+		_eventBus.EmitDamageDealt("debug", target.Id, amount, false, category, category);
 	}
 }

@@ -31,6 +31,7 @@ public class CombatUnitData
 	public float PositionX { get; set; }
 	public float HitBoxRadius { get; set; } = 10f;
 	public float ActionGauge { get; set; }
+	public int BasicAttackCounter { get; set; }
 
 	public UnitCombatState CombatState { get; set; } = UnitCombatState.Idle;
 	public float NormalAttackTimer { get; set; }
@@ -49,5 +50,14 @@ public class CombatUnitData
 	public bool IsBlockingOutput =>
 		CombatState is UnitCombatState.Stunned
 			or UnitCombatState.Casting
-			or UnitCombatState.Reposition;
+			or UnitCombatState.Reposition
+		|| StunNextAction;
+
+	public bool StunNextAction { get; set; }
+	public bool ChargeAttackPending { get; set; }
+	public string EchoRepeatSkillId { get; set; } = string.Empty;
+	public string RecursionSkillId { get; set; } = string.Empty;
+	public float TempActionPowerBonus { get; set; }
+	public float TempCritRateDelta { get; set; }
+	public int ResourceStackCap { get; set; } = 20;
 }

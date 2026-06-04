@@ -38,5 +38,9 @@
 
 - [x] SaveManager JSON 存星图/会话时间
 - [x] OfflineIdleManager 挂钩 SaveGame
-- [ ] 完整装备/背包序列化（后续）
+- [x] 完整装备/背包序列化（SaveManager v3：identified / chests / equipped）
 - [ ] TrainingMode 关卡表驱动（后续）
+
+---
+
+装备/开箱规则快照见 [`EQUIPMENT_LOOT_SNAPSHOT.md`](EQUIPMENT_LOOT_SNAPSHOT.md)；UI 信息流 [`UI_INFORMATION_FLOW.md`](UI_INFORMATION_FLOW.md)；资产工作流 [`UI_ASSET_WORKFLOW.md`](UI_ASSET_WORKFLOW.md)；任务板 [`WORK_IN_PROGRESS.md`](WORK_IN_PROGRESS.md)。

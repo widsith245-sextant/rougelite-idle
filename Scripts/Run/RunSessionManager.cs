@@ -7,6 +7,7 @@ using RougeliteIdle.Combat;
 using RougeliteIdle.Core;
 using RougeliteIdle.Meta;
 using RougeliteIdle.Save;
+using RougeliteIdle.Stats;
 
 namespace RougeliteIdle.Run;
 
@@ -30,6 +31,8 @@ public partial class RunSessionManager : Node
 	private ProgressionManager _progression = null!;
 	private RosterProgressionManager _rosterProgression = null!;
 	private RunCardManager _runCards = null!;
+	private RunRelicManager _runRelics = null!;
+	private RunStatsAggregator _runStats = null!;
 	private RandomNumberGenerator _rng = new();
 
 	private int _currentRoomIndex;
@@ -57,6 +60,8 @@ public partial class RunSessionManager : Node
 		_progression = GetNode<ProgressionManager>("/root/ProgressionManager");
 		_rosterProgression = GetNode<RosterProgressionManager>("/root/RosterProgressionManager");
 		_runCards = GetNode<RunCardManager>("/root/RunCardManager");
+		_runRelics = GetNode<RunRelicManager>("/root/RunRelicManager");
+		_runStats = GetNode<RunStatsAggregator>("/root/RunStatsAggregator");
 		_rng.Randomize();
 		LoadPool();
 		_eventBus.StageRunCompleted += OnStageRunCompleted;
@@ -104,6 +109,8 @@ public partial class RunSessionManager : Node
 	}
 
 	public Godot.Collections.Array GetActiveCardsSnapshot() => _runCards.GetActiveCardsSnapshot();
+
+	public Godot.Collections.Array GetActiveRelicsSnapshot() => _runRelics.GetActiveRelicsSnapshot();
 
 	public bool StartRun(int? seed = null) => TryStartRun(seed);
 
@@ -163,7 +170,11 @@ public partial class RunSessionManager : Node
 		_combat.RunRogueliteActive = true;
 		_combat.SetRunPaused(false);
 		_runCards.ResetForRun();
+		_runRelics.ResetForRun();
+		_runStats.ResetForRun();
+		RebuildPartyStatsForRun();
 		_eventBus.EmitRunVisualModeChanged("wonderland");
+		InterruptTrainingForRun();
 		EmitState();
 		EnterCurrentRoom();
 		_eventBus.EmitCombatBroadcast($"奇境 Run 开始 · {_roomQueue.Count} 房间", "run");
@@ -217,11 +228,13 @@ public partial class RunSessionManager : Node
 				break;
 			case "rest":
 				_combat.SetRunPaused(true);
+				_combat.ClearEngagementForRunPause();
 				_awaitingRoomAction = true;
 				break;
 			case "reward":
 				_combat.SetRunPaused(true);
-				_runCards.BeginRoomRewardPick();
+				_combat.ClearEngagementForRunPause();
+				_runRelics.BeginRoomRewardPick();
 				break;
 		}
 	}
@@ -242,6 +255,22 @@ public partial class RunSessionManager : Node
 	}
 
 	public void CompleteRoomAfterCardReward()
+	{
+		if (_state != RunSessionState.InRoom)
+		{
+			return;
+		}
+
+		var room = GetCurrentRoom();
+		if (room == null || room.Type != "reward")
+		{
+			return;
+		}
+
+		CompleteRoom();
+	}
+
+	public void CompleteRoomAfterRelicReward()
 	{
 		if (_state != RunSessionState.InRoom)
 		{
@@ -322,34 +351,67 @@ public partial class RunSessionManager : Node
 
 	private void SettleRun(bool success)
 	{
+		var settlement = _runStats.Evaluate(_roomsCleared, success);
+		var goldGrant = _runStats.GetGoldGrant(settlement);
+		var expGrant = _runStats.GetExpGrant(settlement);
+
 		_combat.RunRogueliteActive = false;
 		_combat.SetRunPaused(false);
 		_runCards.Clear();
+		_runRelics.Clear();
 		_awaitingRoomAction = false;
 		_state = success ? RunSessionState.RunComplete : RunSessionState.RunFailed;
 		_eventBus.EmitRunVisualModeChanged("training");
+		RebuildPartyStatsForRun();
 
-		var goldBase = _roomsCleared * 15 + (success ? 40 : 0);
-		var goldGrant = success ? goldBase : goldBase / 2;
 		_progression.AddGold(goldGrant);
+		if (expGrant > 0f)
+		{
+			_rosterProgression.GrantExpToActiveSquad(expGrant);
+		}
 
 		if (success)
 		{
-			var exp = _roomsCleared * 12f;
-			_rosterProgression.GrantExpToActiveSquad(exp);
-			_eventBus.EmitCombatBroadcast($"Run 通关 · 结算 +{goldGrant} 金币 · +{exp:F0} 经验", "run");
+			_eventBus.EmitCombatBroadcast(
+				$"Run 通关 · 评级 {settlement.Grade} · +{goldGrant} 金币 · +{expGrant:F0} 经验",
+				"run");
 		}
 		else
 		{
-			_eventBus.EmitCombatBroadcast($"Run 失败 · 结算 +{goldGrant} 金币", "run");
+			_eventBus.EmitCombatBroadcast(
+				$"Run 失败 · 评级 {settlement.Grade} · +{goldGrant} 金币",
+				"run");
 		}
+
+		GetNodeOrNull<RunSettlementWindowManager>("/root/RunSettlementWindowManager")
+			?.ShowSettlement(settlement, goldGrant, expGrant, settlement.ChestQuality);
+		_eventBus.EmitRunSettlementReady();
 
 		GetNodeOrNull<SaveBootstrap>("/root/SaveBootstrap")?.RequestSave();
 		GetNodeOrNull<GameLogger>("/root/GameLogger")?.Log("Run", GameLogger.LogLevel.Info,
-			$"SettleRun success={success} rooms={_roomsCleared} gold={goldGrant}");
+			$"SettleRun success={success} grade={settlement.Grade} rooms={_roomsCleared} gold={goldGrant}");
 		EmitState();
 		_roomQueue.Clear();
 		_currentRoomIndex = 0;
+	}
+
+	private void RebuildPartyStatsForRun()
+	{
+		var stats = GetNodeOrNull<Stats.StatsService>("/root/StatsService");
+		if (stats == null)
+		{
+			return;
+		}
+
+		stats.RebuildAll(_combat.Allies);
+		foreach (var ally in _combat.Allies)
+		{
+			ally.Stats = stats.GetOrCreate(ally);
+			ally.MaxHp = ally.Stats.GetFinal(StatId.MaxHp);
+			ally.CurrentHp = Mathf.Min(ally.CurrentHp, ally.MaxHp);
+			_eventBus.EmitUnitHpChanged(ally.Id, ally.CurrentHp, ally.MaxHp);
+			_eventBus.EmitStatsChanged(ally.Id);
+		}
 	}
 
 	private void HealActiveParty(float ratio)
@@ -475,6 +537,33 @@ public partial class RunSessionManager : Node
 		GD.PushWarning($"Run room stage {requestedStageId} locked; using {fallback}");
 		_eventBus.EmitCombatBroadcast($"奇境战斗关降级为 {fallback}", "run");
 		return fallback;
+	}
+
+	private void InterruptTrainingForRun()
+	{
+		var stageId = ResolveFirstCombatStageId();
+		if (!string.IsNullOrEmpty(stageId))
+		{
+			_combat.SetStageId(stageId);
+			return;
+		}
+
+		_combat.ClearEngagementForRunPause();
+	}
+
+	private string ResolveFirstCombatStageId()
+	{
+		foreach (var room in _roomQueue)
+		{
+			if (room.Type != "combat" || string.IsNullOrEmpty(room.StageId))
+			{
+				continue;
+			}
+
+			return ResolveCombatStageId(room.StageId);
+		}
+
+		return string.Empty;
 	}
 
 	private RunRoomDefinition PickWeighted(IReadOnlyList<RunRoomDefinition> candidates)

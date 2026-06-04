@@ -30,6 +30,8 @@ func _ready() -> void:
 			event_bus.connect("RunSessionChanged", _on_run_session_changed)
 		if event_bus.has_signal("RunCardPickOffered"):
 			event_bus.connect("RunCardPickOffered", _on_card_pick_offered)
+		if event_bus.has_signal("RunRelicPickOffered"):
+			event_bus.connect("RunRelicPickOffered", _on_relic_pick_offered)
 	call_deferred("refresh")
 
 
@@ -95,17 +97,28 @@ func _format_queue(run: Node) -> String:
 
 
 func _format_cards(run: Node) -> String:
-	if not run.has_method("GetActiveCardsSnapshot"):
-		return "卡牌: —"
-	var cards: Variant = run.call("GetActiveCardsSnapshot")
-	if typeof(cards) != TYPE_ARRAY or cards.is_empty():
-		return "卡牌: —"
-	var names: PackedStringArray = []
-	for entry in cards:
-		if typeof(entry) != TYPE_DICTIONARY:
-			continue
-		names.append(str(entry.get("name", "?")))
-	return "卡牌: " + ", ".join(names)
+	var parts: PackedStringArray = []
+	if run.has_method("GetActiveRelicsSnapshot"):
+		var relics: Variant = run.call("GetActiveRelicsSnapshot")
+		if typeof(relics) == TYPE_ARRAY and not relics.is_empty():
+			var relic_names: PackedStringArray = []
+			for entry in relics:
+				if typeof(entry) != TYPE_DICTIONARY:
+					continue
+				relic_names.append(str(entry.get("name", "?")))
+			parts.append("遗物: " + ", ".join(relic_names))
+	if run.has_method("GetActiveCardsSnapshot"):
+		var cards: Variant = run.call("GetActiveCardsSnapshot")
+		if typeof(cards) == TYPE_ARRAY and not cards.is_empty():
+			var names: PackedStringArray = []
+			for entry in cards:
+				if typeof(entry) != TYPE_DICTIONARY:
+					continue
+				names.append(str(entry.get("name", "?")))
+			parts.append("卡牌: " + ", ".join(names))
+	if parts.is_empty():
+		return "构筑: —"
+	return " · ".join(parts)
 
 
 func _on_detail_pressed() -> void:
@@ -136,6 +149,12 @@ func _on_card_pick_offered() -> void:
 	var popup := get_tree().root.get_node_or_null("GameRoot/PopupManager")
 	if popup and popup.has_method("open_run_card_pick"):
 		popup.call("open_run_card_pick")
+
+
+func _on_relic_pick_offered() -> void:
+	var popup := get_tree().root.get_node_or_null("GameRoot/PopupManager")
+	if popup and popup.has_method("open_run_relic_pick"):
+		popup.call("open_run_relic_pick")
 
 
 func _room_type_label(room_type: String) -> String:

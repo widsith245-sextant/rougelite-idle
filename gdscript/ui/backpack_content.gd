@@ -4,12 +4,10 @@ extends Control
 
 const ItemCellScene := preload("res://scenes/ui/components/item_grid_cell.tscn")
 const GRID_COLUMNS := 8
-const BAG_CAPACITY := 48
 const CELL_SIZE := Vector2(48, 48)
 const SLOT_TYPES := [
 	"Weapon", "Armor", "Helmet", "Gloves", "Boots", "HeadAccessory", "BackAccessory", "Trinket",
 ]
-const SLOT_LABELS := ["武", "甲", "头", "手", "靴", "饰", "背", "奇"]
 const ALL_UNIT_IDS := ["ally_a", "ally_b", "ally_c"]
 const IDENTIFY_DELAY := 0.55
 const REVEAL_WAIT := 0.9
@@ -48,9 +46,11 @@ var _tooltip_root: PanelContainer
 var _tooltip_title: Label
 var _tooltip_body: Label
 var _batch_identifying := false
+var _slot_display_names: Array[String] = []
 
 
 func _ready() -> void:
+	_load_slot_display_names()
 	if _unit_selector:
 		_unit_selector.item_selected.connect(_on_unit_selected)
 	_content_tab.tab_changed.connect(_on_content_tab_changed)
@@ -70,6 +70,20 @@ func _ready() -> void:
 	call_deferred("_deferred_init")
 
 
+func _load_slot_display_names() -> void:
+	_slot_display_names.clear()
+	for slot_type in SLOT_TYPES:
+		_slot_display_names.append(UiLabelsLoader.get_slot_display_name(slot_type))
+
+
+func _slot_label(slot_index: int) -> String:
+	if slot_index >= 0 and slot_index < _slot_display_names.size():
+		return _slot_display_names[slot_index]
+	if slot_index >= 0 and slot_index < SLOT_TYPES.size():
+		return UiLabelsLoader.get_slot_display_name(SLOT_TYPES[slot_index])
+	return ""
+
+
 func _connect_event_bus() -> void:
 	var event_bus := get_node_or_null("/root/EventBus")
 	if event_bus == null:
@@ -80,8 +94,7 @@ func _connect_event_bus() -> void:
 		event_bus.connect("EquipmentChanged", func(_uid: String) -> void: refresh())
 	if event_bus.has_signal("StatsChanged"):
 		event_bus.connect("StatsChanged", func(_uid: String) -> void:
-			if _stats_compare and _stats_compare.has_method("refresh"):
-				_stats_compare.refresh(_selected_unit_id)
+			_refresh_stats_compare()
 		)
 	if event_bus.has_signal("SquadChanged"):
 		event_bus.connect("SquadChanged", refresh)
@@ -179,6 +192,26 @@ func _selected_unit() -> String:
 	return _selected_unit_id
 
 
+func _preview_item_for_stats() -> Dictionary:
+	if _selected_bag_index < 0:
+		return {}
+	var loot := get_node_or_null("/root/LootManager")
+	if loot == null:
+		return {}
+	var items: Array = loot.call("GetIdentifiedItemsSnapshot")
+	if _selected_bag_index >= items.size():
+		return {}
+	var data: Dictionary = items[_selected_bag_index]
+	data["_bag_index"] = _selected_bag_index
+	return data
+
+
+func _refresh_stats_compare() -> void:
+	if _stats_compare == null or not _stats_compare.has_method("refresh"):
+		return
+	_stats_compare.refresh(_selected_unit_id, _preview_item_for_stats())
+
+
 func refresh() -> void:
 	if not is_node_ready():
 		call_deferred("refresh")
@@ -191,8 +224,7 @@ func refresh() -> void:
 	_refresh_skill_tab()
 	_refresh_roster_exp()
 	_refresh_progress()
-	if _stats_compare and _stats_compare.has_method("refresh"):
-		_stats_compare.refresh(_selected_unit_id)
+	_refresh_stats_compare()
 	if _preview_doll and is_instance_valid(_preview_doll) and _preview_doll.has_method("play_idle"):
 		_preview_doll.play_idle()
 
@@ -242,7 +274,7 @@ func _setup_item_tooltip() -> void:
 func _build_slot_cells() -> void:
 	if _slot_grid == null:
 		return
-	for i in SLOT_LABELS.size():
+	for i in SLOT_TYPES.size():
 		var cell: PanelContainer = ItemCellScene.instantiate()
 		cell.cell_size = CELL_SIZE
 		cell.cell_index = -1 - i
@@ -252,13 +284,14 @@ func _build_slot_cells() -> void:
 		cell.cell_hovered.connect(_on_cell_hovered)
 		cell.cell_dropped.connect(_on_equip_slot_dropped)
 		_slot_grid.add_child(cell)
-		cell.setup_slot(SLOT_LABELS[i])
+		cell.setup_slot(_slot_label(i))
 
 
 func _build_bag_cells() -> void:
 	if _bag_grid == null:
 		return
-	for i in BAG_CAPACITY:
+	var cap := _get_bag_capacity()
+	for i in cap:
 		var cell: PanelContainer = ItemCellScene.instantiate()
 		cell.cell_size = CELL_SIZE
 		cell.cell_index = i
@@ -302,7 +335,14 @@ func _refresh_equipped_slots() -> void:
 				str(data.get("quality", "common"))
 			)
 		else:
-			cell.setup_slot(SLOT_LABELS[i])
+			cell.setup_slot(_slot_label(i))
+
+
+func _get_bag_capacity() -> int:
+	var loot := get_node_or_null("/root/LootManager")
+	if loot and loot.has_method("GetBagCapacity"):
+		return int(loot.call("GetBagCapacity"))
+	return 48
 
 
 func _refresh_bag_items() -> void:
@@ -322,6 +362,8 @@ func _refresh_bag_items() -> void:
 				1,
 				str(data.get("quality", "common"))
 			)
+			cell.slot_type_name = str(data.get("slot", ""))
+			cell.set_meta("class_id", str(data.get("class_id", "")))
 		else:
 			cell.clear_cell()
 
@@ -362,79 +404,46 @@ func _refresh_skill_tab() -> void:
 		display_name = str(party.call("GetDisplayNameForUnit", _selected_unit_id))
 
 	var header := Label.new()
-	header.text = "%s — 技能" % display_name
+	header.text = "%s — 技能装配" % display_name
 	header.add_theme_font_size_override("font_size", 11)
 	_skill_lines.add_child(header)
 
-	var body := HBoxContainer.new()
-	body.add_theme_constant_override("separation", 8)
-	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_skill_lines.add_child(body)
+	if roster_id.is_empty():
+		var hint := Label.new()
+		hint.text = "无角色数据"
+		hint.add_theme_font_size_override("font_size", 9)
+		_skill_lines.add_child(hint)
+		return
 
-	var equipped_box := VBoxContainer.new()
-	equipped_box.custom_minimum_size = Vector2(100, 0)
-	equipped_box.add_theme_constant_override("separation", 2)
-	body.add_child(equipped_box)
-	var eq_title := Label.new()
-	eq_title.text = "已装配"
-	eq_title.add_theme_font_size_override("font_size", 10)
-	equipped_box.add_child(eq_title)
+	var slot_panel := preload("res://gdscript/ui/skill_slot_panel.gd").new()
+	slot_panel.cell_size = Vector2(48, 34)
+	_skill_lines.add_child(slot_panel)
+	slot_panel.setup(roster_id, false)
 
 	var mgr := get_node_or_null("/root/CharacterSkillManager")
-	var db := get_node_or_null("/root/DbManager")
-	var max_active := 1
-	if db:
-		max_active = int(db.get("MaxActiveSkillSlots"))
-	var equipped: Dictionary = {}
-	if mgr and not roster_id.is_empty():
-		var es: Variant = mgr.call("GetEquippedSnapshot", roster_id)
-		if typeof(es) == TYPE_DICTIONARY:
-			equipped = es
-	for i in max_active:
-		var sid: String = str(equipped.get("active_%d" % i, "—"))
-		var lbl := Label.new()
-		lbl.text = "主动%d: %s" % [i + 1, sid]
-		lbl.add_theme_font_size_override("font_size", 9)
-		equipped_box.add_child(lbl)
-	var pass_sid: String = str(equipped.get("passive_0", "—"))
-	var pass_l := Label.new()
-	pass_l.text = "被动: %s" % pass_sid
-	pass_l.add_theme_font_size_override("font_size", 9)
-	equipped_box.add_child(pass_l)
-
 	var tree_box := VBoxContainer.new()
-	tree_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tree_box.add_theme_constant_override("separation", 2)
-	body.add_child(tree_box)
-	var tree_title := Label.new()
-	tree_title.text = "技能树"
-	tree_title.add_theme_font_size_override("font_size", 10)
-	tree_box.add_child(tree_title)
+	tree_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_skill_lines.add_child(tree_box)
 
-	if mgr == null or roster_id.is_empty():
-		var hint := Label.new()
-		hint.text = "无技能树数据"
-		hint.add_theme_font_size_override("font_size", 9)
-		tree_box.add_child(hint)
-	else:
-		var snap: Variant = mgr.call("GetTreeSnapshot", roster_id)
-		if typeof(snap) == TYPE_ARRAY:
-			for entry in snap:
-				var data: Dictionary = entry
-				var req_lv: int = int(data.get("required_level", 1))
-				var prefix := "✓" if bool(data.get("unlocked", false)) else ("○" if bool(data.get("can_unlock", false)) else "🔒")
-				var line := Label.new()
-				line.text = "%s Lv%d %s" % [prefix, req_lv, str(data.get("display_name", "?"))]
-				line.add_theme_font_size_override("font_size", 9)
-				if bool(data.get("can_unlock", false)):
-					var node_id: String = str(data.get("id", ""))
-					line.mouse_filter = Control.MOUSE_FILTER_STOP
-					line.gui_input.connect(func(event: InputEvent) -> void:
-						if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-							mgr.call("TryUnlockNode", roster_id, node_id)
-							refresh()
-					)
-				tree_box.add_child(line)
+	if mgr == null:
+		return
+
+	var snap: Variant = mgr.call("GetTreeSnapshot", roster_id)
+	if typeof(snap) != TYPE_ARRAY:
+		return
+
+	var active_nodes: Array = []
+	var passive_nodes: Array = []
+	for entry in snap:
+		var data: Dictionary = entry
+		if str(data.get("node_type", "")) == "passive":
+			passive_nodes.append(data)
+		else:
+			active_nodes.append(data)
+
+	_add_skill_tree_group(tree_box, mgr, roster_id, "主动节点", active_nodes)
+	_add_skill_tree_group(tree_box, mgr, roster_id, "被动节点", passive_nodes)
 
 	var open_btn := Button.new()
 	open_btn.text = "打开完整技能树 →"
@@ -442,13 +451,42 @@ func _refresh_skill_tab() -> void:
 	open_btn.pressed.connect(_open_skill_popup)
 	_skill_lines.add_child(open_btn)
 
-	for line in ClassSkillsLoader.build_skill_lines(_selected_unit_id):
-		var detail := Label.new()
-		detail.text = line
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		detail.add_theme_font_size_override("font_size", 8)
-		detail.modulate = Color(0.75, 0.78, 0.85)
-		_skill_lines.add_child(detail)
+
+func _add_skill_tree_group(
+	parent: VBoxContainer,
+	mgr: Node,
+	roster_id: String,
+	title: String,
+	nodes: Array,
+) -> void:
+	var group_title := Label.new()
+	group_title.text = title
+	group_title.add_theme_font_size_override("font_size", 10)
+	group_title.modulate = Color(0.78, 0.82, 0.9)
+	parent.add_child(group_title)
+
+	if nodes.is_empty():
+		var empty := Label.new()
+		empty.text = "—"
+		empty.add_theme_font_size_override("font_size", 9)
+		parent.add_child(empty)
+		return
+
+	for data in nodes:
+		var req_lv: int = int(data.get("required_level", 1))
+		var prefix := "✓" if bool(data.get("unlocked", false)) else ("○" if bool(data.get("can_unlock", false)) else "🔒")
+		var line := Label.new()
+		line.text = "%s Lv%d %s" % [prefix, req_lv, str(data.get("display_name", "?"))]
+		line.add_theme_font_size_override("font_size", 9)
+		if bool(data.get("can_unlock", false)):
+			var node_id: String = str(data.get("id", ""))
+			line.mouse_filter = Control.MOUSE_FILTER_STOP
+			line.gui_input.connect(func(event: InputEvent) -> void:
+				if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+					mgr.call("TryUnlockNode", roster_id, node_id)
+					refresh()
+			)
+		parent.add_child(line)
 
 
 func _open_skill_popup() -> void:
@@ -499,7 +537,8 @@ func _refresh_progress() -> void:
 	if loot:
 		chest_n = loot.call("GetUnidentifiedCount")
 		item_n = loot.call("GetIdentifiedCount")
-	_progress_label.text = "金%d | 箱%d 装%d/%d" % [gold, chest_n, item_n, BAG_CAPACITY]
+	_progress_label.text = "金%d | 箱%d 装%d/%d" % [gold, chest_n, item_n, _get_bag_capacity()]
+	_refresh_identify_buttons()
 
 
 func _set_detail(text: String) -> void:
@@ -527,13 +566,24 @@ func _on_bag_cell_pressed(index: int) -> void:
 		_set_detail("空格子")
 		return
 	var data: Dictionary = items[index]
-	_set_detail("[%s] %s | iLvl %d | 白值 %.1f | %s" % [
+	var detail := "[%s] %s | iLvl %d | 白值 %.1f | %s" % [
 		_quality_label(str(data.get("quality", "common"))),
 		data.get("display_name", "?"),
 		data.get("item_level", 0),
 		data.get("rolled_base_stat", 0.0),
 		data.get("slot", ""),
-	])
+	]
+	var class_id := str(data.get("class_id", ""))
+	if not class_id.is_empty():
+		detail += " | 职业专属: %s" % class_id
+	if loot.has_method("CanEquipByBagIndex"):
+		var can: bool = loot.call("CanEquipByBagIndex", index, _selected_unit_id)
+		if not can:
+			var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+			if not err.is_empty():
+				detail += " | %s" % err
+	_set_detail(detail)
+	_refresh_stats_compare()
 
 
 func _on_slot_cell_pressed(index: int) -> void:
@@ -552,7 +602,7 @@ func _on_slot_cell_pressed(index: int) -> void:
 		if str(data.get("equipped_slot", "")) == slot_name:
 			_set_detail("已装备: %s (点击「卸下」)" % data.get("display_name", "?"))
 			return
-	_set_detail("部位 %s 空" % SLOT_LABELS[slot_i])
+	_set_detail("部位「%s」空" % _slot_label(slot_i))
 
 
 func _on_equip_pressed() -> void:
@@ -565,7 +615,8 @@ func _on_equip_pressed() -> void:
 	var ok: bool = loot.call("EquipByBagIndex", _selected_bag_index, _selected_unit_id)
 	if ok:
 		_selected_bag_index = -1
-	_set_detail("已穿上" if ok else "无法穿上（部位冲突或无效）")
+	var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+	_set_detail("已穿上" if ok else (err if not err.is_empty() else "无法穿上"))
 	_request_save()
 	refresh()
 
@@ -577,8 +628,9 @@ func _on_unequip_pressed() -> void:
 	if _selected_slot_index >= 0:
 		var slot_i: int = _selected_slot_index
 		if slot_i < SLOT_TYPES.size():
-			loot.call("UnequipBySlotName", SLOT_TYPES[slot_i], _selected_unit_id)
-			_set_detail("已卸下 %s" % SLOT_LABELS[slot_i])
+			var ok: bool = loot.call("UnequipBySlotName", SLOT_TYPES[slot_i], _selected_unit_id)
+			var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+			_set_detail("已卸下「%s」" % _slot_label(slot_i) if ok else (err if not err.is_empty() else "卸下失败"))
 			refresh()
 			return
 	if _selected_bag_index >= 0:
@@ -607,6 +659,9 @@ func _run_batch_identify() -> void:
 	if count <= 0:
 		_set_detail("没有待鉴定的宝箱")
 		return
+	if not bool(loot.call("CanIdentify")):
+		_set_detail("背包已满，请先整理或分解")
+		return
 
 	var log_mgr := get_node_or_null("/root/LogWindowManager")
 	if log_mgr and log_mgr.has_method("Show"):
@@ -620,11 +675,17 @@ func _run_batch_identify() -> void:
 	while true:
 		if not is_inside_tree():
 			break
+		if not bool(loot.call("CanIdentify")):
+			_set_detail("背包已满，批量鉴定停止于 %d 件" % done)
+			break
 		var remaining: int = int(loot.call("GetUnidentifiedCount"))
 		if remaining <= 0:
 			break
 		var result: Variant = loot.call("IdentifyNextAsDictionary", _get_identify_stage_level())
 		if result == null:
+			var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+			if not err.is_empty() and done == 0:
+				_set_detail(err)
 			break
 		var data: Dictionary = result
 		done += 1
@@ -649,9 +710,17 @@ func _identify_one() -> void:
 	var loot := get_node_or_null("/root/LootManager")
 	if loot == null:
 		return
+	if not bool(loot.call("CanIdentify")):
+		var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+		_set_detail(err if not err.is_empty() else "背包已满，无法开箱")
+		_refresh_identify_buttons()
+		return
 	var result: Variant = loot.call("IdentifyNextAsDictionary", _get_identify_stage_level())
 	if result == null:
-		_set_detail("没有待鉴定的宝箱")
+		var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+		if err.is_empty():
+			err = "没有待鉴定的宝箱" if int(loot.call("GetUnidentifiedCount")) <= 0 else "鉴定失败"
+		_set_detail(err)
 	else:
 		var data: Dictionary = result
 		_set_detail("鉴定获得: [%s] %s (iLvl %d)" % [
@@ -672,6 +741,19 @@ func _get_identify_stage_level() -> int:
 	if roster and party and roster.has_method("GetAverageActiveRosterLevel"):
 		return int(roster.call("GetAverageActiveRosterLevel", party))
 	return 1
+
+
+func _refresh_identify_buttons() -> void:
+	if _batch_identifying:
+		return
+	var loot := get_node_or_null("/root/LootManager")
+	if loot == null:
+		return
+	var can := bool(loot.call("CanIdentify"))
+	if _identify_button:
+		_identify_button.disabled = not can
+	if _batch_identify_button:
+		_batch_identify_button.disabled = not can
 
 
 func _set_identify_buttons_enabled(enabled: bool) -> void:
@@ -698,7 +780,7 @@ func _play_identify_reveal(data: Dictionary):
 		await get_tree().create_timer(REVEAL_WAIT).timeout
 		return
 	if overlay.has_signal("reveal_finished"):
-		var finished := overlay.reveal_finished
+		var finished: Signal = overlay.reveal_finished
 		overlay.call("play_reveal", data)
 		await finished
 	else:
@@ -720,13 +802,21 @@ func _on_cell_hovered(index: int, entered: bool) -> void:
 	var lines: PackedStringArray = PackedStringArray()
 	lines.append("品质: %s | iLvl %d" % [_quality_label(str(data.get("quality", "common"))), int(data.get("item_level", 0))])
 	lines.append("部位: %s | 白值 %.1f" % [data.get("slot", ""), float(data.get("rolled_base_stat", 0))])
-	lines.append("【固有属性】")
+	var class_id := str(data.get("class_id", ""))
+	if not class_id.is_empty():
+		lines.append("职业专属: %s" % class_id)
+		var slot := str(data.get("slot", ""))
+		if (slot == "Weapon" or slot == "Armor") and index >= 0:
+			var loot := get_node_or_null("/root/LootManager")
+			if loot and loot.has_method("CanEquipByBagIndex"):
+				if not bool(loot.call("CanEquipByBagIndex", index, _selected_unit_id)):
+					var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+					lines.append(err if not err.is_empty() else "职业不符，无法穿戴")
+	lines.append("【词缀】")
 	for affix in data.get("affixes", []):
 		if typeof(affix) == TYPE_DICTIONARY:
 			var a: Dictionary = affix
 			lines.append("• %s +%.1f" % [a.get("display_name", a.get("id", "?")), float(a.get("value", 0))])
-	lines.append("【装饰槽】")
-	lines.append("• 空槽 (可装饰)")
 	_tooltip_body.text = "\n".join(lines)
 	_tooltip_root.visible = true
 	_tooltip_root.global_position = get_global_mouse_position() + Vector2(12, 8)
@@ -762,10 +852,14 @@ func _on_equip_slot_dropped(slot_index: int, payload: Dictionary) -> void:
 		return
 	if kind == "bag":
 		var bag_i: int = int(payload.get("cell_index", -1))
-		if bag_i >= 0:
-			loot.call("EquipByBagIndex", bag_i, _selected_unit_id)
-			_set_detail("已拖拽穿上")
+		var item_slot := str(payload.get("slot_type", ""))
+		if bag_i >= 0 and item_slot == SLOT_TYPES[slot_i]:
+			var ok: bool = loot.call("EquipByBagIndex", bag_i, _selected_unit_id)
+			var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+			_set_detail("已拖拽穿上" if ok else (err if not err.is_empty() else "无法穿上"))
 			refresh()
+		else:
+			_set_detail("部位不匹配")
 	elif kind == "equip_slot":
 		_set_detail("同槽位无需交换")
 
@@ -778,8 +872,9 @@ func _on_bag_cell_dropped(bag_index: int, payload: Dictionary) -> void:
 	if kind == "equip_slot":
 		var slot_i: int = (-1 - int(payload.get("cell_index", 0)))
 		if slot_i >= 0 and slot_i < SLOT_TYPES.size():
-			loot.call("UnequipBySlotName", SLOT_TYPES[slot_i], _selected_unit_id)
-			_set_detail("已拖拽卸下")
+			var ok: bool = loot.call("UnequipBySlotName", SLOT_TYPES[slot_i], _selected_unit_id)
+			var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+			_set_detail("已拖拽卸下" if ok else (err if not err.is_empty() else "卸下失败"))
 			refresh()
 
 
@@ -839,4 +934,4 @@ func _show_portrait() -> void:
 	if mgr and mgr.has_method("ShowPortrait"):
 		mgr.call("ShowPortrait", _selected_unit_id, false)
 	else:
-		_set_detail("立绘预览未加载（占位）")
+		_set_detail("立绘窗口不可用")

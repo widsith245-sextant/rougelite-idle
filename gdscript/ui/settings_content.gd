@@ -7,6 +7,8 @@ extends Control
 @onready var _interval_option: OptionButton = %IntervalOption
 @onready var _open_save_dir_button: Button = %OpenSaveDirButton
 @onready var _reset_progress_button: Button = %ResetProgressButton
+@onready var _toggle_log_button: Button = %ToggleLogButton
+@onready var _portrait_button: Button = %PortraitButton
 @onready var _status_label: Label = %StatusLabel
 
 
@@ -22,6 +24,10 @@ func _ready() -> void:
 	_identify_reveal.toggled.connect(_on_identify_reveal_toggled)
 	_open_save_dir_button.pressed.connect(_on_open_save_dir_pressed)
 	_reset_progress_button.pressed.connect(_on_reset_progress_pressed)
+	if _toggle_log_button:
+		_toggle_log_button.pressed.connect(_on_toggle_log_pressed)
+	if _portrait_button:
+		_portrait_button.pressed.connect(_on_portrait_pressed)
 	_apply_snapshot()
 
 
@@ -89,6 +95,26 @@ func _on_interval_selected(index: int) -> void:
 func _on_open_save_dir_pressed() -> void:
 	OS.shell_open(ProjectSettings.globalize_path("user://"))
 	_set_status("已打开存档目录")
+
+
+func _on_toggle_log_pressed() -> void:
+	var mgr := get_node_or_null("/root/LogWindowManager")
+	if mgr and mgr.has_method("Toggle"):
+		mgr.call("Toggle")
+	_set_status("已切换日志窗口")
+
+
+func _on_portrait_pressed() -> void:
+	var party := get_node_or_null("/root/PartyManager")
+	if party == null:
+		return
+	var unit_id := "ally_a"
+	if party.has_method("GetUnitIdForSlot"):
+		unit_id = str(party.call("GetUnitIdForSlot", 0))
+	var mgr := get_node_or_null("/root/PortraitWindowManager")
+	if mgr and mgr.has_method("ShowPortrait"):
+		mgr.call("ShowPortrait", unit_id, false)
+	_set_status("已打开立绘预览")
 
 
 func _on_reset_progress_pressed() -> void:

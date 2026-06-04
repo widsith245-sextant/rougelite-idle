@@ -16,6 +16,7 @@ public class BattlefieldController
 	private const float DefaultAttackRange = 20f;
 	private const float MaxChargeStrikeDistance = 20f;
 	private const float ChargeStopOffset = 20f;
+	private const float AdjacentHitRange = 48f;
 
 	private readonly Dictionary<string, CombatUnitData> _units = new();
 
@@ -43,10 +44,11 @@ public class BattlefieldController
 	public float GetDistanceToEnemy(CombatUnitData ally, CombatUnitData enemy) =>
 		GetDistanceBetween(ally, enemy);
 
-	public bool IsInAttackRange(CombatUnitData attacker, CombatUnitData target)
-	{
-		return GetEdgeDistanceBetween(attacker, target) <= GetAttackRange(attacker);
-	}
+	public bool IsInAttackRange(CombatUnitData attacker, CombatUnitData target) =>
+		GetEdgeDistanceBetween(attacker, target) <= GetAttackRange(attacker);
+
+	public bool IsBehindTarget(CombatUnitData attacker, CombatUnitData target) =>
+		attacker.PositionX > target.PositionX;
 
 	public CombatUnitData? GetFrontAlly(IReadOnlyList<CombatUnitData> allies)
 	{
@@ -69,15 +71,110 @@ public class BattlefieldController
 		return front;
 	}
 
-	public bool CanPassThrough(CombatUnitData a, CombatUnitData b) =>
-		a.IsAlly && b.IsAlly;
-
-	public bool BlocksEnemy(CombatUnitData ally, CombatUnitData enemy) =>
-		ally.IsAlly && !enemy.IsAlly && ally.CombatState == UnitCombatState.InRange
-			&& IsInAttackRange(ally, enemy);
-
-	public List<PositionChangeEvent> ApplyWorldMove(CombatUnitData unit, MoveTag tag, CombatUnitData? target = null)
+	public CombatUnitData? GetBackAlly(IReadOnlyList<CombatUnitData> allies)
 	{
+		CombatUnitData? back = null;
+		var maxX = float.MinValue;
+		foreach (var ally in allies)
+		{
+			if (ally.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			if (ally.PositionX > maxX)
+			{
+				maxX = ally.PositionX;
+				back = ally;
+			}
+		}
+
+		return back;
+	}
+
+	public static float ApplySeparation(
+		float oldX,
+		float newX,
+		CombatUnitData unit,
+		IReadOnlyList<CombatUnitData>? others)
+	{
+		if (others == null || Math.Abs(newX - oldX) < 0.001f)
+		{
+			return newX;
+		}
+
+		var movingRight = newX > oldX;
+		foreach (var other in others)
+		{
+			if (other.Id == unit.Id || other.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			var minGap = unit.HitBoxRadius + other.HitBoxRadius;
+			if (movingRight && other.PositionX <= newX + 0.001f)
+			{
+				newX = Math.Max(newX, other.PositionX + minGap);
+			}
+			else if (!movingRight && other.PositionX >= newX - 0.001f)
+			{
+				newX = Math.Min(newX, other.PositionX - minGap);
+			}
+		}
+
+		return newX;
+	}
+
+	public List<CombatUnitData> GetUnitsInHitRange(
+		float centerX,
+		float radius,
+		IReadOnlyList<CombatUnitData> candidates,
+		int maxTargets = 0)
+	{
+		var hits = new List<CombatUnitData>();
+		foreach (var unit in candidates)
+		{
+			if (unit.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			var dist = Math.Abs(unit.PositionX - centerX) - unit.HitBoxRadius;
+			if (dist > radius)
+			{
+				continue;
+			}
+
+			hits.Add(unit);
+			if (maxTargets > 0 && hits.Count >= maxTargets)
+			{
+				break;
+			}
+		}
+
+		return hits;
+	}
+
+	public List<CombatUnitData> GetAdjacentUnits(
+		CombatUnitData origin,
+		IReadOnlyList<CombatUnitData> candidates,
+		float range = AdjacentHitRange)
+	{
+		return GetUnitsInHitRange(origin.PositionX, range, candidates);
+	}
+
+	public List<PositionChangeEvent> ApplyWorldMove(
+		CombatUnitData unit,
+		MoveTag tag,
+		CombatUnitData? target = null,
+		IReadOnlyList<CombatUnitData>? allies = null,
+		IReadOnlyList<CombatUnitData>? obstacles = null)
+	{
+		if (tag.Kind == MoveTagKind.ForceSwap)
+		{
+			return ApplyForceSwap(unit, allies);
+		}
+
 		var oldX = unit.PositionX;
 		var distance = tag.Distance;
 		if (tag.Kind == MoveTagKind.Charge && unit.ActiveSkill?.Id == "charge_strike")
@@ -104,7 +201,12 @@ public class BattlefieldController
 			movedX = ClampChargeStrikeX(unit, target, movedX);
 		}
 
-		unit.PositionX = Math.Clamp(movedX, MinAllyX, MaxAllyX);
+		var minX = unit.IsAlly ? MinAllyX : 20f;
+		var maxX = unit.IsAlly ? MaxAllyX : EnemyAnchorX;
+		movedX = Math.Clamp(movedX, minX, maxX);
+		movedX = ApplySeparation(oldX, movedX, unit, obstacles);
+		movedX = Math.Clamp(movedX, minX, maxX);
+		unit.PositionX = movedX;
 		if (Math.Abs(unit.PositionX - oldX) < 0.01f)
 		{
 			return new List<PositionChangeEvent>();
@@ -116,36 +218,98 @@ public class BattlefieldController
 		};
 	}
 
-	public void MoveTowardEnemy(CombatUnitData unit, CombatUnitData enemy, float moveSpeed, float delta)
+	public List<PositionChangeEvent> ApplyForceSwap(
+		CombatUnitData unit,
+		IReadOnlyList<CombatUnitData>? allies)
 	{
-		MoveTowardTarget(unit, enemy, moveSpeed * 0.1f * delta);
+		if (allies == null || allies.Count < 2)
+		{
+			return new List<PositionChangeEvent>();
+		}
+
+		CombatUnitData? partner = null;
+		var bestDist = float.MaxValue;
+		foreach (var ally in allies)
+		{
+			if (ally.Id == unit.Id || ally.CurrentHp <= 0f)
+			{
+				continue;
+			}
+
+			var dist = Math.Abs(ally.PositionX - unit.PositionX);
+			if (dist < bestDist)
+			{
+				bestDist = dist;
+				partner = ally;
+			}
+		}
+
+		if (partner == null)
+		{
+			return new List<PositionChangeEvent>();
+		}
+
+		var oldA = unit.PositionX;
+		var oldB = partner.PositionX;
+		unit.PositionX = oldB;
+		partner.PositionX = oldA;
+		return new List<PositionChangeEvent>
+		{
+			new(unit.Id, oldA, unit.PositionX),
+			new(partner.Id, oldB, partner.PositionX),
+		};
 	}
 
-	public void MoveTowardTarget(CombatUnitData unit, CombatUnitData target, float step)
+	public void MoveTowardEnemy(
+		CombatUnitData unit,
+		CombatUnitData enemy,
+		float moveSpeed,
+		float delta,
+		IReadOnlyList<CombatUnitData>? obstacles = null)
 	{
+		MoveTowardTarget(unit, enemy, moveSpeed * 0.1f * delta, obstacles);
+	}
+
+	public void MoveTowardTarget(
+		CombatUnitData unit,
+		CombatUnitData target,
+		float step,
+		IReadOnlyList<CombatUnitData>? obstacles = null)
+	{
+		if (IsInAttackRange(unit, target))
+		{
+			unit.CombatState = UnitCombatState.InRange;
+			return;
+		}
+
 		var dist = GetEdgeDistanceBetween(unit, target);
 		var range = GetAttackRange(unit);
 		if (dist <= range)
 		{
+			unit.CombatState = UnitCombatState.InRange;
 			return;
 		}
 
 		var oldX = unit.PositionX;
 		var desiredCenterGap = range + unit.HitBoxRadius + target.HitBoxRadius;
+		float movedX;
 		if (unit.PositionX < target.PositionX)
 		{
 			var stopX = target.PositionX - desiredCenterGap;
-			unit.PositionX = Math.Min(unit.PositionX + step, stopX);
+			movedX = Math.Min(unit.PositionX + step, stopX);
 		}
 		else
 		{
 			var stopX = target.PositionX + desiredCenterGap;
-			unit.PositionX = Math.Max(unit.PositionX - step, stopX);
+			movedX = Math.Max(unit.PositionX - step, stopX);
 		}
 
 		var minX = unit.IsAlly ? MinAllyX : 20f;
 		var maxX = unit.IsAlly ? MaxAllyX : EnemyAnchorX;
-		unit.PositionX = Math.Clamp(unit.PositionX, minX, maxX);
+		movedX = Math.Clamp(movedX, minX, maxX);
+		movedX = ApplySeparation(oldX, movedX, unit, obstacles);
+		movedX = Math.Clamp(movedX, minX, maxX);
+		unit.PositionX = movedX;
 		if (Math.Abs(unit.PositionX - oldX) >= 0.01f)
 		{
 			unit.CombatState = UnitCombatState.Moving;
@@ -177,12 +341,20 @@ public class BattlefieldController
 		return Math.Max(targetX, minX);
 	}
 
-	public void MarchRight(CombatUnitData unit, float moveSpeed, float delta)
+	public void MarchRight(
+		CombatUnitData unit,
+		float moveSpeed,
+		float delta,
+		IReadOnlyList<CombatUnitData>? obstacles = null)
 	{
+		var oldX = unit.PositionX;
 		var pixelsPerSecond = moveSpeed * 0.1f;
 		var step = pixelsPerSecond * delta;
-		unit.PositionX = Math.Min(unit.PositionX + step, MaxAllyX);
-		if (step > 0.01f)
+		var movedX = Math.Min(unit.PositionX + step, MaxAllyX);
+		movedX = ApplySeparation(oldX, movedX, unit, obstacles);
+		movedX = Math.Clamp(movedX, MinAllyX, MaxAllyX);
+		unit.PositionX = movedX;
+		if (Math.Abs(unit.PositionX - oldX) > 0.01f)
 		{
 			unit.CombatState = UnitCombatState.Moving;
 		}

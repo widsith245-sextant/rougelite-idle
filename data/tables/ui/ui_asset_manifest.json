@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-02",
+  "slotLabelsPath": "res://data/tables/ui/slot_labels.json",
+  "assets": [
+    {
+      "id": "character_visual_ally_a",
+      "role": "paper_doll",
+      "currentSource": "PlaceholderSpriteFactory + ally_a_visual.tres (tint only)",
+      "targetPath": "resources/characters/vanguard_a_visual.tres",
+      "usedByScenes": ["backpack_content", "squad_content", "combat_stage"],
+      "status": "placeholder"
+    },
+    {
+      "id": "character_visual_ally_b",
+      "role": "paper_doll",
+      "currentSource": "PlaceholderSpriteFactory + ally_b_visual.tres",
+      "targetPath": "resources/characters/sniper_b_visual.tres",
+      "usedByScenes": ["backpack_content", "squad_content", "combat_stage"],
+      "status": "placeholder"
+    },
+    {
+      "id": "character_visual_ally_c",
+      "role": "paper_doll",
+      "currentSource": "PlaceholderSpriteFactory + ally_c_visual.tres",
+      "targetPath": "resources/characters/mage_c_visual.tres",
+      "usedByScenes": ["backpack_content", "squad_content", "combat_stage"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_weapon",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell ColorRect + slot_labels displayName",
+      "targetPath": "assets/ui/slots/weapon.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_armor",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/armor.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_helmet",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/helmet.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_gloves",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/gloves.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_boots",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/boots.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_head_accessory",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/head_acc.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_back_accessory",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/back_acc.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "slot_icon_trinket",
+      "role": "equip_slot_empty",
+      "currentSource": "item_grid_cell text label",
+      "targetPath": "assets/ui/slots/trinket.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "item_icon_template",
+      "role": "inventory_item",
+      "currentSource": "item_grid_cell ColorRect by quality",
+      "targetPath": "assets/ui/items/{templateId}.png",
+      "usedByScenes": ["backpack_content"],
+      "status": "placeholder"
+    },
+    {
+      "id": "chest_icon_common",
+      "role": "chest_unidentified",
+      "currentSource": "ColorRect + label 宝箱",
+      "targetPath": "assets/ui/chests/common.png",
+      "usedByScenes": ["backpack_content", "chest_bubble_hud"],
+      "status": "placeholder"
+    },
+    {
+      "id": "chest_icon_rare",
+      "role": "chest_unidentified",
+      "currentSource": "ColorRect quality color",
+      "targetPath": "assets/ui/chests/rare.png",
+      "usedByScenes": ["backpack_content", "chest_bubble_hud"],
+      "status": "placeholder"
+    },
+    {
+      "id": "chest_icon_epic",
+      "role": "chest_unidentified",
+      "currentSource": "ColorRect quality color",
+      "targetPath": "assets/ui/chests/epic.png",
+      "usedByScenes": ["backpack_content", "chest_bubble_hud"],
+      "status": "placeholder"
+    },
+    {
+      "id": "quickbar_nav",
+      "role": "navigation",
+      "currentSource": "quick_bar.tscn Button text 全名",
+      "targetPath": "assets/ui/nav/",
+      "usedByScenes": ["quick_bar.tscn"],
+      "status": "ready"
+    },
+    {
+      "id": "unit_overhead_hud",
+      "role": "combat_hud",
+      "currentSource": "unit_overhead_hud.tscn procedural",
+      "targetPath": "assets/ui/hud/overhead/",
+      "usedByScenes": ["combat_stage"],
+      "status": "placeholder"
+    },
+    {
+      "id": "chest_bubble_hud",
+      "role": "combat_hud",
+      "currentSource": "chest_bubble_hud.tscn",
+      "targetPath": "assets/ui/hud/chest_bubble/",
+      "usedByScenes": ["game_root"],
+      "status": "placeholder"
+    },
+    {
+      "id": "theme_default",
+      "role": "theme",
+      "currentSource": "theme/default_theme.tres",
+      "targetPath": "theme/default_theme.tres",
+      "usedByScenes": ["project.godot"],
+      "status": "ready"
+    },
+    {
+      "id": "portrait_window",
+      "role": "portrait",
+      "currentSource": "PlaceholderSpriteFactory.build_portrait",
+      "targetPath": "assets/characters/portraits/{rosterId}.png",
+      "usedByScenes": ["portrait_window", "portrait_overlay"],
+      "status": "placeholder"
+    }
+  ]
+}

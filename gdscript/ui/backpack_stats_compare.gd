@@ -2,28 +2,27 @@ extends Control
 
 ## Eight-stat compare strip: base → final (Δ colored).
 
-const DISPLAY_KEYS := [
-	["Level", "Lv"],
-	["MaxHp", "HP"],
-	["Dps", "DPS"],
-	["Damage", "DMG"],
-	["AtkSpeed", "Spd"],
-	["AtkRange", "Rng"],
-	["MoveSpeed", "Move"],
-	["CritRate", "Crit"],
-]
+const DISPLAY_KEYS: Array[String] = UiLabelsLoader.get_stat_compare_keys()
 
 @onready var _grid: GridContainer = %StatGrid
 @onready var _range_hint: Label = %RangeHint
 
 var _value_nodes: Dictionary = {}
+var _equip_hint: Label
+var _preview_item: Dictionary = {}
 
 
 func _ready() -> void:
 	_build_labels()
+	_equip_hint = Label.new()
+	_equip_hint.add_theme_font_size_override("font_size", 8)
+	_equip_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if _range_hint and _range_hint.get_parent():
+		_range_hint.get_parent().add_child(_equip_hint)
 
 
-func refresh(unit_id: String) -> void:
+func refresh(unit_id: String, preview_item: Dictionary = {}) -> void:
+	_preview_item = preview_item
 	var stats := get_node_or_null("/root/StatsService")
 	if stats == null:
 		return
@@ -32,18 +31,17 @@ func refresh(unit_id: String) -> void:
 		return
 	_apply_snapshot(snap)
 	_refresh_range_hint(snap)
+	_refresh_equip_hint(unit_id)
 
 
 func _build_labels() -> void:
 	if _grid == null:
 		return
-	for row in DISPLAY_KEYS:
-		var key: String = row[0]
-		var short: String = row[1]
+	for key in DISPLAY_KEYS:
 		var box := VBoxContainer.new()
 		box.add_theme_constant_override("separation", 0)
 		var title := Label.new()
-		title.text = short
+		title.text = UiLabelsLoader.get_stat_display_name(key)
 		title.add_theme_font_size_override("font_size", 8)
 		var value := Label.new()
 		value.name = "Val_%s" % key
@@ -56,8 +54,7 @@ func _build_labels() -> void:
 
 
 func _apply_snapshot(snap: Dictionary) -> void:
-	for row in DISPLAY_KEYS:
-		var key: String = row[0]
+	for key in DISPLAY_KEYS:
 		var node: Label = _value_nodes.get(key)
 		if node == null:
 			continue
@@ -104,6 +101,45 @@ func _refresh_range_hint(snap: Dictionary) -> void:
 	var stop_x: float = enemy_x - atk_range
 	var dist: float = maxf(0.0, enemy_x - stop_x)
 	_range_hint.text = "距木桩约 %.0f | 停步 X≈%.0f | 射程 %.0f" % [dist, stop_x, atk_range]
+
+
+func _refresh_equip_hint(unit_id: String) -> void:
+	if _equip_hint == null:
+		return
+	if _preview_item.is_empty():
+		_equip_hint.text = ""
+		_equip_hint.remove_theme_color_override("font_color")
+		return
+	var slot := str(_preview_item.get("slot", ""))
+	if slot != "Weapon" and slot != "Armor":
+		_equip_hint.text = ""
+		_equip_hint.remove_theme_color_override("font_color")
+		return
+	var item_class := str(_preview_item.get("class_id", ""))
+	if item_class.is_empty() or item_class == "any":
+		_equip_hint.text = ""
+		_equip_hint.remove_theme_color_override("font_color")
+		return
+	var loot := get_node_or_null("/root/LootManager")
+	var bag_index := int(_preview_item.get("_bag_index", -1))
+	if loot and bag_index >= 0 and loot.has_method("CanEquipByBagIndex"):
+		var can: bool = loot.call("CanEquipByBagIndex", bag_index, unit_id)
+		var err := str(loot.call("GetLastEquipError")) if loot.has_method("GetLastEquipError") else ""
+		if can:
+			_equip_hint.text = "可穿戴（%s 专属）" % item_class
+			_equip_hint.add_theme_color_override("font_color", Color(0.4, 0.95, 0.5))
+		else:
+			_equip_hint.text = err if not err.is_empty() else "职业不符，无法穿戴"
+			_equip_hint.add_theme_color_override("font_color", Color(0.55, 0.55, 0.58))
+		return
+	var party := get_node_or_null("/root/PartyManager")
+	var unit_class := str(party.call("GetClassIdForUnit", unit_id)) if party else ""
+	if unit_class == item_class:
+		_equip_hint.text = "可穿戴（%s 专属）" % item_class
+		_equip_hint.add_theme_color_override("font_color", Color(0.4, 0.95, 0.5))
+	else:
+		_equip_hint.text = "职业不符，无法穿戴（需 %s）" % item_class
+		_equip_hint.add_theme_color_override("font_color", Color(0.55, 0.55, 0.58))
 
 
 func _load_engagement_rules() -> Dictionary:

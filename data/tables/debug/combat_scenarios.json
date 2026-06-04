@@ -1,0 +1,54 @@
+{
+  "scenarios": [
+    {
+      "id": "mech_backstab",
+      "label": "机制-背刺",
+      "note": "给 ally 背刺效果，需从背后攻击验证",
+      "applyEffects": [
+        { "targetId": "ally_a", "effectId": "BACKSTAB", "pile": 1, "intensity": 2 }
+      ]
+    },
+    {
+      "id": "mech_swap_curse",
+      "label": "机制-换位诅咒",
+      "note": "给 ally 换位诅咒，ForceSwap 后验证",
+      "applyEffects": [
+        { "targetId": "ally_a", "effectId": "SWAP_CURSE", "pile": 1, "intensity": 0 }
+      ]
+    },
+    {
+      "id": "mech_mark_timer",
+      "label": "机制-定时标记",
+      "note": "敌人叠 MARK_TIMER",
+      "applyEffects": [
+        { "targetId": "enemy_1", "effectId": "MARK_TIMER", "pile": 3, "intensity": 5 }
+      ]
+    },
+    {
+      "id": "mech_charge_attack",
+      "label": "机制-冲锋打击",
+      "note": "CHARGE_ATTACK 挂 ally",
+      "applyEffects": [
+        { "targetId": "ally_a", "effectId": "CHARGE_ATTACK", "pile": 1, "intensity": 0 }
+      ]
+    },
+    {
+      "id": "bd1_tank_retaliate",
+      "label": "BD1框定-反击流",
+      "note": "非奇境；反伤护盾+防御强化",
+      "applyEffects": [
+        { "targetId": "ally_a", "effectId": "SHIELD_WITH_RETALIATION", "pile": 2, "intensity": 15 },
+        { "targetId": "ally_a", "effectId": "DEF_PERCENT_UP", "pile": 2, "intensity": 0 }
+      ]
+    },
+    {
+      "id": "bd2_dot_curse",
+      "label": "BD2框定-持续dot",
+      "note": "非奇境",
+      "applyEffects": [
+        { "targetId": "enemy_1", "effectId": "MARK_TIMER", "pile": 3, "intensity": 4 },
+        { "targetId": "enemy_1", "effectId": "MARK_TAKEDAMAGE", "pile": 2, "intensity": 3 }
+      ]
+    }
+  ]
+}

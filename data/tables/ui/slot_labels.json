@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "slots": [
+    { "id": "Weapon", "displayName": "武器", "iconPath": null, "iconAbbrev": "weapon" },
+    { "id": "Armor", "displayName": "护甲", "iconPath": null, "iconAbbrev": "armor" },
+    { "id": "Helmet", "displayName": "头盔", "iconPath": null, "iconAbbrev": "helmet" },
+    { "id": "Gloves", "displayName": "手套", "iconPath": null, "iconAbbrev": "gloves" },
+    { "id": "Boots", "displayName": "靴子", "iconPath": null, "iconAbbrev": "boots" },
+    { "id": "HeadAccessory", "displayName": "头部饰品", "iconPath": null, "iconAbbrev": "head_acc" },
+    { "id": "BackAccessory", "displayName": "背部饰品", "iconPath": null, "iconAbbrev": "back_acc" },
+    { "id": "Trinket", "displayName": "饰品", "iconPath": null, "iconAbbrev": "trinket" }
+  ]
+}

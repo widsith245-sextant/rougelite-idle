@@ -1,11 +1,28 @@
 extends Button
 class_name SkillTreeCell
 
+const EffectGlossaryLoaderScript := preload("res://gdscript/ui/effect_glossary_loader.gd")
+
 ## Draggable skill tree node button.
 
 var roster_id: String = ""
 var node_id: String = ""
 var node_type: String = "active"
+
+
+func set_effect_badges(applied_effects: Array) -> void:
+	if applied_effects.is_empty():
+		return
+	var badges := ""
+	for effect in applied_effects.slice(0, 2):
+		if effect is Dictionary:
+			var effect_id := str(effect.get("effect_id", ""))
+			if effect_id.is_empty():
+				continue
+			badges += EffectGlossaryLoaderScript.get_icon(effect_id)
+	if badges.is_empty():
+		return
+	text = "%s %s" % [badges, text]
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:

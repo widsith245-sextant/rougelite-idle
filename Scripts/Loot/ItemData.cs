@@ -33,6 +33,7 @@ public class ItemData
 	public float RolledBaseStat { get; set; }
 
 	public string? EffectId { get; set; }
+	public string ClassId { get; set; } = string.Empty;
 	public List<AffixDefinition> AffixDefinitions { get; } = new();
 	public List<AffixRoll> Affixes { get; } = new();
 }

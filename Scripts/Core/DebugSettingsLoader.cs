@@ -43,5 +43,6 @@ public static class DebugSettingsLoader
 		public bool SkipWonderlandTicket { get; set; } = true;
 		public bool UnlockPassiveSkillSlots { get; set; } = true;
 		public int MaxActiveSkillSlotsOverride { get; set; }
+		public bool GmToolsEnabled { get; set; } = true;
 	}
 }

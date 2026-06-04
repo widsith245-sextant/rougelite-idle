@@ -23,8 +23,7 @@ func _ready() -> void:
 	# 弹窗挂到 get_tree().root（见 popup_manager.gd），勿用已移除的 embedded 属性。
 	exclusive = false
 	unresizable = false
-	SatelliteWindow.configure(self)
-	borderless = false
+	SatelliteWindow.configure(self, true)
 
 	size = POPUP_SIZE
 	min_size = POPUP_SIZE
@@ -71,3 +70,12 @@ func _on_close_requested() -> void:
 	if not _close_allowed:
 		return
 	hide_popup()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("toggle_gm"):
+		return
+	var gm := get_tree().root.get_node_or_null("GameRoot/GmToolsLayer")
+	if gm and gm.has_method("toggle_panel"):
+		gm.call("toggle_panel")
+		get_viewport().set_input_as_handled()

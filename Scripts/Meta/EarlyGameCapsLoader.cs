@@ -42,6 +42,7 @@ public static class EarlyGameCapsLoader
 	{
 		public int DefaultMaxActiveSlots { get; set; } = 1;
 		public int DefaultMaxActiveSkillSlots { get; set; } = 1;
+		public int DefaultMaxPassiveSkillSlots { get; set; } = 2;
 		public bool PassiveSlotsUnlocked { get; set; }
 		public Dictionary<string, float> PlayerStatMultipliers { get; set; } = new();
 		public int PlayerInitialLevelCap { get; set; } = 10;

@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://settings_dock_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/settings_dock.gd" id="1_script"]
+
+[node name="SettingsDockLayer" type="CanvasLayer"]
+layer = 3
+
+[node name="SettingsDock" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="DockAnchor" type="Control" parent="SettingsDock"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -18.0
+offset_right = 58.0
+grow_vertical = 0
+
+[node name="DockBg" type="ColorRect" parent="SettingsDock/DockAnchor"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.11, 0.9)
+
+[node name="SettingsButton" type="Button" parent="SettingsDock/DockAnchor"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 1.0
+offset_right = -2.0
+offset_bottom = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 9
+text = "设置"

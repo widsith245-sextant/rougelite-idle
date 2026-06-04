@@ -1,0 +1,88 @@
+{
+  "effects": {
+    "ATK_FLAT_UP": {
+      "icon": "⚔",
+      "name": "攻击强化",
+      "summary": "造成伤害时附加固定值，触发后层数减 1",
+      "richText": "[color=#7ec8ff]⚔ 攻强[/color] 本次伤害 [b]+{pile}[/b] 固定值"
+    },
+    "ATK_PERCENT_UP": {
+      "icon": "⚔%",
+      "name": "攻击强化%",
+      "summary": "造成伤害时提高 10%×层数",
+      "richText": "[color=#7ec8ff]⚔%[/color] 伤害提高 [b]{pile}0%[/b]"
+    },
+    "DEF_PERCENT_UP": {
+      "icon": "🛡",
+      "name": "防御强化",
+      "summary": "受击时减免 10%×层数",
+      "richText": "[color=#7ec8ff]🛡[/color] 受击减免 [b]{pile}0%[/b]"
+    },
+    "SHIELD": {
+      "icon": "🔰",
+      "name": "护盾",
+      "summary": "优先吸收伤害，归零或超时消失",
+      "richText": "[color=#66ddff]🔰 护盾[/color] 吸收 [b]{shield}[/b] 点"
+    },
+    "VULNERABILITY": {
+      "icon": "💢",
+      "name": "易伤",
+      "summary": "受击伤害额外提高 20%×层数",
+      "richText": "[color=#ff7e7e]💢 易伤[/color] [b]×{pile}[/b] 层"
+    },
+    "MARK_TAKEDAMAGE": {
+      "icon": "✦",
+      "name": "标记-受击追加",
+      "summary": "受击时额外承受固定伤害",
+      "richText": "[color=#ffaa44]✦ 受击标记[/color] +[b]{intensity}[/b] × [b]{pile}[/b]"
+    },
+    "MARK_TIMER": {
+      "icon": "⏱",
+      "name": "标记-定时伤害",
+      "summary": "每 2 秒受到固定伤害",
+      "richText": "[color=#ffaa44]⏱ 定时[/color] 每 2 秒 [b]{intensity}[/b] 点"
+    },
+    "CHARGE_ATTACK": {
+      "icon": "⚡",
+      "name": "冲锋打击",
+      "summary": "Charge 结束后追加一次普攻",
+      "richText": "[color=#ffe066]⚡ 冲锋[/color] 位移后追加普攻"
+    },
+    "BACKSTAB": {
+      "icon": "🗡",
+      "name": "背刺",
+      "summary": "从背后攻击时伤害 +30% 并叠标记",
+      "richText": "[color=#ffe066]🗡 背刺[/color] 伤害 +30%"
+    },
+    "CRIT_RATE_UP": {
+      "icon": "★",
+      "name": "暴击提升",
+      "summary": "行动前暴击率 +5%×层数",
+      "richText": "[color=#7ec8ff]★ 暴击[/color] +[b]{pile}[/b] 层"
+    },
+    "ACTION_POWER_UP": {
+      "icon": "↑",
+      "name": "行动威力提升",
+      "summary": "行动条满时技能倍率提高",
+      "richText": "[color=#7ec8ff]↑ 威力[/color] [b]+{pile}0%[/b]"
+    },
+    "RESOURCE_STACK": {
+      "icon": "◆",
+      "name": "资源层数",
+      "summary": "特殊资源，每 2 秒减 1 层，上限 20",
+      "richText": "[color=#66ddaa]◆ 资源[/color] [b]{pile}[/b] 层"
+    },
+    "SPEED_UP": {
+      "icon": "»",
+      "name": "速度提升",
+      "summary": "提高移动/行动速度",
+      "richText": "[color=#7ec8ff]» 加速[/color] [b]{pile}[/b] 层"
+    },
+    "SWAP_CURSE": {
+      "icon": "⇄",
+      "name": "换位诅咒",
+      "summary": "换位后周围敌人获得易伤",
+      "richText": "[color=#c8a0ff]⇄ 诅咒[/color] 周围易伤"
+    }
+  }
+}

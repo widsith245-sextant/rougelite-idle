@@ -57,8 +57,11 @@ public partial class PartyManager : Node
 	public string GetClassIdForSlot(int slotIndex)
 	{
 		var rosterId = GetRosterIdForSlot(slotIndex);
-		return _roster.TryGetValue(rosterId, out var entry) ? entry.ClassId : string.Empty;
+		return GetClassIdForRoster(rosterId);
 	}
+
+	public string GetClassIdForRoster(string rosterId) =>
+		_roster.TryGetValue(rosterId, out var entry) ? entry.ClassId : string.Empty;
 
 	public string GetClassIdForUnit(string unitId)
 	{
@@ -123,6 +126,8 @@ public partial class PartyManager : Node
 		}
 
 		(_activeRosterIds[slotA], _activeRosterIds[slotB]) = (_activeRosterIds[slotB], _activeRosterIds[slotA]);
+		_eventBus.EmitSquadSwapped(slotA, slotB);
+		ApplySquadToCombat();
 	}
 
 	public void SetSquadSlot(int slotIndex, string rosterId)

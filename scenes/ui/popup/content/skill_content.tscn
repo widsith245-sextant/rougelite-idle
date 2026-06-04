@@ -45,7 +45,7 @@ theme_override_constants/v_separation = 4
 columns = 3
 
 [node name="RightVBox" type="VBoxContainer" parent="MainHBox"]
-custom_minimum_size = Vector2(160, 0)
+custom_minimum_size = Vector2(240, 0)
 layout_mode = 2
 theme_override_constants/separation = 6
 
@@ -59,13 +59,15 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="DetailLabel" type="Label" parent="MainHBox/RightVBox"]
+[node name="DetailLabel" type="RichTextLabel" parent="MainHBox/RightVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/normal_font_size = 10
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
 text = "选择技能节点"
-autowrap_mode = 3
 
 [node name="EquipButton" type="Button" parent="MainHBox/RightVBox"]
 unique_name_in_owner = true

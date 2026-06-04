@@ -1,5 +1,15 @@
 # UI 规范
 
+## 文案规范（禁止简称 Label）
+
+- 面向玩家的 **Label、详情、Tooltip、错误提示** 必须使用完整中文（或配表 `displayName`）。
+- **禁止**：装备槽单字（武/甲/头…）、属性英文缩写（HP/DMG/Spd）、物品名 4 字硬截断。
+- **允许简化仅用于图标层**：`slot_labels.json` 的 `iconAbbrev`、`stat_labels.json` 的 `compactIcon` 路径；48×48 格以图标为主。
+- 空间不足时：缩小字号、autowrap、Tooltip，而非删字。
+- 加载器：[`gdscript/ui/ui_labels_loader.gd`](../gdscript/ui/ui_labels_loader.gd)；槽位表 [`data/tables/ui/slot_labels.json`](../data/tables/ui/slot_labels.json)。
+
+信息流与资产替换：[`UI_INFORMATION_FLOW.md`](UI_INFORMATION_FLOW.md)、[`UI_ASSET_WORKFLOW.md`](UI_ASSET_WORKFLOW.md)。
+
 ## 三层信息架构
 
 ### Tier 1 — 战斗 HUD（400×150）
@@ -13,9 +23,13 @@
 - QuickBar 上方 **6px 波次进度条**（摆点 + 当前推进）
 - **禁止**在 HUD 内塞入administration、鉴定详情、技能树
 
+- 战斗区高度约 **112px**（为底部进度条 + QuickBar 预留 ~38px）
+- `GameRoot` / `QuickBar` 启用 `clip_contents`，防止控件绘制溢出 400×150
+
 ### Tier 2 — 管理弹窗（640×480）
 
 - 基类：`popup_window_base.gd` — 挂 `get_tree().root`，独立 OS 窗口
+- **全部 satellite 窗 `borderless=true`** + 深色 `ColorRect` 背景（`SatelliteWindow.BACKGROUND_COLOR`）
 - 管理：`popup_manager.gd` — 单例式开关各 content 场景
 
 | 键 | Content 场景 |
@@ -31,16 +45,30 @@
 - 窗口：640×480
 - 左栏纸娃娃：宽 72px，高 ~120px
 - 主网格：48×48 格，8 列，间距 2px
-- TabBar：高 22px，标题截断 4–6 字
+- TabBar：高 22px，Tab 标题使用全名（装备/宝箱/技能）；极窄时可用图标+Tooltip，不截断为无意义单字
 - 底栏：单行 12px 字体 — `Lv / EXP / 金币` + 上下文操作按钮
 - 详情区：最多 3 行 autowrap，超出滚动
 
-## QuickBar
+## QuickBar（4 入口）
 
-- 收起：18px 高，仅显示 **≡ 菜单**
-- 展开：30px，图标行：**背包 / 编队 / 技能 / 养成 / 奇境**
-- 每钮 `custom_minimum_size.x ≈ 52`，字号 9–10
+- 收起：18px 高，右下 **≡ 菜单**
+- 展开：宽 **320px**，高 30px，右对齐
+- 四个双字入口：**背包** | **编队** | **养成** | **冒险▼**
+- **冒险** 为 `MenuButton` 子菜单：训练关卡 / 奇境 Run
+- 技能入口合并至背包「技能」Tab；日志/立绘移至设置
 - 场景：`scenes/layers/quick_bar.tscn`
+
+## SettingsDock（常驻）
+
+- 左下角 **58×18**「设置」按钮，不随 QuickBar 折叠
+- 点击 toggle 设置弹窗（`PopupId.SETTINGS`）
+- 设置页「工具」区：打开/关闭日志、立绘预览、打开存档目录
+- 场景：`scenes/layers/settings_dock.tscn`
+
+## 日志卫星窗
+
+- 独立 OS 窗 400×160，`borderless=true`，深色 `ColorRect` 背景
+- 从 **设置 → 工具 → 打开/关闭日志** 切换（不在 QuickBar）
 
 ## 背包布局
 
@@ -48,8 +76,8 @@
 ┌─────────────────────────────────────────────────────────┐
 │ 当前查看：[出战角色 ▼]                                   │
 ├──────────┬──────────────────────────────────────────────┤
-│ 纸娃娃   │ 属性对比（8 项 base→final，Δ 着色）+ 交战距离  │
-│ 4×2 部位 │ Tab: 装备 | 宝箱 | 技能摘要                   │
+│ 纸娃娃   │ 属性对比（8 项中文全名 base→final，Δ 着色）  │
+│ 8 装备槽 │ Tab: 装备 | 宝箱 | 技能（槽位全名见 slot_labels）│
 ├──────────┴──────────────────────────────────────────────┤
 │ 详情 + [穿上][卸下][鉴定][分解]   Lv/EXP/金币 底栏       │
 └─────────────────────────────────────────────────────────┘
@@ -82,7 +110,9 @@
 
 ## 技能弹窗
 
-- 按 roster 角色 Tab；左技能树、右插槽装配
+- 按 roster 角色 Tab（完整 display_name，最多 6 字）
+- 左：技能树（主动/被动分区）；右：**240px** 插槽栏
+- 共用组件 `skill_slot_panel.gd`：4 主动 + 2 被动格子，中文名，锁定占位格
 - 插槽上限读 `DbManager`；节点读 `character_skill_trees.json`
 
 ## 技能发动（战斗区）

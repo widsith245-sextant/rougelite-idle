@@ -15,9 +15,10 @@ func _ready() -> void:
 	size = WINDOW_SIZE
 	min_size = WINDOW_SIZE
 	max_size = WINDOW_SIZE
-	borderless = false
+	borderless = true
+	unresizable = true
 	visible = false
-	SatelliteWindow.configure(self)
+	SatelliteWindow.configure(self, true)
 	close_requested.connect(hide_log)
 	if _close_button:
 		_close_button.pressed.connect(hide_log)
