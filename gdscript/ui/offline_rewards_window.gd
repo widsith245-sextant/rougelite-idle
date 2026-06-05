@@ -40,10 +40,17 @@ func show_pending(data: Dictionary) -> void:
 		_exp_label.text = "经验: +%.0f" % float(data.get("experience", 0))
 	if _hint_label:
 		_hint_label.text = "公式: 金币=秒×0.5×等级 · 经验=秒×0.2×等级"
-	popup_centered()
+	SatelliteWindow.place_popup_beside_main(self, self)
 	visible = true
 	show()
+	call_deferred("_after_show")
+
+
+func _after_show() -> void:
 	SatelliteWindow.ensure_transient_parent(self)
+	var wid := get_window_id()
+	if wid >= 0:
+		DisplayServer.window_move_to_foreground(wid)
 
 
 func hide_window() -> void:
@@ -53,9 +60,9 @@ func hide_window() -> void:
 
 func _on_claim_pressed() -> void:
 	var mgr := get_node_or_null("/root/OfflineRewardsWindowManager")
-	if mgr and mgr.has_method("ClaimPending"):
-		mgr.call("ClaimPending")
 	hide_window()
+	if mgr and mgr.has_method("ClaimPending"):
+		mgr.call_deferred("ClaimPending")
 
 
 func _on_later_pressed() -> void:

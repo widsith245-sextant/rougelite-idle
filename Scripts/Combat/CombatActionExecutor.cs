@@ -260,15 +260,48 @@ public class CombatActionExecutor
 			ApplyDamage(target, source, context.RetaliationDamage, false, "retaliate", 1f, "retaliate");
 		}
 
+		if (context.ShieldAbsorbed > 0f)
+		{
+			_eventBus.EmitDamageDealt(
+				source.Id,
+				target.Id,
+				context.ShieldAbsorbed,
+				false,
+				"shield",
+				"shield");
+		}
+
+		if (context.MarkBonus > 0f)
+		{
+			_eventBus.EmitDamageDealt(
+				source.Id,
+				target.Id,
+				context.MarkBonus,
+				false,
+				"mark",
+				"mark");
+		}
+
 		if (context.Cancelled || context.FinalAmount <= 0f)
 		{
 			return;
 		}
 
 		target.CurrentHp = System.Math.Max(0f, target.CurrentHp - context.FinalAmount);
-		_eventBus.EmitUnitHpChanged(target.Id, target.CurrentHp, target.MaxHp);
 		_settlement.EmitDamage(context);
+		_eventBus.EmitUnitHpChanged(target.Id, target.CurrentHp, target.MaxHp);
 	}
+
+	public void EmitHealNumber(CombatUnitData target, float amount)
+	{
+		if (amount <= 0f || target == null)
+		{
+			return;
+		}
+
+		_eventBus.EmitDamageDealt("heal", target.Id, amount, false, "heal", "heal");
+	}
+
 
 	public void ProcessMoveTriggers(CombatUnitData actor, IReadOnlyList<PositionChangeEvent> events)
 	{

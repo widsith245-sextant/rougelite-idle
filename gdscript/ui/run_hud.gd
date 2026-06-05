@@ -16,8 +16,18 @@ const WONDERLAND_ACCENT := Color(0.82, 0.62, 1.0)
 var _visible_run: bool = false
 
 
+func _apply_flat_panel(panel: PanelContainer) -> void:
+	if panel == null:
+		return
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.09, 0.11, 0.92)
+	style.set_border_width_all(0)
+	panel.add_theme_stylebox_override("panel", style)
+
+
 func _ready() -> void:
 	visible = false
+	_apply_flat_panel(_panel)
 	if _detail_button:
 		_detail_button.pressed.connect(_on_detail_pressed)
 	if _abandon_button:

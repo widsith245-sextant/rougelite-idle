@@ -4,8 +4,10 @@
   "frontLineThresholdX": 120,
   "moveSpeedScale": 0.1,
   "classes": [
-    { "classId": "Vanguard_01", "atkRange": 50, "stopX": 290 },
+    { "classId": "Vanguard_01", "atkRange": 20, "stopX": 290 },
     { "classId": "Sniper_01", "atkRange": 250, "stopX": 90 },
-    { "classId": "Mage_01", "atkRange": 180, "stopX": 160 }
+    { "classId": "Mage_01", "atkRange": 180, "stopX": 160 },
+    { "classId": "Berserker_01", "atkRange": 40, "stopX": 300 },
+    { "classId": "Support_01", "atkRange": 200, "stopX": 140 }
   ]
 }

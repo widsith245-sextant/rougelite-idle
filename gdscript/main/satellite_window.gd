@@ -15,7 +15,8 @@ static func configure(win: Window, borderless: bool = true, always_on_top: bool 
 		return
 	win.borderless = borderless
 	win.always_on_top = always_on_top
-	win.transient = true
+	# Transient 父子关系仅在 ensure_transient_parent 中通过 DisplayServer 设置，
+	# 避免 win.transient=true 与 window_set_transient 重复绑定导致引擎报错。
 
 
 static func ensure_transient_parent(win: Window, attempt: int = 0) -> void:

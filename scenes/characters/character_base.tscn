@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://gdscript/stats/stats_component.gd" id="4_stats"]
 
 [node name="CharacterBase" type="Node2D"]
+position = Vector2(0, -32)
 script = ExtResource("1_script")
 
 [node name="Shadow" type="Sprite2D" parent="."]

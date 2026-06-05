@@ -23,8 +23,7 @@ internal static class MarkEffectHandlers
 			return;
 		}
 
-		ctx.FinalAmount += inst.Intensity > 0f ? inst.Intensity : inst.Pile;
-		ctx.DisplayTag = "mark";
+		ctx.MarkBonus += inst.Intensity > 0f ? inst.Intensity : inst.Pile;
 		inst.Pile = Math.Max(0, inst.Pile - 1);
 	}
 

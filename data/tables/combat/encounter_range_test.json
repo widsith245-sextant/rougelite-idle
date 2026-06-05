@@ -2,37 +2,23 @@
   "allies": [
     {
       "id": "ally_a",
-      "classId": "Vanguard_01",
       "displayName": "先锋(近)",
       "level": 1,
       "formationIndex": 0,
       "initialPositionX": 40,
       "speed": 12,
       "baseAttack": 20,
-      "maxHp": 300,
-      "activeSkill": {
-        "id": "charge_strike",
-        "skillMultiplier": 1.0,
-        "moveTags": [{ "kind": "Charge", "distance": 40 }]
-      },
-      "passives": []
+      "maxHp": 300
     },
     {
       "id": "ally_b",
-      "classId": "Sniper_01",
-      "displayName": "狙击(远)",
+      "displayName": "2号位(远/近由名册决定)",
       "level": 1,
       "formationIndex": 1,
       "initialPositionX": 72,
       "speed": 10,
       "baseAttack": 35,
-      "maxHp": 180,
-      "activeSkill": {
-        "id": "basic_shot",
-        "skillMultiplier": 1.0,
-        "moveTags": []
-      },
-      "passives": []
+      "maxHp": 180
     }
   ],
   "enemies": [

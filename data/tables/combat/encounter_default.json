@@ -2,68 +2,33 @@
   "allies": [
     {
       "id": "ally_a",
-      "classId": "Vanguard_01",
       "displayName": "先锋剑士",
       "level": 1,
       "formationIndex": 0,
       "initialPositionX": 40,
       "speed": 12,
       "baseAttack": 20,
-      "maxHp": 300,
-      "activeSkill": {
-        "id": "charge_strike",
-        "skillMultiplier": 1.0,
-        "moveTags": [{ "kind": "Charge", "distance": 40 }]
-      },
-      "passives": []
+      "maxHp": 300
     },
     {
       "id": "ally_b",
-      "classId": "Sniper_01",
-      "displayName": "狙击手",
+      "displayName": "2号位",
       "level": 1,
       "formationIndex": 1,
       "initialPositionX": 72,
       "speed": 10,
       "baseAttack": 35,
-      "maxHp": 180,
-      "activeSkill": {
-        "id": "basic_shot",
-        "skillMultiplier": 1.0,
-        "moveTags": []
-      },
-      "passives": [
-        {
-          "id": "crossfire",
-          "triggerType": "OnAnyAllyMoved",
-          "targetSlot": -1,
-          "skillMultiplier": 0.5
-        }
-      ]
+      "maxHp": 180
     },
     {
       "id": "ally_c",
-      "classId": "Mage_01",
       "displayName": "大法师",
       "level": 1,
       "formationIndex": 2,
       "initialPositionX": 104,
       "speed": 8,
       "baseAttack": 45,
-      "maxHp": 150,
-      "activeSkill": {
-        "id": "charge2_strike",
-        "skillMultiplier": 1.0,
-        "moveTags": [{ "kind": "Charge", "distance": 80 }]
-      },
-      "passives": [
-        {
-          "id": "entry_burst",
-          "triggerType": "OnSelfReachFront",
-          "targetSlot": 0,
-          "skillMultiplier": 2.0
-        }
-      ]
+      "maxHp": 150
     }
   ],
   "enemies": [

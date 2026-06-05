@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://damage_fly_line_scene"]
+
+[ext_resource type="Script" path="res://gdscript/combat/damage_fly_line.gd" id="1_script"]
+
+[node name="DamageFlyLine" type="Node2D"]
+script = ExtResource("1_script")

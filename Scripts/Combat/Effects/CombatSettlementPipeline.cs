@@ -42,7 +42,7 @@ public sealed class CombatSettlementPipeline
 			context.FinalAmount,
 			context.IsCrit,
 			context.DamageType,
-			context.DisplayTag);
+			string.IsNullOrEmpty(context.DisplayTag) ? context.DamageType : context.DisplayTag);
 	}
 
 	private static void RunTriggerEffects(

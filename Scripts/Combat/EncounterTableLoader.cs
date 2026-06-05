@@ -164,7 +164,9 @@ public static class EncounterTableLoader
 	private static CombatUnitData MapUnit(UnitEntry entry, bool isAlly)
 	{
 		var party = GetPartyManager();
-		var classId = entry.ClassId ?? ResolveClassId(entry.Id, party);
+		var classId = isAlly
+			? FirstNonEmpty(ResolveClassId(entry.Id, party), entry.ClassId)
+			: (entry.ClassId ?? string.Empty);
 		var displayName = entry.DisplayName;
 		var level = entry.Level > 0 ? entry.Level : 1;
 		if (isAlly && party != null)
@@ -241,6 +243,19 @@ public static class EncounterTableLoader
 			"ally_c" => "Mage_01",
 			_ => string.Empty,
 		};
+	}
+
+	private static string FirstNonEmpty(params string?[] values)
+	{
+		foreach (var value in values)
+		{
+			if (!string.IsNullOrEmpty(value))
+			{
+				return value;
+			}
+		}
+
+		return string.Empty;
 	}
 
 	private static PartyManager? GetPartyManager()

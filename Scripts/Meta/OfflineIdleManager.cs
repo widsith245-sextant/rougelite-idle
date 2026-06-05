@@ -6,6 +6,8 @@ namespace RougeliteIdle.Meta;
 
 public partial class OfflineIdleManager : Node
 {
+	private const long MaxOfflineElapsedSeconds = 7L * 24 * 3600;
+
 	public void StampSessionTime()
 	{
 		var save = GetNode<SaveManager>("/root/SaveManager");
@@ -16,6 +18,10 @@ public partial class OfflineIdleManager : Node
 	{
 		var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 		var elapsedSeconds = Math.Max(0, now - lastSessionUnix);
+		if (elapsedSeconds > MaxOfflineElapsedSeconds)
+		{
+			elapsedSeconds = MaxOfflineElapsedSeconds;
+		}
 
 		return new OfflineIdleResult
 		{

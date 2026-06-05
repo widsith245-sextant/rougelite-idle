@@ -17,6 +17,8 @@ public sealed class CombatHitContext
 	public float SkillMultiplier { get; set; } = 1f;
 	public bool Cancelled { get; set; }
 	public float RetaliationDamage { get; set; }
+	public float ShieldAbsorbed { get; set; }
+	public float MarkBonus { get; set; }
 	public string DisplayTag { get; set; } = string.Empty;
 
 	public static CombatHitContext Create(

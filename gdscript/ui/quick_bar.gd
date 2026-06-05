@@ -20,7 +20,6 @@ const POPUP_IDS := {
 @onready var _expanded_row: HBoxContainer = %ExpandedRow
 @onready var _collapse_button: Button = %CollapseButton
 @onready var _adventure_button: MenuButton = %AdventureButton
-@onready var _adventure_menu: PopupMenu = %AdventureMenu
 
 var _expanded := false
 var _popup_manager: Node
@@ -36,17 +35,14 @@ func _ready() -> void:
 	%SquadButton.pressed.connect(_open_popup.bind(POPUP_IDS.squad))
 	%CultivationButton.pressed.connect(_open_popup.bind(POPUP_IDS.cultivation))
 
-	if _adventure_menu:
-		_adventure_menu.clear()
-		_adventure_menu.add_item("训练关卡", POPUP_IDS.stage)
-		_adventure_menu.add_item("奇境 Run", POPUP_IDS.wonderland)
-		_adventure_menu.id_pressed.connect(_on_adventure_menu_id_pressed)
-	elif _adventure_button:
+	if _adventure_button:
 		var menu: PopupMenu = _adventure_button.get_popup()
-		menu.clear()
-		menu.add_item("训练关卡", POPUP_IDS.stage)
-		menu.add_item("奇境 Run", POPUP_IDS.wonderland)
-		menu.id_pressed.connect(_on_adventure_menu_id_pressed)
+		if menu:
+			if not menu.id_pressed.is_connected(_on_adventure_menu_id_pressed):
+				menu.id_pressed.connect(_on_adventure_menu_id_pressed)
+			menu.clear()
+			menu.add_item("训练关卡", POPUP_IDS.stage)
+			menu.add_item("奇境 Run", POPUP_IDS.wonderland)
 
 	if _expanded_row:
 		_expanded_row.alignment = BoxContainer.ALIGNMENT_BEGIN
@@ -69,6 +65,8 @@ func _on_collapse_pressed() -> void:
 func _open_popup(popup_id: int) -> void:
 	if _popup_manager and _popup_manager.has_method("open_popup"):
 		_popup_manager.open_popup(popup_id)
+	else:
+		push_warning("QuickBar: PopupManager not found at /root/GameRoot/PopupManager")
 
 
 func _set_expanded(expanded: bool, animate: bool) -> void:

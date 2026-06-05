@@ -259,6 +259,17 @@ public partial class CharacterSkillManager : Node
 			return;
 		}
 
+		var party = GetNodeOrNull<PartyManager>("/root/PartyManager");
+		var classId = party?.GetClassIdForRoster(rosterId) ?? string.Empty;
+		if (string.IsNullOrEmpty(classId))
+		{
+			classId = unit.ClassId;
+		}
+		else
+		{
+			unit.ClassId = classId;
+		}
+
 		unit.ActiveSkills.Clear();
 		unit.Passives.Clear();
 		var maxSlots = _db?.MaxActiveSkillSlots ?? 1;
@@ -269,7 +280,7 @@ public partial class CharacterSkillManager : Node
 				continue;
 			}
 
-			var skill = ClassSkillsLoader.BuildActiveSkill(unit.ClassId, activeId);
+			var skill = ClassSkillsLoader.BuildActiveSkill(classId, activeId);
 			if (skill != null)
 			{
 				unit.ActiveSkills.Add(skill);
@@ -288,7 +299,7 @@ public partial class CharacterSkillManager : Node
 					continue;
 				}
 
-				var passive = ClassSkillsLoader.BuildPassive(unit.ClassId, passiveId);
+				var passive = ClassSkillsLoader.BuildPassive(classId, passiveId);
 				if (passive != null)
 				{
 					unit.Passives.Add(passive);

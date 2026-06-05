@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://combat_stage_layer_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://combat_stage_layer_scene"]
 
 [ext_resource type="Script" path="res://gdscript/combat/combat_stage.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://vfx_manager_scene" path="res://scenes/combat/vfx_manager.tscn" id="2_vfx"]
+[ext_resource type="Script" path="res://gdscript/combat/combat_range_overlay.gd" id="3_range"]
 
 [node name="CombatStageLayer" type="CanvasLayer"]
 layer = 1
@@ -10,7 +11,17 @@ layer = 1
 unique_name_in_owner = true
 layer = 2
 
+[node name="CombatFillBg" type="ColorRect" parent="."]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 126.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.0784314, 0.0941176, 0.121569, 1)
+
 [node name="CombatStage" type="Control" parent="."]
+clip_contents = true
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
@@ -27,9 +38,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.12, 0.14, 0.18, 0.6)
+color = Color(0.12, 0.14, 0.18, 0.92)
 
 [node name="CombatWorld" type="Node2D" parent="."]
+
+[node name="CombatRangeOverlay" type="Node2D" parent="CombatWorld"]
+script = ExtResource("3_range")
 
 [node name="AllySlots" type="Node2D" parent="CombatWorld"]
 unique_name_in_owner = true
@@ -52,8 +66,8 @@ position = Vector2(340, 90)
 
 [node name="BattleCamera" type="Camera2D" parent="CombatWorld"]
 unique_name_in_owner = true
-position = Vector2(0, 60)
-enabled = true
+position = Vector2(200, 56)
+enabled = false
 
 [node name="VfxManager" parent="CombatWorld" instance=ExtResource("2_vfx")]
 unique_name_in_owner = true

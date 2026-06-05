@@ -52,12 +52,18 @@ var _pending_stats_unit_id: String = "ally_a"
 
 
 func open_popup(popup_id: int) -> void:
+	if not CONTENT_SCENES.has(popup_id):
+		push_warning("PopupManager: unknown popup_id=%d" % popup_id)
+		return
 	if _building.get(popup_id, false):
 		if popup_id not in _pending_open:
 			_pending_open.append(popup_id)
 		return
 	var window: Window = _get_or_create_window(popup_id)
-	if window == null or not window.is_inside_tree():
+	if window == null:
+		push_warning("PopupManager: failed to create window for popup_id=%d" % popup_id)
+		return
+	if not window.is_inside_tree():
 		if popup_id not in _pending_open:
 			_pending_open.append(popup_id)
 		return
@@ -142,8 +148,21 @@ func _get_or_create_window(popup_id: int) -> Window:
 	window.popup_title = POPUP_TITLES.get(popup_id, "Panel")
 	_windows[popup_id] = window
 	get_tree().root.call_deferred("add_child", window)
-	window.tree_entered.connect(_on_popup_window_entered.bind(popup_id), CONNECT_ONE_SHOT)
+	if window.is_node_ready():
+		call_deferred("_on_popup_window_entered", popup_id)
+	else:
+		window.ready.connect(_on_popup_window_entered.bind(popup_id), CONNECT_ONE_SHOT)
 	return window
+
+
+func _resolve_content_root(window: Window) -> Control:
+	if window == null or not is_instance_valid(window):
+		return null
+	if window.has_method("get_content_root"):
+		var root: Control = window.get_content_root()
+		if root != null:
+			return root
+	return window.get_node_or_null("%ContentRoot") as Control
 
 
 func _on_popup_window_entered(popup_id: int) -> void:
@@ -153,7 +172,12 @@ func _on_popup_window_entered(popup_id: int) -> void:
 		_flush_pending()
 		return
 
-	var content_root: Control = window.get_content_root()
+	var content_root: Control = _resolve_content_root(window)
+	if content_root == null:
+		push_warning("PopupManager: content_root null for popup_id=%d after ready" % popup_id)
+		_building.erase(popup_id)
+		_flush_pending()
+		return
 	if content_root.get_child_count() == 0:
 		var content: Control = CONTENT_SCENES[popup_id].instantiate()
 		content.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -186,7 +210,13 @@ func _flush_pending() -> void:
 
 func _show_popup_window(popup_id: int, window: Window) -> void:
 	window.show_popup()
-	var content_root: Control = window.get_content_root()
+	var wid := window.get_window_id()
+	if wid >= 0:
+		DisplayServer.window_move_to_foreground(wid)
+	var content_root: Control = _resolve_content_root(window)
+	if content_root == null:
+		push_warning("PopupManager: content_root null when showing popup_id=%d" % popup_id)
+		return
 	if content_root.get_child_count() > 0:
 		var content: Node = content_root.get_child(0)
 		if popup_id == PopupId.CHARACTER_STATS and content.has_method("set_unit_id"):

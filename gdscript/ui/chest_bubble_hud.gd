@@ -20,8 +20,18 @@ var _opening := false
 var _pulse_tween: Tween
 
 
+func _apply_flat_panel(panel: PanelContainer) -> void:
+	if panel == null:
+		return
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.08, 0.09, 0.11, 0.92)
+	style.set_border_width_all(0)
+	panel.add_theme_stylebox_override("panel", style)
+
+
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	_apply_flat_panel(_panel)
 	_load_quality_table()
 	_build_pips()
 	_connect_bus()

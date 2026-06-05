@@ -63,7 +63,7 @@ public static class UnitCombatAI
 			return false;
 		}
 
-		var atkSpeed = unit.Stats.GetFinal(StatId.AtkSpeed);
+		var atkSpeed = unit.Stats.GetFinal(StatId.AtkSpeed) * CombatManager.GlobalNormalAttackSpeedMultiplier;
 		unit.NormalAttackTimer += delta * atkSpeed;
 		if (unit.NormalAttackTimer < 1f)
 		{

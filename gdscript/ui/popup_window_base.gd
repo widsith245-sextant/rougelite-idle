@@ -68,7 +68,9 @@ func set_close_enabled(enabled: bool) -> void:
 
 
 func get_content_root() -> Control:
-	return _content_root
+	if _content_root != null:
+		return _content_root
+	return get_node_or_null("%ContentRoot") as Control
 
 
 func _on_close_requested() -> void:

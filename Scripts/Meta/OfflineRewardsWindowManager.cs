@@ -8,6 +8,7 @@ public partial class OfflineRewardsWindowManager : Node
 {
 	private Window? _window;
 	private OfflineIdleResult? _pending;
+	private bool _windowReady;
 
 	public bool HasPending => _pending != null;
 
@@ -22,23 +23,19 @@ public partial class OfflineRewardsWindowManager : Node
 
 		_window = scene.Instantiate<Window>();
 		_window.Visible = false;
+		_window.TreeEntered += OnWindowTreeEntered;
 		GetTree().Root.CallDeferred(Node.MethodName.AddChild, _window);
 	}
 
 	public void ShowPending(OfflineIdleResult result)
 	{
 		_pending = result;
-		ShowWindow();
+		TryShowWindow();
 	}
 
 	public void ShowPendingIfAny()
 	{
-		if (_pending == null)
-		{
-			return;
-		}
-
-		ShowWindow();
+		TryShowWindow();
 	}
 
 	public void ClaimPending()
@@ -62,6 +59,7 @@ public partial class OfflineRewardsWindowManager : Node
 
 	public void DismissPending()
 	{
+		_pending = null;
 		if (_window == null)
 		{
 			return;
@@ -77,9 +75,20 @@ public partial class OfflineRewardsWindowManager : Node
 		}
 	}
 
-	private void ShowWindow()
+	private void OnWindowTreeEntered()
 	{
-		if (_window == null || _pending == null)
+		if (_window == null || !_window.IsInsideTree())
+		{
+			return;
+		}
+
+		_windowReady = true;
+		TryShowWindow();
+	}
+
+	private void TryShowWindow()
+	{
+		if (_window == null || _pending == null || !_windowReady || !_window.IsInsideTree())
 		{
 			return;
 		}
@@ -88,7 +97,7 @@ public partial class OfflineRewardsWindowManager : Node
 		var payload = offline.ResultToDictionary(_pending);
 		if (_window.HasMethod("show_pending"))
 		{
-			_window.Call("show_pending", payload);
+			_window.CallDeferred("show_pending", payload);
 		}
 	}
 }

@@ -129,7 +129,7 @@
       "moveSpeed": 200,
       "hitBoxRadius": 10,
       "rewardTier": 2,
-      "damageProfile": { "type": "physical", "skillMultiplierScale": 1.0 },
+      "damageProfile": { "type": "magical", "skillMultiplierScale": 1.0 },
       "onHitEffects": [{ "id": "MARK_TAKEDAMAGE", "chance": 0.25 }],
       "onDeathEffects": [],
       "activeSkill": {

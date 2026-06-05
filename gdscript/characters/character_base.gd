@@ -27,6 +27,7 @@ var _move_tween: Tween
 
 
 func _ready() -> void:
+	position.y = -32.0
 	var event_bus := get_node_or_null("/root/EventBus")
 	if event_bus:
 		if event_bus.has_signal("UnitHpChanged"):
@@ -44,7 +45,11 @@ func _ready() -> void:
 static func spawn(parent: Node, unit_id: String, pos_x: float = 40.0) -> Node2D:
 	var node: Node2D = CharacterScene.instantiate()
 	parent.add_child(node)
-	node.call_deferred("setup", unit_id, pos_x)
+	# Setup immediately so feet land on CombatCoords grid (y=-32); deferred setup left dolls at y=0.
+	if node.is_node_ready():
+		node.setup(unit_id, pos_x)
+	else:
+		node.call_deferred("setup", unit_id, pos_x)
 	return node
 
 

@@ -40,11 +40,16 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if not is_inside_tree():
+		return
 	var main := get_tree().root.get_node_or_null("GameRoot")
-	if main:
-		var main_win := main.get_window()
-		if main_win and main_win.position != _last_main_pos:
-			_position_above_main()
+	if main == null or not is_instance_valid(main):
+		return
+	var main_win := main.get_window()
+	if main_win == null:
+		return
+	if main_win.position != _last_main_pos:
+		_position_above_main()
 	if _pending.is_empty():
 		return
 	_stagger_timer -= delta
@@ -56,8 +61,10 @@ func _process(delta: float) -> void:
 
 
 func _position_above_main() -> void:
+	if not is_inside_tree():
+		return
 	var main := get_tree().root.get_node_or_null("GameRoot")
-	if main == null:
+	if main == null or not is_instance_valid(main):
 		return
 	var main_win := main.get_window()
 	if main_win == null:

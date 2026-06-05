@@ -2,5 +2,6 @@
 
 [ext_resource type="Script" path="res://gdscript/combat/damage_number.gd" id="1_script"]
 
-[node name="DamageNumber" type="Node2D"]
+[node name="DamageNumber" type="Control"]
+mouse_filter = 2
 script = ExtResource("1_script")

@@ -226,7 +226,10 @@ internal static class DirectModifierHandlers
 		var absorb = Math.Min(inst.Shield, ctx.FinalAmount);
 		ctx.FinalAmount -= absorb;
 		inst.Shield -= absorb;
-		ctx.DisplayTag = absorb > 0f ? "shield" : ctx.DisplayTag;
+		if (absorb > 0f)
+		{
+			ctx.ShieldAbsorbed += absorb;
+		}
 	}
 
 	private static void ShieldWithRetaliation(CombatUnitData owner, CombatHitContext ctx, ActiveCombatEffect inst, EffectTriggerKind _, EffectHandlerServices __)
@@ -239,7 +242,10 @@ internal static class DirectModifierHandlers
 		var absorb = Math.Min(inst.Shield, ctx.FinalAmount);
 		ctx.FinalAmount -= absorb;
 		inst.Shield -= absorb;
-		ctx.DisplayTag = absorb > 0f ? "shield" : ctx.DisplayTag;
+		if (absorb > 0f)
+		{
+			ctx.ShieldAbsorbed += absorb;
+		}
 		if (inst.Shield <= 0f && inst.Intensity > 0f)
 		{
 			ctx.RetaliationDamage += inst.Intensity;

@@ -29,7 +29,7 @@ flowchart LR
 | Layer | 节点 | 职责 |
 |-------|------|------|
 | 0 | Background | 横向卷轴背景 |
-| 1 | CombatStage | 上部 120px 战斗纸娃娃 |
+| 1 | CombatStage | 上部 112px 战斗纸娃娃 |
 | 2 | HUD | 顶部双血条 |
 | 3 | QuickBar | 右下折叠菜单（18px / 30px） |
 

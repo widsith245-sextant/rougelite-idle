@@ -2,7 +2,7 @@ extends Control
 
 ## Multi-enemy combat stage visuals.
 
-const STAGE_HEIGHT := 120
+const STAGE_HEIGHT := 112
 const TWEEN_DURATION := 0.15
 const MICRO_MOVE_DURATION := 0.04
 const SNAP_MOVE_LOGIC_DELTA := 0.5
@@ -35,8 +35,32 @@ var _camera_zoom: Vector2 = Vector2.ONE
 func _ready() -> void:
 	custom_minimum_size = Vector2(400, STAGE_HEIGHT)
 	_hide_placeholder_slots()
+	if _vfx_manager:
+		if _vfx_manager.has_method("configure_damage_overlay"):
+			_vfx_manager.configure_damage_overlay(_overhead_layer)
+		if _vfx_manager.has_method("configure_fly_overlay"):
+			_vfx_manager.configure_fly_overlay(_overhead_layer)
+		if _vfx_manager.has_method("configure_camera"):
+			_vfx_manager.configure_camera(_camera)
+	var overlay := get_parent().get_node_or_null("CombatWorld/CombatRangeOverlay")
+	if overlay and overlay.has_method("bind_stage"):
+		overlay.bind_stage(self)
 	call_deferred("_setup_allies_from_manager")
 	_connect_event_bus(get_node_or_null("/root/EventBus"))
+
+
+func get_feet_world_y() -> float:
+	return CombatCoords.feet_world_y(_ally_slots)
+
+
+func _get_live_doll(registry: Dictionary, entity_id: String) -> Node2D:
+	if not registry.has(entity_id):
+		return null
+	var node = registry[entity_id]
+	if node == null or not is_instance_valid(node):
+		registry.erase(entity_id)
+		return null
+	return node as Node2D
 
 
 func _process(delta: float) -> void:
@@ -95,14 +119,14 @@ func _on_squad_changed() -> void:
 
 func _apply_march_walk() -> void:
 	for entity_id in _ally_nodes.keys():
-		var doll: Node2D = _ally_nodes[entity_id]
+		var doll := _get_live_doll(_ally_nodes, entity_id)
 		if doll and doll.has_method("play_walk"):
 			doll.play_walk()
 
 
 func _stop_march_walk() -> void:
 	for entity_id in _ally_nodes.keys():
-		var doll: Node2D = _ally_nodes[entity_id]
+		var doll := _get_live_doll(_ally_nodes, entity_id)
 		if doll and doll.has_method("play_idle"):
 			doll.play_idle()
 
@@ -121,8 +145,9 @@ func _setup_allies_from_manager() -> void:
 		return
 
 	for entity_id in _ally_nodes.keys():
-		var node: Node = _ally_nodes[entity_id]
-		node.queue_free()
+		var node = _ally_nodes[entity_id]
+		if node != null and is_instance_valid(node):
+			node.queue_free()
 	_ally_nodes.clear()
 	for entity_id in _overhead_nodes.keys():
 		if _enemy_nodes.has(entity_id):
@@ -141,6 +166,8 @@ func _setup_allies_from_manager() -> void:
 
 func _spawn_ally(entity_id: String, pos_x: float) -> void:
 	var doll: Node2D = CharacterBase.spawn(_ally_slots, entity_id, _logic_to_ally_local_x(pos_x))
+	if doll:
+		doll.z_index = 10
 	_ally_nodes[entity_id] = doll
 	_unit_positions[entity_id] = doll.get_anchor_position() if doll.has_method("get_anchor_position") else doll.global_position
 	_spawn_overhead(entity_id, true)
@@ -158,15 +185,16 @@ func _sync_enemies_from_manager() -> void:
 		if entity_id.is_empty():
 			continue
 		seen[entity_id] = true
-		var logic_x: float = float(entry.get("position_x", ENEMY_ANCHOR_X))
-		var local_x := logic_x - ENEMY_ANCHOR_X
+		var logic_x: float = float(entry.get("position_x", _enemy_spawn.global_position.x))
+		var local_x := logic_x - _enemy_spawn.global_position.x
 		if _enemy_nodes.has(entity_id):
-			var existing: Node2D = _enemy_nodes[entity_id]
-			if existing and is_instance_valid(existing):
+			var existing := _get_live_doll(_enemy_nodes, entity_id)
+			if existing:
 				existing.position.x = local_x
 			continue
 		var doll: Node2D = CharacterBase.spawn(_enemy_spawn, entity_id, local_x)
 		if doll:
+			doll.z_index = 10
 			doll.modulate = Color(0.95, 0.55, 0.35)
 			_enemy_nodes[entity_id] = doll
 			_unit_positions[entity_id] = doll.get_anchor_position()
@@ -179,14 +207,16 @@ func _sync_enemies_from_manager() -> void:
 
 
 func _despawn_enemy(entity_id: String) -> void:
+	if _vfx_manager and _vfx_manager.has_method("purge_pending_for_target"):
+		_vfx_manager.purge_pending_for_target(entity_id)
 	if _enemy_nodes.has(entity_id):
-		var node: Node = _enemy_nodes[entity_id]
-		if is_instance_valid(node):
+		var node = _enemy_nodes[entity_id]
+		if node != null and is_instance_valid(node):
 			node.queue_free()
 		_enemy_nodes.erase(entity_id)
 	if _overhead_nodes.has(entity_id):
-		var hud: Node = _overhead_nodes[entity_id]
-		if is_instance_valid(hud):
+		var hud = _overhead_nodes[entity_id]
+		if hud != null and is_instance_valid(hud):
 			hud.queue_free()
 		_overhead_nodes.erase(entity_id)
 	_unit_positions.erase(entity_id)
@@ -207,21 +237,23 @@ func _on_wave_cleared(_wave_index: int) -> void:
 
 func _on_unit_hp_changed(entity_id: String, current_hp: float, _max_hp: float) -> void:
 	if current_hp <= 0.0 and _enemy_nodes.has(entity_id):
-		_despawn_enemy(entity_id)
+		call_deferred("_despawn_enemy", entity_id)
 
 
 func _on_position_changed(entity_id: String, old_x: float, new_x: float) -> void:
 	var logic_delta := absf(new_x - old_x)
 	if _enemy_nodes.has(entity_id):
-		var enemy_doll: Node2D = _enemy_nodes[entity_id]
-		if enemy_doll and is_instance_valid(enemy_doll):
-			_apply_logic_x_to_node(enemy_doll, new_x - ENEMY_ANCHOR_X, logic_delta)
+		var enemy_doll := _get_live_doll(_enemy_nodes, entity_id)
+		if enemy_doll:
+			_apply_logic_x_to_node(enemy_doll, new_x - _enemy_spawn.global_position.x, logic_delta)
 			_unit_positions[entity_id] = enemy_doll.get_anchor_position() if enemy_doll.has_method("get_anchor_position") else enemy_doll.global_position
 		return
 	if not _ally_nodes.has(entity_id):
 		return
 
-	var doll: Node2D = _ally_nodes[entity_id]
+	var doll := _get_live_doll(_ally_nodes, entity_id)
+	if doll == null:
+		return
 	var local_x := _logic_to_ally_local_x(new_x)
 	_apply_logic_x_to_node(doll, local_x, logic_delta)
 	if logic_delta >= 20.0 and doll.has_method("play_reposition_trail"):
@@ -256,21 +288,30 @@ func _on_damage_dealt(
 		return
 
 	var anchor: Node2D = _resolve_damage_anchor(target_id)
+	var source_anchor: Node2D = _resolve_damage_anchor(_source_id)
 	var category := display_tag if not display_tag.is_empty() else damage_type
 	var opts := {
 		"category": category if not category.is_empty() else "physical",
 		"is_crit": is_crit,
 		"target_id": target_id,
+		"camera": _camera,
 	}
-	if anchor != null and _vfx_manager.has_method("spawn_damage_number_staggered"):
-		_vfx_manager.spawn_damage_number_staggered(amount, anchor, opts)
+	if source_anchor != null and anchor != null and _vfx_manager.has_method("spawn_damage_fly_line"):
+		var atk_range := _atk_range_for_unit(_source_id)
+		if atk_range > 80.0:
+			_vfx_manager.spawn_damage_fly_line(source_anchor, anchor, opts["category"])
+	if anchor != null:
+		if anchor.has_method("get_anchor_position"):
+			_unit_positions[target_id] = anchor.get_anchor_position()
+		if _vfx_manager.has_method("spawn_damage_number_staggered"):
+			_vfx_manager.spawn_damage_number_staggered(amount, anchor, opts)
 	elif _vfx_manager.has_method("spawn_damage_number"):
 		var world_pos: Vector2 = _unit_positions.get(target_id, _enemy_spawn.global_position)
 		_vfx_manager.spawn_damage_number(amount, world_pos, opts)
 
 	if is_crit and _ally_nodes.has(_source_id):
-		var doll: Node = _ally_nodes[_source_id]
-		if doll.has_method("apply_hit_stop"):
+		var doll := _get_live_doll(_ally_nodes, _source_id)
+		if doll and doll.has_method("apply_hit_stop"):
 			doll.apply_hit_stop(0.05)
 			_hit_stop_timer = 0.05
 
@@ -278,15 +319,29 @@ func _on_damage_dealt(
 func _resolve_damage_anchor(target_id: String) -> Node2D:
 	if target_id.is_empty():
 		return null
-	if _enemy_nodes.has(target_id):
-		var enemy: Node2D = _enemy_nodes[target_id]
-		if enemy != null and is_instance_valid(enemy):
-			return enemy
-	if _ally_nodes.has(target_id):
-		var ally: Node2D = _ally_nodes[target_id]
-		if ally != null and is_instance_valid(ally):
-			return ally
-	return null
+	var enemy := _get_live_doll(_enemy_nodes, target_id)
+	if enemy:
+		return enemy
+	return _get_live_doll(_ally_nodes, target_id)
+
+
+func _atk_range_for_unit(unit_id: String) -> float:
+	var combat := get_node_or_null("/root/CombatManager")
+	if combat == null or unit_id.is_empty():
+		return 0.0
+	for method in ["GetAllySnapshot", "GetEnemySnapshot"]:
+		if not combat.has_method(method):
+			continue
+		var snapshot: Variant = combat.call(method)
+		if typeof(snapshot) != TYPE_ARRAY:
+			continue
+		for entry in snapshot:
+			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			var unit: Dictionary = entry
+			if str(unit.get("id", "")) == unit_id:
+				return float(unit.get("atk_range", 0.0))
+	return 0.0
 
 
 func _on_combat_effect_applied(_target_id: String, _effect_id: String, _display_name: String, _category: String, _pile: int, _intensity: float) -> void:
@@ -303,7 +358,7 @@ func _on_combat_state_changed(state: int) -> void:
 
 
 func _update_camera_follow() -> void:
-	if _camera == null:
+	if _camera == null or not _camera.enabled:
 		return
 	var combat_manager := get_node_or_null("/root/CombatManager")
 	if combat_manager == null:
@@ -344,26 +399,26 @@ func _spawn_overhead(entity_id: String, is_ally: bool) -> void:
 
 func _refresh_overhead_positions() -> void:
 	for entity_id in _ally_nodes.keys():
-		var doll: Node2D = _ally_nodes[entity_id]
+		var doll := _get_live_doll(_ally_nodes, entity_id)
 		if doll == null:
 			continue
-		var anchor: Vector2 = doll.global_position
-		if doll.has_method("get_anchor_position"):
-			anchor = doll.get_anchor_position()
+		var anchor: Vector2 = CombatCoords.doll_anchor_pos(doll)
 		_unit_positions[entity_id] = anchor
 		if _overhead_nodes.has(entity_id):
 			var hud: Control = _overhead_nodes[entity_id]
-			if hud and hud.has_method("set_anchor_global"):
+			if hud and hud.has_method("set_anchor_from_doll"):
+				hud.set_anchor_from_doll(doll, _camera)
+			elif hud and hud.has_method("set_anchor_global"):
 				hud.set_anchor_global(anchor)
 	for entity_id in _enemy_nodes.keys():
-		var enemy_doll: Node2D = _enemy_nodes[entity_id]
-		if enemy_doll == null or not is_instance_valid(enemy_doll):
+		var enemy_doll := _get_live_doll(_enemy_nodes, entity_id)
+		if enemy_doll == null:
 			continue
-		var enemy_anchor: Vector2 = enemy_doll.global_position
-		if enemy_doll.has_method("get_anchor_position"):
-			enemy_anchor = enemy_doll.get_anchor_position()
+		var enemy_anchor: Vector2 = CombatCoords.doll_anchor_pos(enemy_doll)
 		_unit_positions[entity_id] = enemy_anchor
 		if _overhead_nodes.has(entity_id):
 			var ehud: Control = _overhead_nodes[entity_id]
-			if ehud and ehud.has_method("set_anchor_global"):
+			if ehud and ehud.has_method("set_anchor_from_doll"):
+				ehud.set_anchor_from_doll(enemy_doll, _camera)
+			elif ehud and ehud.has_method("set_anchor_global"):
 				ehud.set_anchor_global(enemy_anchor)

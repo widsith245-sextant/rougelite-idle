@@ -55,7 +55,11 @@ func _process(_delta: float) -> void:
 
 
 func set_anchor_global(world_pos: Vector2) -> void:
-	global_position = world_pos + Vector2(-14, -30)
+	global_position = world_pos + CombatCoords.HUD_DAMAGE_OFFSET
+
+
+func set_anchor_from_doll(doll: Node2D, camera: Camera2D) -> void:
+	global_position = CombatCoords.hud_canvas_pos(doll, camera)
 
 
 func _refresh() -> void:

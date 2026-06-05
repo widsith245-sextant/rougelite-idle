@@ -14,6 +14,7 @@ namespace RougeliteIdle.Combat;
 public partial class CombatManager : Node
 {
 	public const bool TrainingMode = true;
+	public const float GlobalNormalAttackSpeedMultiplier = 0.5f;
 
 	/// <summary>When true, stage clear / party wipe are handled by RunSessionManager.</summary>
 	public bool RunRogueliteActive { get; set; }
@@ -144,8 +145,8 @@ public partial class CombatManager : Node
 			}
 
 			ally.NormalAttackTimer += dt;
-			var atkSpeed = ally.Stats.GetFinal(StatId.AtkSpeed);
-			var interval = atkSpeed > 0.01f ? 1f / atkSpeed : 1.2f;
+			var atkSpeed = ally.Stats.GetFinal(StatId.AtkSpeed) * GlobalNormalAttackSpeedMultiplier;
+			var interval = atkSpeed > 0.01f ? 1f / atkSpeed : 1.2f / GlobalNormalAttackSpeedMultiplier;
 			if (ally.NormalAttackTimer < interval)
 			{
 				continue;
@@ -179,16 +180,18 @@ public partial class CombatManager : Node
 
 		foreach (var ally in _allies)
 		{
-			if (!saved.TryGetValue(ally.Id, out var snap))
-			{
-				continue;
-			}
-
 			ally.Stats = _statsService.GetOrCreate(ally);
 			ally.MaxHp = ally.Stats.GetFinal(StatId.MaxHp);
-			ally.CurrentHp = Mathf.Clamp(snap.Hp, 0f, ally.MaxHp);
-			ally.PositionX = snap.X;
-			ally.ActionGauge = snap.Gauge;
+			if (saved.TryGetValue(ally.Id, out var snap))
+			{
+				ally.CurrentHp = Mathf.Clamp(snap.Hp, 0f, ally.MaxHp);
+				ally.PositionX = snap.X;
+				ally.ActionGauge = snap.Gauge;
+			}
+			else
+			{
+				ally.CurrentHp = ally.MaxHp;
+			}
 		}
 
 		_allUnits.RemoveAll(u => u.IsAlly);
@@ -535,6 +538,9 @@ public partial class CombatManager : Node
 				{ "position_x", enemy.PositionX },
 				{ "current_hp", enemy.CurrentHp },
 				{ "max_hp", enemy.MaxHp },
+				{ "atk_range", enemy.Stats.GetFinal(StatId.AtkRange) },
+				{ "hit_box_radius", enemy.HitBoxRadius },
+				{ "is_ally", false },
 			});
 		}
 
@@ -922,6 +928,9 @@ public partial class CombatManager : Node
 				{ "formation_index", ally.FormationIndex },
 				{ "position_x", ally.PositionX },
 				{ "class_id", ally.ClassId },
+				{ "atk_range", ally.Stats.GetFinal(StatId.AtkRange) },
+				{ "hit_box_radius", ally.HitBoxRadius },
+				{ "is_ally", true },
 			});
 		}
 
