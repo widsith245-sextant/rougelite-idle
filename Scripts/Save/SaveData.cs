@@ -21,6 +21,7 @@ public sealed class SaveData
 	public List<string> ActiveRosterIds { get; set; } = new();
 
 	public List<ItemSaveDto> IdentifiedItems { get; set; } = new();
+	public List<ItemSaveDto> WarehouseItems { get; set; } = new();
 	public List<ChestSaveDto> UnidentifiedChests { get; set; } = new();
 	public Dictionary<string, int> PendingChestsByQuality { get; set; } = new();
 	public string ActivePendingQuality { get; set; } = "common";

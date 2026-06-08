@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "godot-cli": {
+      "command": "npx",
+      "args": ["-y", "@coding-solo/godot-mcp"],
+      "env": {
+        "GODOT_PATH": "E:/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64/Godot_v4.6.3-stable_mono_win64.exe",
+        "DEBUG": "true"
+      }
+    },
+    "godot-editor": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "godot-mcp-server"]
+    }
+  }
+}

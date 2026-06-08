@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text.Json;
 using Godot;
 using RougeliteIdle.Core;
-using RougeliteIdle.Core.Enums;
+using RougeliteIdle.Loot;
 
 namespace RougeliteIdle.Meta;
 
 public partial class DbManager : Node
 {
-	private const string DbTreePath = "res://data/tables/meta/db_tree.json";
+	private const string MetaTreePath = "res://data/tables/meta/meta_growth_tree.json";
 
 	private readonly HashSet<string> _purchasedNodes = new();
 	private readonly Dictionary<string, DbNodeEntry> _nodes = new();
+	private readonly Dictionary<string, float> _globalStatPercents = new(StringComparer.OrdinalIgnoreCase);
 
 	private ProgressionManager _progression = null!;
 	private PartyManager _party = null!;
@@ -28,6 +29,29 @@ public partial class DbManager : Node
 	public bool PassiveSlotsUnlocked { get; private set; }
 	public float GlobalMaxHpPercent { get; private set; }
 	public float GlobalDamagePercent { get; private set; }
+
+	public float KillExpPercent { get; private set; }
+	public float OfflineExpPercent { get; private set; }
+	public float SalvagePercent { get; private set; }
+	public int KillGoldFlat { get; private set; }
+	public float KillGoldPercent { get; private set; }
+	public float StageGoldPercent { get; private set; }
+	public int BagSlotBonus { get; private set; }
+	public bool WarehouseUnlocked { get; private set; }
+	public int WarehouseCapacity { get; private set; }
+	public float ChestDropPercent { get; private set; }
+	public int ChestMaxAccumulateBonus { get; private set; }
+	public bool AutoOpenChest { get; private set; }
+	public float AutoOpenIntervalReductionPercent { get; private set; }
+
+	public int BagCapacity
+	{
+		get
+		{
+			var caps = EarlyGameCapsLoader.Get();
+			return caps.BagSlotsVisible + BagSlotBonus;
+		}
+	}
 
 	public override void _Ready()
 	{
@@ -48,7 +72,7 @@ public partial class DbManager : Node
 			return false;
 		}
 
-		if (_progression.Gold < node.CostGold)
+		if (node.CostGold > 0 && _progression.Gold < node.CostGold)
 		{
 			return false;
 		}
@@ -72,7 +96,7 @@ public partial class DbManager : Node
 		}
 
 		var node = _nodes[nodeId];
-		if (!_progression.TrySpendGold(node.CostGold))
+		if (node.CostGold > 0 && !_progression.TrySpendGold(node.CostGold))
 		{
 			return false;
 		}
@@ -85,15 +109,26 @@ public partial class DbManager : Node
 		return true;
 	}
 
-	public Godot.Collections.Array GetNodeSnapshot()
+	public Godot.Collections.Array GetNodeSnapshot(string? branchFilter = null)
 	{
 		var result = new Godot.Collections.Array();
-		foreach (var pair in _nodes)
+		var ordered = _nodes.Values
+			.OrderBy(n => BranchOrder(n.Branch))
+			.ThenBy(n => n.Tier)
+			.ThenBy(n => n.Id, StringComparer.Ordinal);
+
+		foreach (var node in ordered)
 		{
-			var node = pair.Value;
+			if (branchFilter != null && !string.Equals(node.Branch, branchFilter, StringComparison.OrdinalIgnoreCase))
+			{
+				continue;
+			}
+
 			result.Add(new Godot.Collections.Dictionary
 			{
 				{ "id", node.Id },
+				{ "branch", node.Branch },
+				{ "tier", node.Tier },
 				{ "display_name", node.DisplayName },
 				{ "cost_gold", node.CostGold },
 				{ "purchased", _purchasedNodes.Contains(node.Id) },
@@ -103,6 +138,17 @@ public partial class DbManager : Node
 		}
 
 		return result;
+	}
+
+	public float GetGlobalStatPercent(string stat) =>
+		_globalStatPercents.GetValueOrDefault(stat, 0f);
+
+	public int GetChestMaxAccumulate(string qualityId)
+	{
+		var baseMax = ChestQualityLoader.GetMaxAccumulate(qualityId);
+		var caps = EarlyGameCapsLoader.Get();
+		var initial = caps.DefaultChestMaxAccumulate > 0 ? caps.DefaultChestMaxAccumulate : 6;
+		return Math.Max(baseMax, initial) + ChestMaxAccumulateBonus;
 	}
 
 	public void RestorePurchasedNodes(IEnumerable<string> nodeIds)
@@ -121,6 +167,32 @@ public partial class DbManager : Node
 	}
 
 	public IReadOnlyCollection<string> GetPurchasedNodeIds() => _purchasedNodes;
+
+	public void GrantStarterNodes()
+	{
+		foreach (var pair in _nodes)
+		{
+			if (pair.Value.CostGold <= 0)
+			{
+				_purchasedNodes.Add(pair.Key);
+			}
+		}
+
+		RecalculateEffects();
+		_party.RefreshMaxActiveSlots();
+	}
+
+	private static int BranchOrder(string branch) => branch switch
+	{
+		"root" => 0,
+		"squad" => 1,
+		"exp" => 2,
+		"gold" => 3,
+		"bag" => 4,
+		"chest" => 5,
+		"stats" => 6,
+		_ => 99,
+	};
 
 	private void ApplyDefaultsFromCaps()
 	{
@@ -147,6 +219,20 @@ public partial class DbManager : Node
 		ApplyDefaultsFromCaps();
 		GlobalMaxHpPercent = 0f;
 		GlobalDamagePercent = 0f;
+		_globalStatPercents.Clear();
+		KillExpPercent = 0f;
+		OfflineExpPercent = 0f;
+		SalvagePercent = 0f;
+		KillGoldFlat = 0;
+		KillGoldPercent = 0f;
+		StageGoldPercent = 0f;
+		BagSlotBonus = 0;
+		WarehouseUnlocked = false;
+		WarehouseCapacity = 0;
+		ChestDropPercent = 0f;
+		ChestMaxAccumulateBonus = 0;
+		AutoOpenChest = false;
+		AutoOpenIntervalReductionPercent = 0f;
 
 		foreach (var nodeId in _purchasedNodes)
 		{
@@ -160,6 +246,9 @@ public partial class DbManager : Node
 				ApplyEffect(effect);
 			}
 		}
+
+		GlobalMaxHpPercent = GetGlobalStatPercent("MaxHp");
+		GlobalDamagePercent = GetGlobalStatPercent("Damage") + GetGlobalStatPercent("BaseAttack");
 	}
 
 	private void ApplyEffect(DbEffectEntry effect)
@@ -176,24 +265,80 @@ public partial class DbManager : Node
 				if (effect.Value > 0)
 				{
 					PassiveSlotsUnlocked = true;
+					MaxPassiveSkillSlots = Math.Max(MaxPassiveSkillSlots, effect.Value);
 				}
 
 				break;
 			case "GlobalStat":
-				if (string.Equals(effect.Stat, "MaxHp", StringComparison.OrdinalIgnoreCase))
+				AddGlobalStat(effect.Stat, effect.Percent);
+				break;
+			case "GlobalStatAll":
+				foreach (var stat in new[] { "MaxHp", "Damage", "Defense", "AtkSpeed", "CritRate", "Dodge" })
 				{
-					GlobalMaxHpPercent += effect.Percent;
-				}
-				else if (string.Equals(effect.Stat, "Damage", StringComparison.OrdinalIgnoreCase)
-				         || string.Equals(effect.Stat, "BaseAttack", StringComparison.OrdinalIgnoreCase))
-				{
-					GlobalDamagePercent += effect.Percent;
+					AddGlobalStat(stat, effect.Percent);
 				}
 
+				break;
+			case "KillExpPercent":
+				KillExpPercent += effect.Percent;
+				break;
+			case "OfflineExpPercent":
+				OfflineExpPercent += effect.Percent;
+				break;
+			case "SalvagePercent":
+				SalvagePercent += effect.Percent;
+				break;
+			case "KillGoldFlat":
+				KillGoldFlat += effect.Value;
+				break;
+			case "KillGoldPercent":
+				KillGoldPercent += effect.Percent;
+				break;
+			case "StageGoldPercent":
+				StageGoldPercent += effect.Percent;
+				break;
+			case "BagSlot":
+				BagSlotBonus += effect.Value;
+				break;
+			case "WarehouseUnlock":
+				if (effect.Value > 0)
+				{
+					WarehouseUnlocked = true;
+				}
+
+				break;
+			case "WarehouseCapacity":
+				WarehouseCapacity = Math.Max(WarehouseCapacity, effect.Value);
+				break;
+			case "ChestDropPercent":
+				ChestDropPercent += effect.Percent;
+				break;
+			case "ChestMaxAccumulate":
+				ChestMaxAccumulateBonus += effect.Value;
+				break;
+			case "AutoOpenChest":
+				if (effect.Value > 0)
+				{
+					AutoOpenChest = true;
+				}
+
+				break;
+			case "AutoOpenInterval":
+				AutoOpenIntervalReductionPercent += effect.Percent;
 				break;
 			case "RosterUnlock":
 				break;
 		}
+	}
+
+	private void AddGlobalStat(string stat, float percent)
+	{
+		if (string.IsNullOrEmpty(stat) || percent == 0f)
+		{
+			return;
+		}
+
+		_globalStatPercents[stat] = _globalStatPercents.GetValueOrDefault(stat) + percent;
 	}
 
 	private static Godot.Collections.Array ToVariantArray(IEnumerable<string> items)
@@ -210,12 +355,12 @@ public partial class DbManager : Node
 	private void LoadTree()
 	{
 		_nodes.Clear();
-		if (!FileAccess.FileExists(DbTreePath))
+		if (!FileAccess.FileExists(MetaTreePath))
 		{
 			return;
 		}
 
-		using var file = FileAccess.Open(DbTreePath, FileAccess.ModeFlags.Read);
+		using var file = FileAccess.Open(MetaTreePath, FileAccess.ModeFlags.Read);
 		if (file == null)
 		{
 			return;
@@ -242,6 +387,8 @@ public partial class DbManager : Node
 	private sealed class DbNodeEntry
 	{
 		public string Id { get; set; } = string.Empty;
+		public string Branch { get; set; } = string.Empty;
+		public int Tier { get; set; }
 		public string DisplayName { get; set; } = string.Empty;
 		public int CostGold { get; set; }
 		public List<string> Prerequisites { get; set; } = new();

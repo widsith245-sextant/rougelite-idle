@@ -19,16 +19,22 @@ public partial class LootManager : Node
 
 	private readonly List<ItemData> _unidentifiedChests = new();
 	private readonly List<ItemData> _identifiedItems = new();
+	private readonly List<ItemData> _warehouseItems = new();
 	private readonly List<ItemData> _equipmentTemplates = new();
 	private readonly Dictionary<string, Dictionary<SlotType, ItemData>> _equippedByUnit = new();
 	private readonly Dictionary<string, int> _pendingChestsByQuality = new();
 	private readonly RandomNumberGenerator _rng = new();
 
 	private EventBus _eventBus = null!;
+	private DbManager? _db;
 	private string _activePendingQuality = "common";
 	private string _lastEquipError = string.Empty;
+	private float _autoOpenTimer;
 
-	public int BagCapacity => EarlyGameCapsLoader.Get().BagSlotsVisible;
+	public int BagCapacity => _db?.BagCapacity ?? EarlyGameCapsLoader.Get().BagSlotsVisible;
+	public IReadOnlyList<ItemData> WarehouseItems => _warehouseItems;
+	public bool WarehouseUnlocked => _db?.WarehouseUnlocked ?? false;
+	public int WarehouseCapacity => _db?.WarehouseCapacity ?? 0;
 	public IReadOnlyList<ItemData> UnidentifiedChests => _unidentifiedChests;
 	public IReadOnlyList<ItemData> IdentifiedItems => _identifiedItems;
 	public string ActivePendingQuality => _activePendingQuality;
@@ -37,8 +43,39 @@ public partial class LootManager : Node
 	{
 		_rng.Randomize();
 		_eventBus = GetNode<EventBus>("/root/EventBus");
+		_db = GetNodeOrNull<DbManager>("/root/DbManager");
 		_equipmentTemplates.AddRange(ItemGenerator.LoadEquipmentTemplates());
 		EnsureDefaultUnits();
+	}
+
+	public override void _Process(double delta)
+	{
+		if (_db == null || !_db.AutoOpenChest)
+		{
+			return;
+		}
+
+		var interval = Mathf.Max(0.5f, 3f * (1f - _db.AutoOpenIntervalReductionPercent / 100f));
+		_autoOpenTimer += (float)delta;
+		if (_autoOpenTimer < interval)
+		{
+			return;
+		}
+
+		_autoOpenTimer = 0f;
+		foreach (var pair in _pendingChestsByQuality)
+		{
+			if (pair.Value > 0)
+			{
+				OpenOnePendingChest(pair.Key);
+				return;
+			}
+		}
+	}
+
+	private int GetEffectiveMaxAccumulate(string quality)
+	{
+		return _db?.GetChestMaxAccumulate(quality) ?? ChestQualityLoader.GetMaxAccumulate(quality);
 	}
 
 	private void EnsureDefaultUnits()
@@ -102,7 +139,7 @@ public partial class LootManager : Node
 		}
 
 		_activePendingQuality = quality;
-		var max = ChestQualityLoader.GetMaxAccumulate(quality);
+		var max = GetEffectiveMaxAccumulate(quality);
 		var count = _pendingChestsByQuality.GetValueOrDefault(quality) + 1;
 		_pendingChestsByQuality[quality] = count;
 		_eventBus.EmitPendingChestChanged(quality, count);
@@ -563,6 +600,75 @@ public partial class LootManager : Node
 		EmitLootChanged();
 	}
 
+	public bool MoveBagItemToWarehouse(int bagIndex)
+	{
+		if (!WarehouseUnlocked || WarehouseCapacity <= 0 || _warehouseItems.Count >= WarehouseCapacity)
+		{
+			return false;
+		}
+
+		if (bagIndex < 0 || bagIndex >= _identifiedItems.Count)
+		{
+			return false;
+		}
+
+		var item = _identifiedItems[bagIndex];
+		_identifiedItems.RemoveAt(bagIndex);
+		_warehouseItems.Add(item);
+		EmitLootChanged();
+		return true;
+	}
+
+	public bool MoveWarehouseItemToBag(int warehouseIndex)
+	{
+		if (!HasBagSpace() || warehouseIndex < 0 || warehouseIndex >= _warehouseItems.Count)
+		{
+			return false;
+		}
+
+		var item = _warehouseItems[warehouseIndex];
+		_warehouseItems.RemoveAt(warehouseIndex);
+		_identifiedItems.Add(item);
+		EmitLootChanged();
+		return true;
+	}
+
+	public Godot.Collections.Array GetBagSnapshot()
+	{
+		var arr = new Godot.Collections.Array();
+		for (var i = 0; i < _identifiedItems.Count; i++)
+		{
+			var item = _identifiedItems[i];
+			arr.Add(new Godot.Collections.Dictionary
+			{
+				{ "index", i },
+				{ "display_name", item.DisplayName },
+				{ "quality", item.Quality },
+				{ "item_level", item.ItemLevel },
+			});
+		}
+
+		return arr;
+	}
+
+	public Godot.Collections.Array GetWarehouseSnapshot()
+	{
+		var arr = new Godot.Collections.Array();
+		for (var i = 0; i < _warehouseItems.Count; i++)
+		{
+			var item = _warehouseItems[i];
+			arr.Add(new Godot.Collections.Dictionary
+			{
+				{ "index", i },
+				{ "display_name", item.DisplayName },
+				{ "quality", item.Quality },
+				{ "item_level", item.ItemLevel },
+			});
+		}
+
+		return arr;
+	}
+
 	private void EmitLootChanged()
 	{
 		_eventBus.EmitLootInventoryChanged();
@@ -574,6 +680,17 @@ public partial class LootManager : Node
 		{
 			_equippedByUnit[unitId] = new Dictionary<SlotType, ItemData>();
 		}
+	}
+
+	public List<ItemSaveDto> ExportWarehouseItems()
+	{
+		var result = new List<ItemSaveDto>();
+		foreach (var item in _warehouseItems)
+		{
+			result.Add(ToSaveDto(item));
+		}
+
+		return result;
 	}
 
 	public List<ItemSaveDto> ExportIdentifiedItems()
@@ -627,9 +744,11 @@ public partial class LootManager : Node
 		List<ChestSaveDto> chests,
 		Dictionary<string, int> pending,
 		string activeQuality,
-		Dictionary<string, Dictionary<string, ItemSaveDto>> equipped)
+		Dictionary<string, Dictionary<string, ItemSaveDto>> equipped,
+		List<ItemSaveDto>? warehouse = null)
 	{
 		_identifiedItems.Clear();
+		_warehouseItems.Clear();
 		_unidentifiedChests.Clear();
 		_pendingChestsByQuality.Clear();
 		EnsureDefaultUnits();
@@ -641,6 +760,14 @@ public partial class LootManager : Node
 		foreach (var dto in identified)
 		{
 			_identifiedItems.Add(FromSaveDto(dto));
+		}
+
+		if (warehouse != null)
+		{
+			foreach (var dto in warehouse)
+			{
+				_warehouseItems.Add(FromSaveDto(dto));
+			}
 		}
 
 		foreach (var dto in chests)

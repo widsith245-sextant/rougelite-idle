@@ -57,7 +57,7 @@ stop_x    = enemy_x - (atk_range + ally_r + enemy_r)   // 友军在左
 | 日志 | 400×160 | 主窗下方 |
 | 立绘 | 220×280 | 居中 |
 
-绑定：`SatelliteWindow.ensure_transient_parent()` + `DisplayServer.window_set_transient`。
+绑定：`SatelliteWindow.ensure_transient_parent()` + `DisplayServer.window_set_transient`。弹窗禁止 `always_on_top` 与 transient 并存；置顶用 `DisplayServer.window_move_to_foreground`。
 
 ## 编排（无 Director）
 

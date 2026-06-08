@@ -1,0 +1,26 @@
+---
+description: Godot 4.6 项目开发与改后必验规则
+alwaysApply: true
+---
+
+# Rougelite_Idle 开发规则
+
+## 架构边界
+
+- C# Autoload（`Scripts/`）负责核心逻辑；GDScript（`gdscript/`）负责 UI/表现；`data/tables/` 为唯一数值源
+- 详见 `docs/ARCHITECTURE.md`
+
+## 改后必验
+
+完成涉及 `Scripts/`、`gdscript/`、`scenes/`、`data/tables/` 的修改后，**必须**执行验收（参见 `.cursor/skills/godot-verify/SKILL.md`）：
+
+1. C# 有改动 → `scripts/verify.ps1`
+2. `godot-cli` → `run_project` 主场景 `res://scenes/main/game_root.tscn`
+3. `godot-cli` → `get_debug_output`，检查 ERROR / SCRIPT ERROR / 异常
+4. 编辑器在线时可用 `godot-editor` 读取 console 错误
+5. 失败则继续修复，直至编译通过且运行时无 ERROR
+
+## MCP 分工
+
+- **godot-cli**：打开编辑器、CLI 运行项目、抓取 stdout/stderr
+- **godot-editor**：场景/脚本实时读写（需 Godot 编辑器已开且右上角 **MCP Connected**）

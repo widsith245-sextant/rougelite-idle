@@ -23,7 +23,7 @@ func _ready() -> void:
 	# 弹窗挂到 get_tree().root（见 popup_manager.gd），勿用已移除的 embedded 属性。
 	exclusive = false
 	unresizable = false
-	SatelliteWindow.configure(self, false, true)
+	SatelliteWindow.configure(self, false, false)
 	borderless = false
 
 	size = POPUP_SIZE

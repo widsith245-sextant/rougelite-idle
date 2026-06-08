@@ -232,8 +232,7 @@ public partial class StatsService : Node
 		stats.AddIncreased(StatId.Damage, _meta.GlobalStatBonusPercent);
 		if (_db != null)
 		{
-			stats.AddIncreased(StatId.MaxHp, _db.GlobalMaxHpPercent / 100f);
-			stats.AddIncreased(StatId.Damage, _db.GlobalDamagePercent / 100f);
+			ApplyDbGlobalStats(stats, _db);
 		}
 
 		stats.RecalculateDerived();
@@ -253,6 +252,32 @@ public partial class StatsService : Node
 		if (stats.GetBase(StatId.Defense) > 0f)
 		{
 			stats.SetBase(StatId.Defense, stats.GetBase(StatId.Defense) * caps.GetMultiplier("Defense"));
+		}
+	}
+
+	private static void ApplyDbGlobalStats(UnitStats stats, DbManager db)
+	{
+		ApplyMetaStatIncreased(stats, StatId.MaxHp, db.GetGlobalStatPercent("MaxHp"));
+		ApplyMetaStatIncreased(stats, StatId.Damage, db.GetGlobalStatPercent("Damage") + db.GetGlobalStatPercent("BaseAttack"));
+		ApplyMetaStatIncreased(stats, StatId.Defense, db.GetGlobalStatPercent("Defense"));
+		ApplyMetaStatIncreased(stats, StatId.AtkSpeed, db.GetGlobalStatPercent("AtkSpeed"));
+		ApplyMetaStatFlatRate(stats, StatId.CritRate, db.GetGlobalStatPercent("CritRate"));
+		ApplyMetaStatFlatRate(stats, StatId.Dodge, db.GetGlobalStatPercent("Dodge"));
+	}
+
+	private static void ApplyMetaStatIncreased(UnitStats stats, StatId id, float percent)
+	{
+		if (percent > 0f)
+		{
+			stats.AddIncreased(id, percent / 100f);
+		}
+	}
+
+	private static void ApplyMetaStatFlatRate(UnitStats stats, StatId id, float percentPoints)
+	{
+		if (percentPoints > 0f)
+		{
+			stats.AddFlat(id, percentPoints / 100f);
 		}
 	}
 

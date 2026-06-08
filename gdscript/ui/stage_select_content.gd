@@ -19,9 +19,9 @@ func _ready() -> void:
 	var bus := get_node_or_null("/root/EventBus")
 	if bus:
 		if bus.has_signal("StageUnlocked"):
-			bus.stage_unlocked.connect(_on_progression_changed)
+			bus.connect("StageUnlocked", _on_progression_changed)
 		if bus.has_signal("StageCleared"):
-			bus.stage_cleared.connect(_on_progression_changed)
+			bus.connect("StageCleared", _on_progression_changed)
 
 
 func refresh() -> void:

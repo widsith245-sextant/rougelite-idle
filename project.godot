@@ -59,6 +59,10 @@ window/dpi/window_scale_override=0
 
 project/assembly_name="Rougelite_Idle"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
 [input]
 
 toggle_gm={

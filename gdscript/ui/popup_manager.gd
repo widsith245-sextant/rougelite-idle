@@ -12,6 +12,7 @@ enum PopupId {
 	RUN_CARD_PICK = 7,
 	SETTINGS = 8,
 	RUN_RELIC_PICK = 9,
+	WAREHOUSE = 10,
 }
 
 const RUN_CARD_PICK_SIZE := Vector2i(640, 320)
@@ -28,6 +29,7 @@ const POPUP_TITLES := {
 	PopupId.RUN_CARD_PICK: "选择增益卡牌",
 	PopupId.SETTINGS: "设置",
 	PopupId.RUN_RELIC_PICK: "选择遗物",
+	PopupId.WAREHOUSE: "仓库",
 }
 
 const CONTENT_SCENES := {
@@ -41,6 +43,7 @@ const CONTENT_SCENES := {
 	PopupId.RUN_CARD_PICK: preload("res://scenes/ui/popup/content/run_card_pick_content.tscn"),
 	PopupId.SETTINGS: preload("res://scenes/ui/popup/content/settings_content.tscn"),
 	PopupId.RUN_RELIC_PICK: preload("res://scenes/ui/popup/content/run_relic_pick_content.tscn"),
+	PopupId.WAREHOUSE: preload("res://scenes/ui/popup/content/warehouse_content.tscn"),
 }
 
 const WindowBaseScene := preload("res://scenes/ui/popup/popup_window_base.tscn")

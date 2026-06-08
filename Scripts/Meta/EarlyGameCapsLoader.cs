@@ -46,7 +46,8 @@ public static class EarlyGameCapsLoader
 		public bool PassiveSlotsUnlocked { get; set; }
 		public Dictionary<string, float> PlayerStatMultipliers { get; set; } = new();
 		public int PlayerInitialLevelCap { get; set; } = 10;
-		public int BagSlotsVisible { get; set; } = 48;
+		public int BagSlotsVisible { get; set; } = 18;
+		public int DefaultChestMaxAccumulate { get; set; } = 6;
 		public string StageUnlockMode { get; set; } = "sequential_clear";
 		public List<string> InitialUnlockedStages { get; set; } = new();
 		public EarlyStageBand? EarlyStageBand { get; set; }

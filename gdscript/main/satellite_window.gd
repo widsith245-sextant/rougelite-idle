@@ -42,6 +42,9 @@ static func ensure_transient_parent(win: Window, attempt: int = 0) -> void:
 		return
 	if int(_transient_links.get(win_id, -1)) == main_id:
 		return
+	# always_on_top 与 transient 双向互斥；绑定后勿恢复 on_top，置顶用 move_to_foreground。
+	if win.always_on_top:
+		win.always_on_top = false
 	DisplayServer.window_set_transient(win_id, main_id)
 	_transient_links[win_id] = main_id
 

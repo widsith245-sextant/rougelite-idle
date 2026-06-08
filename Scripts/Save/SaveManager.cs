@@ -42,6 +42,7 @@ public partial class SaveManager : Node
 			DbUnlockedNodes = db?.GetPurchasedNodeIds().ToList() ?? new List<string>(),
 			ActiveRosterIds = party.ExportActiveRosterIds(),
 			IdentifiedItems = loot.ExportIdentifiedItems(),
+			WarehouseItems = loot.ExportWarehouseItems(),
 			UnidentifiedChests = loot.ExportUnidentifiedChests(),
 			PendingChestsByQuality = loot.ExportPendingChests(),
 			ActivePendingQuality = loot.ActivePendingQuality,
@@ -107,7 +108,8 @@ public partial class SaveManager : Node
 			data.UnidentifiedChests ?? new List<ChestSaveDto>(),
 			data.PendingChestsByQuality ?? new Dictionary<string, int>(),
 			data.ActivePendingQuality ?? "common",
-			data.EquippedByUnit ?? new Dictionary<string, Dictionary<string, ItemSaveDto>>());
+			data.EquippedByUnit ?? new Dictionary<string, Dictionary<string, ItemSaveDto>>(),
+			data.WarehouseItems ?? new List<ItemSaveDto>());
 
 		var skills = GetNode<CharacterSkillManager>("/root/CharacterSkillManager");
 		skills.RestoreState(

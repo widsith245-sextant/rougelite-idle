@@ -1,8 +1,9 @@
 {
   "defaultMaxActiveSlots": 1,
-  "defaultMaxActiveSkillSlots": 2,
+  "defaultMaxActiveSkillSlots": 1,
   "defaultMaxPassiveSkillSlots": 1,
-  "passiveSlotsUnlocked": true,
+  "passiveSlotsUnlocked": false,
+  "defaultChestMaxAccumulate": 6,
   "playerStatMultipliers": {
     "MaxHp": 0.72,
     "BaseAttack": 0.68,
@@ -10,7 +11,7 @@
     "Speed": 0.9
   },
   "playerInitialLevelCap": 10,
-  "bagSlotsVisible": 48,
+  "bagSlotsVisible": 18,
   "stageUnlockMode": "sequential_clear",
   "initialUnlockedStages": ["chapter_01_level_01"],
   "earlyStageBand": {

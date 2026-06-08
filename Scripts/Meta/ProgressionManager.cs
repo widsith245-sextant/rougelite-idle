@@ -105,7 +105,10 @@ public partial class ProgressionManager : Node
 		var perLevel = _currencies.SalvageGoldPerItemLevel > 0
 			? _currencies.SalvageGoldPerItemLevel
 			: 5;
-		AddGold(itemLevel * perLevel);
+		var db = GetNodeOrNull<DbManager>("/root/DbManager");
+		var salvagePct = db?.SalvagePercent ?? 0f;
+		var amount = Mathf.RoundToInt(itemLevel * perLevel * (1f + salvagePct / 100f));
+		AddGold(amount);
 	}
 
 	public bool TryRollTrainingBonusChest()
@@ -165,8 +168,12 @@ public partial class ProgressionManager : Node
 		var rosterProg = GetNodeOrNull<RosterProgressionManager>("/root/RosterProgressionManager");
 		var avgLevel = rosterProg?.GetAverageActiveRosterLevel(party) ?? 1;
 		var mul = ComputeRewardMultiplier(avgLevel, enemyLevel);
-		var expGrant = reward.Exp * mul;
-		var goldGrant = Mathf.RoundToInt(reward.Gold * mul);
+		var db = GetNodeOrNull<DbManager>("/root/DbManager");
+		var metaExpPct = db?.KillExpPercent ?? 0f;
+		var metaGoldPct = db?.KillGoldPercent ?? 0f;
+		var metaGoldFlat = db?.KillGoldFlat ?? 0;
+		var expGrant = reward.Exp * mul * (1f + metaExpPct / 100f);
+		var goldGrant = Mathf.RoundToInt((reward.Gold + metaGoldFlat) * mul * (1f + metaGoldPct / 100f));
 		var combat = GetNodeOrNull<CombatManager>("/root/CombatManager");
 		if (combat != null && combat.RunRogueliteActive)
 		{
@@ -193,7 +200,8 @@ public partial class ProgressionManager : Node
 		}
 
 		_rng.Randomize();
-		if (_rng.Randf() <= reward.Chest.Chance)
+		var chestChance = reward.Chest.Chance + (db?.ChestDropPercent ?? 0f) / 100f;
+		if (_rng.Randf() <= chestChance)
 		{
 			var rewardTier = EnemyTemplateLoader.GetRewardTier(enemyId);
 			var chestQuality = ResolveChestQualityWithRewardTier(reward.Chest.Quality, rewardTier);
@@ -246,8 +254,10 @@ public partial class ProgressionManager : Node
 			mul *= band.RewardMultiplier;
 		}
 
+		var db = GetNodeOrNull<DbManager>("/root/DbManager");
+		var stageGoldPct = db?.StageGoldPercent ?? 0f;
 		rosterProg?.GrantExpToActiveSquad(reward.Exp * mul);
-		AddGold(Mathf.RoundToInt(reward.Gold * mul));
+		AddGold(Mathf.RoundToInt(reward.Gold * mul * (1f + stageGoldPct / 100f)));
 	}
 
 	private readonly RandomNumberGenerator _rng = new();

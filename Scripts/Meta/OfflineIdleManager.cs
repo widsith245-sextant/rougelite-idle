@@ -45,7 +45,9 @@ public partial class OfflineIdleManager : Node
 
 		if (result.Experience > 0.01f)
 		{
-			rosterProgression.GrantExpToActiveSquad(result.Experience);
+			var db = GetNodeOrNull<DbManager>("/root/DbManager");
+			var offlinePct = db?.OfflineExpPercent ?? 0f;
+			rosterProgression.GrantExpToActiveSquad(result.Experience * (1f + offlinePct / 100f));
 		}
 	}
 

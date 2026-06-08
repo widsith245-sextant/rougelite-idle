@@ -1,0 +1,78 @@
+[gd_scene load_steps=2 format=3 uid="uid://warehouse_content_scene"]
+
+[ext_resource type="Script" path="res://gdscript/ui/warehouse_content.gd" id="1_script"]
+
+[node name="WarehouseContent" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 6
+
+[node name="InfoLabel" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "仓库"
+
+[node name="HBox" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="WarehouseVBox" type="VBoxContainer" parent="VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="WhLabel" type="Label" parent="VBox/HBox/WarehouseVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "仓库"
+
+[node name="WarehouseList" type="ItemList" parent="VBox/HBox/WarehouseVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(280, 260)
+
+[node name="ToBagButton" type="Button" parent="VBox/HBox/WarehouseVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "移回背包"
+
+[node name="BagVBox" type="VBoxContainer" parent="VBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="BagLabel" type="Label" parent="VBox/HBox/BagVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "背包物品"
+
+[node name="BagList" type="ItemList" parent="VBox/HBox/BagVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(280, 260)
+
+[node name="ToWarehouseButton" type="Button" parent="VBox/HBox/BagVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "存入仓库"

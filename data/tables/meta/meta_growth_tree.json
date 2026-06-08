@@ -1,0 +1,1805 @@
+{
+  "nodes": [
+    {
+      "id": "meta_root",
+      "branch": "root",
+      "tier": 0,
+      "displayName": "元质枢纽",
+      "costGold": 0,
+      "prerequisites": [],
+      "effects": []
+    },
+    {
+      "id": "br1_root",
+      "branch": "squad",
+      "tier": 0,
+      "displayName": "编队之路",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br1_squad_02",
+      "branch": "squad",
+      "tier": 1,
+      "displayName": "第二出战位",
+      "costGold": 280,
+      "prerequisites": [
+        "br1_root"
+      ],
+      "effects": [
+        {
+          "type": "SquadSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br1_active_02",
+      "branch": "squad",
+      "tier": 2,
+      "displayName": "第二主动槽",
+      "costGold": 400,
+      "prerequisites": [
+        "br1_squad_02"
+      ],
+      "effects": [
+        {
+          "type": "ActiveSkillSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br1_squad_03",
+      "branch": "squad",
+      "tier": 3,
+      "displayName": "第三出战位",
+      "costGold": 800,
+      "prerequisites": [
+        "br1_active_02"
+      ],
+      "effects": [
+        {
+          "type": "SquadSlot",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "id": "br1_passive_unlock",
+      "branch": "squad",
+      "tier": 4,
+      "displayName": "被动槽解锁",
+      "costGold": 1200,
+      "prerequisites": [
+        "br1_squad_03"
+      ],
+      "effects": [
+        {
+          "type": "PassiveSlot",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_passive_02",
+      "branch": "squad",
+      "tier": 5,
+      "displayName": "被动槽强化",
+      "costGold": 600,
+      "prerequisites": [
+        "br1_passive_unlock"
+      ],
+      "effects": [
+        {
+          "type": "PassiveSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br1_roster_sniper",
+      "branch": "squad",
+      "tier": 6,
+      "displayName": "解锁狙击手",
+      "costGold": 500,
+      "prerequisites": [
+        "br1_squad_02"
+      ],
+      "effects": [
+        {
+          "type": "RosterUnlock",
+          "rosterId": "sniper_b"
+        }
+      ]
+    },
+    {
+      "id": "br1_roster_mage",
+      "branch": "squad",
+      "tier": 6,
+      "displayName": "解锁大法师",
+      "costGold": 500,
+      "prerequisites": [
+        "br1_squad_02"
+      ],
+      "effects": [
+        {
+          "type": "RosterUnlock",
+          "rosterId": "mage_c"
+        }
+      ]
+    },
+    {
+      "id": "br1_roster_support",
+      "branch": "squad",
+      "tier": 6,
+      "displayName": "解锁支援医师",
+      "costGold": 600,
+      "prerequisites": [
+        "br1_squad_03"
+      ],
+      "effects": [
+        {
+          "type": "RosterUnlock",
+          "rosterId": "support_d"
+        }
+      ]
+    },
+    {
+      "id": "br1_roster_berserker",
+      "branch": "squad",
+      "tier": 6,
+      "displayName": "解锁狂战士",
+      "costGold": 600,
+      "prerequisites": [
+        "br1_squad_03"
+      ],
+      "effects": [
+        {
+          "type": "RosterUnlock",
+          "rosterId": "berserker_e"
+        }
+      ]
+    },
+    {
+      "id": "br1_form_01",
+      "branch": "squad",
+      "tier": 7,
+      "displayName": "阵线协调1",
+      "costGold": 390,
+      "prerequisites": [
+        "br1_passive_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_02",
+      "branch": "squad",
+      "tier": 8,
+      "displayName": "阵线协调2",
+      "costGold": 430,
+      "prerequisites": [
+        "br1_form_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_03",
+      "branch": "squad",
+      "tier": 9,
+      "displayName": "阵线协调3",
+      "costGold": 470,
+      "prerequisites": [
+        "br1_form_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_04",
+      "branch": "squad",
+      "tier": 10,
+      "displayName": "阵线协调4",
+      "costGold": 510,
+      "prerequisites": [
+        "br1_form_03"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_05",
+      "branch": "squad",
+      "tier": 11,
+      "displayName": "阵线协调5",
+      "costGold": 550,
+      "prerequisites": [
+        "br1_form_04"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_06",
+      "branch": "squad",
+      "tier": 12,
+      "displayName": "阵线协调6",
+      "costGold": 590,
+      "prerequisites": [
+        "br1_form_05"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_07",
+      "branch": "squad",
+      "tier": 13,
+      "displayName": "阵线协调7",
+      "costGold": 630,
+      "prerequisites": [
+        "br1_form_06"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_08",
+      "branch": "squad",
+      "tier": 14,
+      "displayName": "阵线协调8",
+      "costGold": 670,
+      "prerequisites": [
+        "br1_form_07"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br1_form_09",
+      "branch": "squad",
+      "tier": 15,
+      "displayName": "阵线协调9",
+      "costGold": 710,
+      "prerequisites": [
+        "br1_form_08"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br2_root",
+      "branch": "exp",
+      "tier": 0,
+      "displayName": "经验之道",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br2_kill_exp_01",
+      "branch": "exp",
+      "tier": 1,
+      "displayName": "击杀经验+3% 1",
+      "costGold": 145,
+      "prerequisites": [
+        "br2_root"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_02",
+      "branch": "exp",
+      "tier": 2,
+      "displayName": "击杀经验+3% 2",
+      "costGold": 170,
+      "prerequisites": [
+        "br2_kill_exp_01"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_03",
+      "branch": "exp",
+      "tier": 3,
+      "displayName": "击杀经验+3% 3",
+      "costGold": 195,
+      "prerequisites": [
+        "br2_kill_exp_02"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_04",
+      "branch": "exp",
+      "tier": 4,
+      "displayName": "击杀经验+3% 4",
+      "costGold": 220,
+      "prerequisites": [
+        "br2_kill_exp_03"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_05",
+      "branch": "exp",
+      "tier": 5,
+      "displayName": "击杀经验+3% 5",
+      "costGold": 245,
+      "prerequisites": [
+        "br2_kill_exp_04"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_06",
+      "branch": "exp",
+      "tier": 6,
+      "displayName": "击杀经验+3% 6",
+      "costGold": 270,
+      "prerequisites": [
+        "br2_kill_exp_05"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_07",
+      "branch": "exp",
+      "tier": 7,
+      "displayName": "击杀经验+3% 7",
+      "costGold": 295,
+      "prerequisites": [
+        "br2_kill_exp_06"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_08",
+      "branch": "exp",
+      "tier": 8,
+      "displayName": "击杀经验+3% 8",
+      "costGold": 320,
+      "prerequisites": [
+        "br2_kill_exp_07"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_09",
+      "branch": "exp",
+      "tier": 9,
+      "displayName": "击杀经验+3% 9",
+      "costGold": 345,
+      "prerequisites": [
+        "br2_kill_exp_08"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_10",
+      "branch": "exp",
+      "tier": 10,
+      "displayName": "击杀经验+3% 10",
+      "costGold": 370,
+      "prerequisites": [
+        "br2_kill_exp_09"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_11",
+      "branch": "exp",
+      "tier": 11,
+      "displayName": "击杀经验+3% 11",
+      "costGold": 395,
+      "prerequisites": [
+        "br2_kill_exp_10"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_kill_exp_12",
+      "branch": "exp",
+      "tier": 12,
+      "displayName": "击杀经验+3% 12",
+      "costGold": 420,
+      "prerequisites": [
+        "br2_kill_exp_11"
+      ],
+      "effects": [
+        {
+          "type": "KillExpPercent",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br2_salvage_01",
+      "branch": "exp",
+      "tier": 13,
+      "displayName": "分解收益+10% 1",
+      "costGold": 250,
+      "prerequisites": [
+        "br2_kill_exp_12"
+      ],
+      "effects": [
+        {
+          "type": "SalvagePercent",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br2_salvage_02",
+      "branch": "exp",
+      "tier": 14,
+      "displayName": "分解收益+10% 2",
+      "costGold": 300,
+      "prerequisites": [
+        "br2_salvage_01"
+      ],
+      "effects": [
+        {
+          "type": "SalvagePercent",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br2_salvage_03",
+      "branch": "exp",
+      "tier": 15,
+      "displayName": "分解收益+10% 3",
+      "costGold": 350,
+      "prerequisites": [
+        "br2_salvage_02"
+      ],
+      "effects": [
+        {
+          "type": "SalvagePercent",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br2_salvage_04",
+      "branch": "exp",
+      "tier": 16,
+      "displayName": "分解收益+10% 4",
+      "costGold": 400,
+      "prerequisites": [
+        "br2_salvage_03"
+      ],
+      "effects": [
+        {
+          "type": "SalvagePercent",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br2_salvage_05",
+      "branch": "exp",
+      "tier": 17,
+      "displayName": "分解收益+10% 5",
+      "costGold": 450,
+      "prerequisites": [
+        "br2_salvage_04"
+      ],
+      "effects": [
+        {
+          "type": "SalvagePercent",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br3_root",
+      "branch": "gold",
+      "tier": 0,
+      "displayName": "财富之道",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br3_flat_01",
+      "branch": "gold",
+      "tier": 1,
+      "displayName": "击杀平金+1 1",
+      "costGold": 130,
+      "prerequisites": [
+        "br3_root"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_02",
+      "branch": "gold",
+      "tier": 2,
+      "displayName": "击杀平金+1 2",
+      "costGold": 160,
+      "prerequisites": [
+        "br3_flat_01"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_03",
+      "branch": "gold",
+      "tier": 3,
+      "displayName": "击杀平金+1 3",
+      "costGold": 190,
+      "prerequisites": [
+        "br3_flat_02"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_04",
+      "branch": "gold",
+      "tier": 4,
+      "displayName": "击杀平金+1 4",
+      "costGold": 220,
+      "prerequisites": [
+        "br3_flat_03"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_05",
+      "branch": "gold",
+      "tier": 5,
+      "displayName": "击杀平金+1 5",
+      "costGold": 250,
+      "prerequisites": [
+        "br3_flat_04"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_06",
+      "branch": "gold",
+      "tier": 6,
+      "displayName": "击杀平金+1 6",
+      "costGold": 280,
+      "prerequisites": [
+        "br3_flat_05"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_07",
+      "branch": "gold",
+      "tier": 7,
+      "displayName": "击杀平金+1 7",
+      "costGold": 310,
+      "prerequisites": [
+        "br3_flat_06"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_flat_08",
+      "branch": "gold",
+      "tier": 8,
+      "displayName": "击杀平金+1 8",
+      "costGold": 340,
+      "prerequisites": [
+        "br3_flat_07"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldFlat",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_01",
+      "branch": "gold",
+      "tier": 9,
+      "displayName": "金币+2% 1",
+      "costGold": 185,
+      "prerequisites": [
+        "br3_flat_08"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_02",
+      "branch": "gold",
+      "tier": 10,
+      "displayName": "金币+2% 2",
+      "costGold": 220,
+      "prerequisites": [
+        "br3_pct_01"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_03",
+      "branch": "gold",
+      "tier": 11,
+      "displayName": "金币+2% 3",
+      "costGold": 255,
+      "prerequisites": [
+        "br3_pct_02"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_04",
+      "branch": "gold",
+      "tier": 12,
+      "displayName": "金币+2% 4",
+      "costGold": 290,
+      "prerequisites": [
+        "br3_pct_03"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_05",
+      "branch": "gold",
+      "tier": 13,
+      "displayName": "金币+2% 5",
+      "costGold": 325,
+      "prerequisites": [
+        "br3_pct_04"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_06",
+      "branch": "gold",
+      "tier": 14,
+      "displayName": "金币+2% 6",
+      "costGold": 360,
+      "prerequisites": [
+        "br3_pct_05"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_07",
+      "branch": "gold",
+      "tier": 15,
+      "displayName": "金币+2% 7",
+      "costGold": 395,
+      "prerequisites": [
+        "br3_pct_06"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br3_pct_08",
+      "branch": "gold",
+      "tier": 16,
+      "displayName": "金币+2% 8",
+      "costGold": 430,
+      "prerequisites": [
+        "br3_pct_07"
+      ],
+      "effects": [
+        {
+          "type": "KillGoldPercent",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_root",
+      "branch": "bag",
+      "tier": 0,
+      "displayName": "仓储之道",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br4_warehouse",
+      "branch": "bag",
+      "tier": 1,
+      "displayName": "仓库解锁",
+      "costGold": 400,
+      "prerequisites": [
+        "br4_root"
+      ],
+      "effects": [
+        {
+          "type": "WarehouseUnlock",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br4_wh_cap_01",
+      "branch": "bag",
+      "tier": 2,
+      "displayName": "仓库扩容I",
+      "costGold": 300,
+      "prerequisites": [
+        "br4_warehouse"
+      ],
+      "effects": [
+        {
+          "type": "WarehouseCapacity",
+          "value": 12
+        }
+      ]
+    },
+    {
+      "id": "br4_wh_cap_02",
+      "branch": "bag",
+      "tier": 3,
+      "displayName": "仓库扩容II",
+      "costGold": 500,
+      "prerequisites": [
+        "br4_wh_cap_01"
+      ],
+      "effects": [
+        {
+          "type": "WarehouseCapacity",
+          "value": 24
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_01",
+      "branch": "bag",
+      "tier": 4,
+      "displayName": "背包+2格 1",
+      "costGold": 210,
+      "prerequisites": [
+        "br4_root"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_02",
+      "branch": "bag",
+      "tier": 5,
+      "displayName": "背包+2格 2",
+      "costGold": 240,
+      "prerequisites": [
+        "br4_bag_01"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_03",
+      "branch": "bag",
+      "tier": 6,
+      "displayName": "背包+2格 3",
+      "costGold": 270,
+      "prerequisites": [
+        "br4_bag_02"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_04",
+      "branch": "bag",
+      "tier": 7,
+      "displayName": "背包+2格 4",
+      "costGold": 300,
+      "prerequisites": [
+        "br4_bag_03"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_05",
+      "branch": "bag",
+      "tier": 8,
+      "displayName": "背包+2格 5",
+      "costGold": 330,
+      "prerequisites": [
+        "br4_bag_04"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_06",
+      "branch": "bag",
+      "tier": 9,
+      "displayName": "背包+2格 6",
+      "costGold": 360,
+      "prerequisites": [
+        "br4_bag_05"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_07",
+      "branch": "bag",
+      "tier": 10,
+      "displayName": "背包+2格 7",
+      "costGold": 390,
+      "prerequisites": [
+        "br4_bag_06"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_08",
+      "branch": "bag",
+      "tier": 11,
+      "displayName": "背包+2格 8",
+      "costGold": 420,
+      "prerequisites": [
+        "br4_bag_07"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_09",
+      "branch": "bag",
+      "tier": 12,
+      "displayName": "背包+2格 9",
+      "costGold": 450,
+      "prerequisites": [
+        "br4_bag_08"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_10",
+      "branch": "bag",
+      "tier": 13,
+      "displayName": "背包+2格 10",
+      "costGold": 480,
+      "prerequisites": [
+        "br4_bag_09"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_11",
+      "branch": "bag",
+      "tier": 14,
+      "displayName": "背包+2格 11",
+      "costGold": 510,
+      "prerequisites": [
+        "br4_bag_10"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_bag_12",
+      "branch": "bag",
+      "tier": 15,
+      "displayName": "背包+2格 12",
+      "costGold": 540,
+      "prerequisites": [
+        "br3_pct_06"
+      ],
+      "effects": [
+        {
+          "type": "BagSlot",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "id": "br4_auto_open",
+      "branch": "bag",
+      "tier": 16,
+      "displayName": "自动开宝箱",
+      "costGold": 800,
+      "prerequisites": [
+        "br4_bag_06"
+      ],
+      "effects": [
+        {
+          "type": "AutoOpenChest",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br4_auto_interval_01",
+      "branch": "bag",
+      "tier": 17,
+      "displayName": "自动间隔-10% 1",
+      "costGold": 500,
+      "prerequisites": [
+        "br4_auto_open"
+      ],
+      "effects": [
+        {
+          "type": "AutoOpenInterval",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br4_auto_interval_02",
+      "branch": "bag",
+      "tier": 18,
+      "displayName": "自动间隔-10% 2",
+      "costGold": 600,
+      "prerequisites": [
+        "br4_auto_interval_01"
+      ],
+      "effects": [
+        {
+          "type": "AutoOpenInterval",
+          "percent": 10
+        }
+      ]
+    },
+    {
+      "id": "br5_root",
+      "branch": "chest",
+      "tier": 0,
+      "displayName": "宝箱之道",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br5_drop_01",
+      "branch": "chest",
+      "tier": 1,
+      "displayName": "掉落率+1% 1",
+      "costGold": 188,
+      "prerequisites": [
+        "br5_root"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_02",
+      "branch": "chest",
+      "tier": 2,
+      "displayName": "掉落率+1% 2",
+      "costGold": 216,
+      "prerequisites": [
+        "br5_drop_01"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_03",
+      "branch": "chest",
+      "tier": 3,
+      "displayName": "掉落率+1% 3",
+      "costGold": 244,
+      "prerequisites": [
+        "br5_drop_02"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_04",
+      "branch": "chest",
+      "tier": 4,
+      "displayName": "掉落率+1% 4",
+      "costGold": 272,
+      "prerequisites": [
+        "br5_drop_03"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_05",
+      "branch": "chest",
+      "tier": 5,
+      "displayName": "掉落率+1% 5",
+      "costGold": 300,
+      "prerequisites": [
+        "br5_drop_04"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_06",
+      "branch": "chest",
+      "tier": 6,
+      "displayName": "掉落率+1% 6",
+      "costGold": 328,
+      "prerequisites": [
+        "br5_drop_05"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_07",
+      "branch": "chest",
+      "tier": 7,
+      "displayName": "掉落率+1% 7",
+      "costGold": 356,
+      "prerequisites": [
+        "br5_drop_06"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_08",
+      "branch": "chest",
+      "tier": 8,
+      "displayName": "掉落率+1% 8",
+      "costGold": 384,
+      "prerequisites": [
+        "br4_bag_06"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_09",
+      "branch": "chest",
+      "tier": 9,
+      "displayName": "掉落率+1% 9",
+      "costGold": 412,
+      "prerequisites": [
+        "br5_drop_08"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_drop_10",
+      "branch": "chest",
+      "tier": 10,
+      "displayName": "掉落率+1% 10",
+      "costGold": 440,
+      "prerequisites": [
+        "br5_drop_09"
+      ],
+      "effects": [
+        {
+          "type": "ChestDropPercent",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_01",
+      "branch": "chest",
+      "tier": 11,
+      "displayName": "待领上限+1 1",
+      "costGold": 265,
+      "prerequisites": [
+        "br5_drop_10"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_02",
+      "branch": "chest",
+      "tier": 12,
+      "displayName": "待领上限+1 2",
+      "costGold": 310,
+      "prerequisites": [
+        "br5_cap_01"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_03",
+      "branch": "chest",
+      "tier": 13,
+      "displayName": "待领上限+1 3",
+      "costGold": 355,
+      "prerequisites": [
+        "br5_cap_02"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_04",
+      "branch": "chest",
+      "tier": 14,
+      "displayName": "待领上限+1 4",
+      "costGold": 400,
+      "prerequisites": [
+        "br5_cap_03"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_05",
+      "branch": "chest",
+      "tier": 15,
+      "displayName": "待领上限+1 5",
+      "costGold": 445,
+      "prerequisites": [
+        "br5_cap_04"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br5_cap_06",
+      "branch": "chest",
+      "tier": 16,
+      "displayName": "待领上限+1 6",
+      "costGold": 490,
+      "prerequisites": [
+        "br5_cap_05"
+      ],
+      "effects": [
+        {
+          "type": "ChestMaxAccumulate",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "br6_root",
+      "branch": "stats",
+      "tier": 0,
+      "displayName": "体魄之道",
+      "costGold": 0,
+      "prerequisites": [
+        "meta_root"
+      ],
+      "effects": []
+    },
+    {
+      "id": "br6_hp_01",
+      "branch": "stats",
+      "tier": 1,
+      "displayName": "生命培育1",
+      "costGold": 90,
+      "prerequisites": [
+        "br6_root"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_hp_02",
+      "branch": "stats",
+      "tier": 2,
+      "displayName": "生命培育2",
+      "costGold": 120,
+      "prerequisites": [
+        "br6_hp_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_hp_03",
+      "branch": "stats",
+      "tier": 3,
+      "displayName": "生命培育3",
+      "costGold": 150,
+      "prerequisites": [
+        "br6_hp_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_hp_04",
+      "branch": "stats",
+      "tier": 4,
+      "displayName": "生命培育4",
+      "costGold": 180,
+      "prerequisites": [
+        "br6_hp_03"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_hp_05",
+      "branch": "stats",
+      "tier": 5,
+      "displayName": "生命培育5",
+      "costGold": 210,
+      "prerequisites": [
+        "br6_hp_04"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "MaxHp",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_atk_01",
+      "branch": "stats",
+      "tier": 6,
+      "displayName": "攻击锻造1",
+      "costGold": 110,
+      "prerequisites": [
+        "br6_hp_05"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Damage",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_atk_02",
+      "branch": "stats",
+      "tier": 7,
+      "displayName": "攻击锻造2",
+      "costGold": 140,
+      "prerequisites": [
+        "br6_atk_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Damage",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_atk_03",
+      "branch": "stats",
+      "tier": 8,
+      "displayName": "攻击锻造3",
+      "costGold": 170,
+      "prerequisites": [
+        "br6_atk_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Damage",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_atk_04",
+      "branch": "stats",
+      "tier": 9,
+      "displayName": "攻击锻造4",
+      "costGold": 200,
+      "prerequisites": [
+        "br6_atk_03"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Damage",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_atk_05",
+      "branch": "stats",
+      "tier": 10,
+      "displayName": "攻击锻造5",
+      "costGold": 230,
+      "prerequisites": [
+        "br6_atk_04"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Damage",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_def_01",
+      "branch": "stats",
+      "tier": 11,
+      "displayName": "铁壁1",
+      "costGold": 110,
+      "prerequisites": [
+        "br6_atk_05"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Defense",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br6_def_02",
+      "branch": "stats",
+      "tier": 12,
+      "displayName": "铁壁2",
+      "costGold": 150,
+      "prerequisites": [
+        "br6_def_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Defense",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br6_def_03",
+      "branch": "stats",
+      "tier": 13,
+      "displayName": "铁壁3",
+      "costGold": 190,
+      "prerequisites": [
+        "br6_def_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Defense",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br6_def_04",
+      "branch": "stats",
+      "tier": 14,
+      "displayName": "铁壁4",
+      "costGold": 230,
+      "prerequisites": [
+        "br6_def_03"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Defense",
+          "percent": 3
+        }
+      ]
+    },
+    {
+      "id": "br6_spd_01",
+      "branch": "stats",
+      "tier": 15,
+      "displayName": "迅捷1",
+      "costGold": 150,
+      "prerequisites": [
+        "br6_def_04"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "AtkSpeed",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_spd_02",
+      "branch": "stats",
+      "tier": 16,
+      "displayName": "迅捷2",
+      "costGold": 210,
+      "prerequisites": [
+        "br6_spd_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "AtkSpeed",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_spd_03",
+      "branch": "stats",
+      "tier": 17,
+      "displayName": "迅捷3",
+      "costGold": 270,
+      "prerequisites": [
+        "br6_spd_02"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "AtkSpeed",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_crit_01",
+      "branch": "stats",
+      "tier": 18,
+      "displayName": "致命I",
+      "costGold": 120,
+      "prerequisites": [
+        "br6_spd_03"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "CritRate",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br6_crit_02",
+      "branch": "stats",
+      "tier": 19,
+      "displayName": "致命II",
+      "costGold": 250,
+      "prerequisites": [
+        "br6_crit_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "CritRate",
+          "percent": 1
+        }
+      ]
+    },
+    {
+      "id": "br6_dodge_01",
+      "branch": "stats",
+      "tier": 19,
+      "displayName": "闪避入门",
+      "costGold": 150,
+      "prerequisites": [
+        "br6_crit_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStat",
+          "stat": "Dodge",
+          "percent": 2
+        }
+      ]
+    },
+    {
+      "id": "br6_capstone",
+      "branch": "stats",
+      "tier": 20,
+      "displayName": "全能巅峰",
+      "costGold": 800,
+      "prerequisites": [
+        "br6_crit_02",
+        "br6_dodge_01"
+      ],
+      "effects": [
+        {
+          "type": "GlobalStatAll",
+          "percent": 3
+        }
+      ]
+    }
+  ]
+}

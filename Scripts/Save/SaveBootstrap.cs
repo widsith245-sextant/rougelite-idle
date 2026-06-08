@@ -50,6 +50,7 @@ public partial class SaveBootstrap : Node
 		{
 			stageProg?.InitializeNewGame();
 			loot.InitializeNewGame();
+			GetNodeOrNull<DbManager>("/root/DbManager")?.GrantStarterNodes();
 			combat.StartEncounter();
 		}
 
